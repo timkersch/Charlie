@@ -7,30 +7,79 @@ import javax.json.JsonObject;
 import javax.json.spi.JsonProvider;
 import javax.websocket.Session;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
 public class SessionHandler {
     private int deviceId = 0;
-    private final Set<Session> sessions = new HashSet<>();
-    private final Set<Device> devices = new HashSet<>();
-    private final Set<UserSession> userSessions = new HashSet<>();
+    private final Set<UserSession> sessions = new HashSet<>();
 
-    public void addSession(Session session) {
+    public void addSession(UserSession session) {
         sessions.add(session);
-        for (Device device : devices) {
+        /*for (Device device : devices) {
             JsonObject addMessage = createAddMessage(device);
             sendToSession(session, addMessage);
+        }*/
+    }
+
+    public void removeSession(UserSession session) {
+        sessions.remove(session);
+    }
+
+    public UserSession getUserSession(String sessionId) {
+        for (UserSession session : sessions) {
+            if (Objects.equals(session.getSession().getId(), sessionId)) {
+                return session;
+            }
+        }
+        return null;
+    }
+
+    public UserSession getUserSession(long userId){
+        for (UserSession session : sessions) {
+            if (session.getUser().getId() == userId) {
+                return session;
+            }
+        }
+        return null;
+    }
+
+    private void sendToAllConnectedSessions(JsonObject message) {
+        for (UserSession session : sessions) {
+            sendToSession(session, message);
         }
     }
 
-    public void removeSession(Session session) {
-        sessions.remove(session);
+    private void sendToSessions(Quiz quiz, JsonObject message){
+        for (User user: quiz.getUsers()){
+            this.sendToSession(this.getUserSession(user.getId()), message);
+        }
+    }
+
+    private void sendToSession(UserSession session, JsonObject message) {
+        try {
+            session.getSession().getBasicRemote().sendText(message.toString());
+        } catch (IOException ex) {
+            sessions.remove(session);
+            Logger.getLogger(SessionHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /*
+
+    private JsonObject createAddMessage(Device device) {
+        JsonProvider provider = JsonProvider.provider();
+        JsonObject addMessage = provider.createObjectBuilder()
+                .add("action", "add")
+                .add("id", device.getId())
+                .add("name", device.getName())
+                .add("type", device.getType())
+                .add("status", device.getStatus())
+                .add("description", device.getDescription())
+                .build();
+        return addMessage;
     }
 
     public List getDevices() {
@@ -83,33 +132,6 @@ public class SessionHandler {
             }
         }
         return null;
-    }
+    }*/
 
-    private JsonObject createAddMessage(Device device) {
-        JsonProvider provider = JsonProvider.provider();
-        JsonObject addMessage = provider.createObjectBuilder()
-                .add("action", "add")
-                .add("id", device.getId())
-                .add("name", device.getName())
-                .add("type", device.getType())
-                .add("status", device.getStatus())
-                .add("description", device.getDescription())
-                .build();
-        return addMessage;
-    }
-
-    private void sendToAllConnectedSessions(JsonObject message) {
-        for (Session session : sessions) {
-            sendToSession(session, message);
-        }
-    }
-
-    private void sendToSession(Session session, JsonObject message) {
-        try {
-            session.getBasicRemote().sendText(message.toString());
-        } catch (IOException ex) {
-            sessions.remove(session);
-            Logger.getLogger(SessionHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 }

@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class User {
     private String name;
+    private long id;
 
     public User(String name) {
         this.name = name;
@@ -23,6 +24,14 @@ public class User {
 
     public String getName(){
         return this.name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public static User createDummyUser(){

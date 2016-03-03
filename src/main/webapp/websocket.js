@@ -87,11 +87,11 @@ function printDeviceElement(device) {
 }
 
 function showForm() {
-    //document.getElementById("addDeviceForm").style.display = '';
+    document.getElementById("addDeviceForm").style.display = '';
 }
 
 function hideForm() {
-    //document.getElementById("addDeviceForm").style.display = "none";
+    document.getElementById("addDeviceForm").style.display = "none";
 }
 
 function formSubmit() {

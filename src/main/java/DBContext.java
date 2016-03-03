@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,20 +21,24 @@ public class DBContext {
         }
     }
 
-    public static List<User> findUser(long id){
+    public static User findUser(long id){
         // TODO
-        return null;
+        return User.createDummyUser();
     }
 
     public static List<User> findGroup(long id) {
         // TODO
-        return null;
+        List<User> list = new ArrayList<>();
+        for (int i = 0; i < 5; i++)
+            list.add(User.createDummyUser());
+        return list;
     }
 
     public static DBContext getInstance(){
-        if (instance == null)
-            return (instance = new DBContext());
-        else
-            return instance;
+        if (instance == null) {
+            instance = new DBContext();
+        }
+
+        return instance;
     }
 }
