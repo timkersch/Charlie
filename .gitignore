@@ -20,4 +20,6 @@ npm-debug.log
 # Intellij
 /.idea/
 *.iml
+/src/main/java/Main.java
+/src/main/java/SpotifyCredentials.java
 

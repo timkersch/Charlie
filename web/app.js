@@ -2,7 +2,8 @@
 
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
-		'ngMaterial'
+		'ngMaterial',
+		'ngMdIcons'
 		/*'signupService'*/
 	]);
 
