@@ -9,7 +9,7 @@
 	charlieApp.config(['$routeProvider',
 		function($routeProvider){
 			console.log("Helo");
-			$routeProvider.when('/test', {
+			$routeProvider.when('/', {
 				templateUrl: 'views/lobbyview.html',
 				controller: 'lobbyController' 	
 			}).
