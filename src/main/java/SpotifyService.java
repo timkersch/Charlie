@@ -31,15 +31,10 @@ public class SpotifyService {
 		/* Set a state. This is used to prevent cross site request forgeries. */
 		String state = "someExpectedStateString";
 
-		String authorizeURL = api.createAuthorizeURL(scopes, state);
-		System.out.println(authorizeURL);
-		return authorizeURL;
+		return api.createAuthorizeURL(scopes, state);
 	}
 
-	public void setAcessTolken() {
-		/* Application details necessary to get an access token */
-		final String code = "<insert code>";
-
+	public void setTokens(String code) {
 		/* Make a token request. Asynchronous requests are made with the .getAsync method and synchronous requests
         * are made with the .get method. This holds for all type of requests. */
 		final SettableFuture<AuthorizationCodeCredentials> authorizationCodeCredentialsFuture = api.authorizationCodeGrant(code).build().getAsync();
@@ -60,8 +55,9 @@ public class SpotifyService {
 
 			@Override
 			public void onFailure(Throwable throwable) {
-            /* Let's say that the client id is invalid, or the code has been used more than once,
-		     * the request will fail. Why it fails is written in the throwable's message. */
+				System.out.println("Fail");
+                /* Let's say that the client id is invalid, or the code has been used more than once,
+		        * the request will fail. Why it fails is written in the throwable's message. */
 			}
 		});
 	}
