@@ -1,12 +1,17 @@
+import com.google.appengine.repackaged.com.google.common.base.Flag;
+import com.google.common.primitives.Booleans;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
+import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -139,4 +144,31 @@ public class SpotifyService {
 			return null;
 		}
 	}
+
+	/**
+	 * Method that returns four artist options for a track.
+	 * @param t the Track
+	 * @return a hashtable with artists as keys and boolans as values
+	 */
+	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+		List<SimpleArtist> artists = t.getArtists();
+		RelatedArtistsRequest request = api.getArtistRelatedArtists(artists.get(0).getId()).build();
+		try {
+			Hashtable<String, Boolean> ht = new Hashtable<>();
+			ht.put(t.getArtists().get(0).getName(), true);
+			for (Artist a : request.get()) {
+				ht.put(a.getName(), false);
+			}
+			return ht;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
+		// TODO
+		return null;
+	}
+
 }
