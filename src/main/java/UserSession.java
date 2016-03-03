@@ -9,9 +9,18 @@ public class UserSession {
 
     public UserSession(Session session) {
         this.session = session;
+        this.user = User.createDummyUser();
+    }
+
+    public Session getSession(){
+        return session;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public User getUser(){
+        return user;
     }
 }
