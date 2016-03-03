@@ -20,7 +20,6 @@ public class SessionHandler {
     private final Set<Session> sessions = new HashSet<>();
     private final Set<Device> devices = new HashSet<>();
 
-
     public void addSession(Session session) {
         sessions.add(session);
         for (Device device : devices) {
