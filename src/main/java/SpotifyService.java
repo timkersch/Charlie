@@ -1,10 +1,17 @@
+import com.google.appengine.repackaged.com.google.common.base.Flag;
+import com.google.common.primitives.Booleans;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
-import com.wrapper.spotify.models.AuthorizationCodeCredentials;
+import com.wrapper.spotify.exceptions.WebApiException;
+import com.wrapper.spotify.methods.*;
+import com.wrapper.spotify.models.*;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -16,9 +23,9 @@ import java.util.List;
 
 public class SpotifyService {
 	private final Api api = Api.builder()
-			//.clientId(SpotifyCredentials.clientID)
-			//.clientSecret(SpotifyCredentials.clientSecret)
-			//.redirectURI(SpotifyCredentials.redirectURI)
+			.clientId(SpotifyCredentials.clientID)
+			.clientSecret(SpotifyCredentials.clientSecret)
+			.redirectURI(SpotifyCredentials.redirectURI)
 			.build();
 
 	/* Continue by sending the user to the authorizeURL, which will look something like
@@ -61,4 +68,107 @@ public class SpotifyService {
 			}
 		});
 	}
+
+	/**
+	 * Method that gathers and returns all playlists of the logged in user.
+	 * @return a list of SimplePlaylist
+	 */
+	public List<SimplePlaylist> getUsersPlaylists() {
+		try {
+			UserPlaylistsRequest request = api.getPlaylistsForUser(api.getMe().build().get().getId()).build();
+			Page<SimplePlaylist> playlistsPage = request.get();
+
+			return playlistsPage.getItems();
+
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns all songs in a playlist
+	 * @param simplePlaylist a SimplePlaylist
+	 * @return List of Track in the playlist
+	 */
+	public List<Track> getPlaylistSongs(SimplePlaylist simplePlaylist) {
+		try {
+			PlaylistTracksRequest request = api.getPlaylistTracks(api.getMe().build().get().getId(), simplePlaylist.getId()).build();
+
+			List<PlaylistTrack> playlistTracks = request.get().getItems();
+			List<Track> tracks = new ArrayList<>(playlistTracks.size());
+			for (PlaylistTrack pt : playlistTracks) {
+				tracks.add(pt.getTrack());
+			}
+
+			return tracks;
+
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Mathod that adds a list of tracks to a playlist
+	 * @param tracks a list of trackURIs
+	 * @param playlistId the id of the playlist
+	 */
+	public void addTracksToPlayList(List<String> tracks, String playlistId) {
+		try {
+			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, tracks).build();
+			request.get();
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+		}
+	}
+
+	/**
+	 * Method that creates a playlist and returns it
+	 * @return a new Playlist
+	 */
+	public Playlist createQuizPlaylist() {
+		try {
+			PlaylistCreationRequest request = api.createPlaylist(api.getMe().build().get().getId(), "quiz" + this.hashCode())
+					.publicAccess(false)
+					.build();
+
+			Playlist playlist = request.get();
+
+			System.out.println("You just created this playlist!");
+			System.out.println("Its title is " + playlist.getName());
+
+			return playlist;
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns four artist options for a track.
+	 * @param t the Track
+	 * @return a hashtable with artists as keys and boolans as values
+	 */
+	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+		List<SimpleArtist> artists = t.getArtists();
+		RelatedArtistsRequest request = api.getArtistRelatedArtists(artists.get(0).getId()).build();
+		try {
+			Hashtable<String, Boolean> ht = new Hashtable<>();
+			ht.put(t.getArtists().get(0).getName(), true);
+			for (Artist a : request.get()) {
+				ht.put(a.getName(), false);
+			}
+			return ht;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
+		// TODO
+		return null;
+	}
+
 }
