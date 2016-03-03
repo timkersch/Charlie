@@ -19,6 +19,7 @@ public class WebsocketServer {
 
     @OnOpen
     public void open(Session session) {
+        System.out.println("Opened Session: " + session.getId());
         sessionHandler.addSession(session);
     }
 

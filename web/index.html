@@ -1,43 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html >
 <head>
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="websocket.js"></script>
+    <!--<script src="websocket.js"></script> -->
     <link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.4/angular-material.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
+    <!-- Latest compiled and minified CSS -->
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+    
+    <!-- Angular.js-->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"> </script>
+  	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.min.js"></script>
+  	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-aria.min.js"></script>
+  	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-messages.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
+	<script src="./app.js"></script>
+	
+    <!-- Angular Material-->
+     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.4/angular-material.min.js"></script>
+
+	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
+
+
 </head>
-<body>
-
-<div id="wrapper">
-    <h1>Java Websocket Home</h1>
-    <p>Welcome to the Java WebSocket Home. Click the Add a device button to start adding devices.</p>
-    <br />
-    <div id="addDevice">
-        <div class="button"> <a href="#" OnClick="showForm()">Add a device</a> </div>
-        <form id="addDeviceForm">
-            <h3>Add a new device</h3>
-            <span>Name: <input type="text" name="device_name" id="device_name"></span>
-                    <span>Type:
-                        <select id="device_type">
-                            <option name="type" value="Appliance">Appliance</option>
-                            <option name="type" value="Electronics">Electronics</option>
-                            <option name="type" value="Lights">Lights</option>
-                            <option name="type" value="Other">Other</option>
-                        </select></span>
-
-                    <span>Description:<br />
-                        <textarea name="description" id="device_description" rows="2" cols="50"></textarea>
-                    </span>
-
-            <input type="button" class="button" value="Add" onclick=formSubmit()>
-            <input type="reset" class="button" value="Cancel" onclick=hideForm()>
-        </form>
-    </div>
-    <br />
-    <h3>Currently connected devices:</h3>
-    <div id="content">
-    </div>
-</div>
-
+<body ng-app="charlieApp">
+<<<<<<< HEAD
+<md-content>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<md-button class="md-icon-button" aria-label="Settings">
+			<md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+		</md-button>
+		<h2>
+			<span>Toolbar with Icon Buttons</span>
+		</h2>
+		<span flex></span>
+		<md-button class="md-icon-button" aria-label="Favorite">
+			<md-icon md-svg-icon="img/icons/favorite.svg" style="color: greenyellow;"></md-icon>
+		</md-button>
+		<md-button class="md-icon-button" aria-label="More">
+			<md-icon md-svg-icon="img/icons/more_vert.svg"></md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+	<div ng-include="'views/lobbyview.html'"></div>
+	</md-content>
+=======
+	
+	<h1>Hello World</h1>
+	<div ng-view> </div>
+>>>>>>> 40db75798c4fa56cae686c70c37f19b1939dd3c6
 </body>
 </html>
