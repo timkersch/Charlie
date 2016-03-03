@@ -134,3 +134,10 @@ p {
 .device a:hover {
     text-decoration: underline;
 }
+
+.toolbardemoBasicUsage md-toolbar md-icon.md-default-theme {
+    color: white; }
+
+h2 img {
+    height: 30px;
+}
