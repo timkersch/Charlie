@@ -19,6 +19,7 @@ public class SessionHandler {
     private int deviceId = 0;
     private final Set<Session> sessions = new HashSet<>();
     private final Set<Device> devices = new HashSet<>();
+    private final Set<UserSession> userSessions = new HashSet<>();
 
     public void addSession(Session session) {
         sessions.add(session);
