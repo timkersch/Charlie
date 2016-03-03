@@ -1,14 +1,19 @@
 'use strict';
 
-var charlieApp = angular.module('charlieApp', [
-    'ngMaterial',
-	'signupService'
-]);
+	var charlieApp = angular.module('charlieApp', [
+		'ngRoute',
+		'ngMaterial'
+		/*'signupService'*/
+	]);
 
-charlieApp.config(['$routeProvider',
-	function($routeProvider){
-		$routeProvider.when('/', {
-			templateUrl: '.html',
-			controller: 'exempelController' 	
-		});	
-	}]);
+	charlieApp.config(['$routeProvider',
+		function($routeProvider){
+			console.log("Helo");
+			$routeProvider.when('/test', {
+				templateUrl: 'views/lobbyview.html',
+				controller: 'lobbyController' 	
+			}).
+			otherwise({
+				redirectTo: 'views/lobbyview.html'
+			});	
+		}]);
