@@ -16,9 +16,9 @@ import java.util.List;
 
 public class SpotifyService {
 	private final Api api = Api.builder()
-			.clientId(SpotifyCredentials.clientID)
-			.clientSecret(SpotifyCredentials.clientSecret)
-			.redirectURI(SpotifyCredentials.redirectURI)
+			//.clientId(SpotifyCredentials.clientID)
+			//.clientSecret(SpotifyCredentials.clientSecret)
+			//.redirectURI(SpotifyCredentials.redirectURI)
 			.build();
 
 	/* Continue by sending the user to the authorizeURL, which will look something like
