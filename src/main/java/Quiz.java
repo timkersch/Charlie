@@ -1,3 +1,4 @@
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -6,17 +7,18 @@ import java.util.List;
 public class Quiz {
     private long id;
     private List<User> users;
+    private List<URL> songs;
+
+    public Quiz(long id, List<User> users){
+        this.id = id;
+        this.users = users;
+    }
 
     public void setId(long id) {
         this.id = id;
     }
 
     public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public Quiz(long id, List<User> users){
-        this.id = id;
         this.users = users;
     }
 

@@ -3,6 +3,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.spi.JsonProvider;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.StringReader;
@@ -69,6 +70,11 @@ public class WebsocketServer {
 
                     break;
                 default:
+                    JsonProvider provider = JsonProvider.provider();
+                    JsonObject addMessage = provider.createObjectBuilder()
+                            .add("message", "hello")
+                            .build();
+                    sessionHandler.sendToAllConnectedSessions(addMessage);
                     break;
             }
         }

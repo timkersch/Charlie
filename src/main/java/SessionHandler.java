@@ -46,19 +46,19 @@ public class SessionHandler {
         return null;
     }
 
-    private void sendToAllConnectedSessions(JsonObject message) {
+    public void sendToAllConnectedSessions(JsonObject message) {
         for (UserSession session : sessions) {
             sendToSession(session, message);
         }
     }
 
-    private void sendToSessions(Quiz quiz, JsonObject message){
+    public void sendToSessions(Quiz quiz, JsonObject message){
         for (User user: quiz.getUsers()){
             this.sendToSession(this.getUserSession(user.getId()), message);
         }
     }
 
-    private void sendToSession(UserSession session, JsonObject message) {
+    public void sendToSession(UserSession session, JsonObject message) {
         try {
             session.getSession().getBasicRemote().sendText(message.toString());
         } catch (IOException ex) {
