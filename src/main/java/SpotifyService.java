@@ -48,7 +48,7 @@ public class SpotifyService {
 				System.out.println("The access token expires in " + authorizationCodeCredentials.getExpiresIn() + " seconds");
 				System.out.println("Luckily, I can refresh it using this refresh token! " +     authorizationCodeCredentials.getRefreshToken());
 
-                 /* Set the access token and refresh token so that they are used whenever needed */
+				/* Set the access token and refresh token so that they are used whenever needed */
 				api.setAccessToken(authorizationCodeCredentials.getAccessToken());
 				api.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
 			}
