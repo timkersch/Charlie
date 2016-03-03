@@ -16,20 +16,22 @@ public class WebsocketServer {
     @Inject
     private SessionHandler sessionHandler;
 
-
     @OnOpen
     public void open(Session session) {
         System.out.println("Opened Session: " + session.getId());
-        sessionHandler.addSession(session);
+        UserSession userSession = new UserSession(session);
+        sessionHandler.addSession(userSession);
     }
 
     @OnClose
     public void close(Session session) {
-        sessionHandler.removeSession(session);
+        System.out.println("Closed Session: " + session.getId());
+        sessionHandler.removeSession(sessionHandler.getUserSession(session.getId()));
     }
 
     @OnError
     public void onError(Throwable error) {
+        System.out.println("Error: " + error.toString());
         Logger.getLogger(WebsocketServer.class.getName()).log(Level.SEVERE, null, error);
     }
 
@@ -37,24 +39,37 @@ public class WebsocketServer {
     public void handleMessage(String message, Session session) {
         try (JsonReader reader = Json.createReader(new StringReader(message))) {
             JsonObject jsonMessage = reader.readObject();
+            String action = jsonMessage.getString("action");
 
-            if ("add".equals(jsonMessage.getString("action"))) {
-                Device device = new Device();
-                device.setName(jsonMessage.getString("name"));
-                device.setDescription(jsonMessage.getString("description"));
-                device.setType(jsonMessage.getString("type"));
-                device.setStatus("Off");
-                sessionHandler.addDevice(device);
-            }
+            long userId;
+            User user;
+            switch(action) {
+                case "register":
+                    userId = jsonMessage.getJsonNumber("id").longValue();
+                    String username = jsonMessage.getString("username");
+                    user = new User(username);
+                    sessionHandler.getUserSession(session.getId()).setUser(user);
+                    break;
+                case "login":
+                    userId = jsonMessage.getJsonNumber("id").longValue();
+                    user = DBContext.findUser(userId);
+                    sessionHandler.getUserSession(session.getId()).setUser(user);
+                    break;
+                case "logout":
+                    sessionHandler.getUserSession(session.getId()).setUser(User.createDummyUser());
+                    break;
+                case "vote":
 
-            if ("remove".equals(jsonMessage.getString("action"))) {
-                int id = (int) jsonMessage.getInt("id");
-                sessionHandler.removeDevice(id);
-            }
+                    break;
+                case "create":
+                    Long[] users = (Long[]) jsonMessage.getJsonArray("users").toArray();
+                    String playlist = jsonMessage.getString("playlist");
+                    int nbrOfSongs = jsonMessage.getInt("nbrOfSongs");
+                    int difficulty = jsonMessage.getInt("difficulty");
 
-            if ("toggle".equals(jsonMessage.getString("action"))) {
-                int id = (int) jsonMessage.getInt("id");
-                sessionHandler.toggleDevice(id);
+                    break;
+                default:
+                    break;
             }
         }
     }
