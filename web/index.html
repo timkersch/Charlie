@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="charlieApp">
 <head>
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="websocket.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <!--<link rel="stylesheet" type="text/css" href="style.css">-->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <!-- jQuery library -->
@@ -12,12 +12,40 @@
     <!-- Latest compiled JavaScript -->
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!-- Angular.js-->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
-    <!-- Angular Material-->
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+
+    <!-- Angular Material Library -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
 
 </head>
-<body ng-app="charlieApp">
+<body ng-controller="charlieControllers" ng-cloak>
+<h4>TEST</h4>
+<div layout="row" layout-padding class="bg-dark-blue nav-dark" layout-align="space-between center">
+    <div>
+        <md-button>Home</md-button>
+        <md-button>Item 1</md-button>
+        <md-button>Item 2</md-button>
+        <md-menu>
+            <md-button md-menu-origin ng-click="$mdOpenMenu()">Help</md-button>
+            <md-menu-content width="2">
+                <md-menu-item>
+                    <md-button>Help</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button>About</md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+    <div class="nav-buttons">
+        <md-button class="md-raised md-accent">My profile</md-button>
+        <md-button class="md-raised md-warn">Log Out</md-button>
+    </div>
 
 </body>
 </html>
