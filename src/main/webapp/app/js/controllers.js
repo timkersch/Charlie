@@ -13,8 +13,43 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
 
+        $scope.url = "hej";
+
         $scope.publish = function () {
-            charlieProxy.postAnswer("Hej");
+            console.log("Publish");
+            charlieProxy.postAnswer();
+        };
+
+        $scope.login = function (){
+            console.log("login");
+            charlieProxy.login();
+
+        };
+
+        charlieProxy.onMessage(function(event){
+            var data = JSON.parse(event.data);
+            if (data.url) {
+                console.log(data.url);
+                $scope.$apply(function () {
+                    $scope.url = data.url;
+                });
+            }
+        });
+
+        $scope.logout = function (){
+            console.log("logout");
+            charlieProxy.logout();
+
+        };
+
+        $scope.create = function (){
+            console.log("create");
+
+        };
+
+        $scope.register = function (){
+            console.log("register");
+
         };
     }]);
 
