@@ -9,10 +9,7 @@ import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by: Tim Kerschbaumer
@@ -166,9 +163,58 @@ public class SpotifyService {
 		}
 	}
 
+	/**
+	 * Method that returns a list of similar tracks based on the tracks specified
+	 * @param tracks the tracks to find similar tracks from
+	 * @param noTracks how many tracks to return
+	 * @return a list of tracks similar to the tracks given as parameter.
+	 */
 	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
-		// TODO
-		return null;
+		List<Track> chosenTracks = new ArrayList<>(noTracks);
+		for(int i = 0; i < noTracks; i++) {
+			int randTrack = randomInt(0, tracks.size()-1);
+			int rand = randomInt(0, 1);
+			Track t = tracks.get(randTrack);
+			if (rand == 0) {
+				try {
+					List<Artist> relart = api.getArtistRelatedArtists(t.getArtists().get(0).getId()).build().get();
+					Track track;
+					do {
+						Artist a = relart.get(randomInt(0,relart.size()-1));
+						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), "SE").build().get();
+						track = popularTracks.get(randomInt(0, popularTracks.size()-1));
+					} while(chosenTracks.contains(track));
+					chosenTracks.add(track);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					SimpleAlbum album = t.getAlbum();
+					try {
+						Album a = api.getAlbum(album.getId()).build().get();
+						List<SimpleTrack> strack = a.getTracks().getItems();
+						Track tt;
+						do {
+							SimpleTrack st = strack.get(randomInt(0, strack.size()-1));
+							tt = api.getTrack(st.getId()).build().get();
+						} while(chosenTracks.contains(tt));
+						chosenTracks.add(tt);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return chosenTracks;
+	}
+
+
+	private int randomInt(int min, int max) {
+		Random random = new Random();
+		return random.nextInt(max - min + 1) + min;
 	}
 
 }
