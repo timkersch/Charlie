@@ -12,34 +12,45 @@ charlieController.controller('mainController', ['$scope', '$routeParams', 'charl
             $mdSidenav('left').toggle();
         };
 
+        var login = function() {
+            charlieProxy.invoke("getLoginURL").then(function (url) {
+                if (url) {
+                    window.location.href = url;
+                    //window.location.href = "http://www.google.se";
+                }
+            });
+        };
+
+        var getUser = function() {
+            var data = {
+                code: $routeParams.code
+            };
+            charlieProxy.invoke("getUserByCode", data).then(function (user) {
+                if (user) {
+                    $scope.user = user;
+                    sessionStorage.user = angular.toJson(user);
+                }
+            });
+        };
+
+        var getUserFromStorage = function() {
+            $scope.user = angular.fromJson(sessionStorage.user);
+            var data2 = {
+                uuid: $scope.user.uuid
+            };
+            charlieProxy.invoke("setUser", data2).then(function (success) {
+                console.log("Success: " + success);
+            });
+        };
+
         var init = function(){
             if (!sessionStorage.user) {
-                if (!$routeParams.code) {
-                    charlieProxy.invoke("getLoginURL").then(function (url) {
-                        if (url) {
-                            $scope.url = url;
-                        }
-                    });
-                } else {
-                    var data = {
-                        code: $routeParams.code
-                    };
-                    charlieProxy.invoke("getUserByCode", data).then(function (user) {
-                        if (user) {
-                            $scope.user = user;
-                            sessionStorage.user = angular.toJson(user);
-                        }
-                    });
-                }
+                if (!$routeParams.code)
+                    login();
+                else
+                    getUser();
             } else {
-                $scope.user = angular.fromJson(sessionStorage.user);
-                console.log("old uuid:" + $scope.user.uuid);
-                var data2 = {
-                    uuid: $scope.user.uuid
-                };
-                charlieProxy.invoke("setUser", data2).then(function (success) {
-                    console.log("Success: " + success);
-                });
+                getUserFromStorage();
             }
         };
 
@@ -58,18 +69,14 @@ charlieController.controller('mainController', ['$scope', '$routeParams', 'charl
 
         $scope.login = function (){
             console.log("login");
-            window.location = $scope.url;
+            //login();
         };
 
         $scope.logout = function (){
             console.log("logout");
             sessionStorage.user = "";
             $scope.user = {};
-            charlieProxy.invoke("getLoginURL").then(function (url) {
-                if (url) {
-                    $scope.url = url;
-                }
-            });
+            charlieProxy.invoke("logout");
         };
     }]);
 
@@ -100,10 +107,14 @@ charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'cha
         $scope.getPlaylists = function (){
             console.log("login");
             charlieProxy.invoke("getPlaylists").then(function(lists){
-                console.log("Playlist[0] = " + lists[0]);
-                if (lists) {
-                    $scope.playlists = lists;
-                }
+                $scope.playlists = lists
+            });
+        };
+
+        $scope.getUsers = function(){
+            console.log("getUsers");
+            charlieProxy.invoke("getUsers").then(function(users){
+                $scope.users = users;
             });
         };
     }]);

@@ -65,7 +65,7 @@ public class SpotifyService {
 		});
 	}
 
-	public User getUser(String code) {
+	public UserIdentity getUser(String code) {
 		try {
 			System.out.println("Getting user");
 
@@ -81,6 +81,7 @@ public class SpotifyService {
 			* We only need the access token to retrieve the user's information.
 			*/
 			final String accessToken = authorizationCodeCredentials.getAccessToken();
+			final String refreshToken = authorizationCodeCredentials.getRefreshToken();
 			System.out.println("AccessToken: " + accessToken);
 
 			/* Retrieve information about the user.
@@ -97,15 +98,18 @@ public class SpotifyService {
 			System.out.println("You can reach this user at: " + currentUser.getEmail());
 			System.out.println("Users display name: " + currentUser.getDisplayName());
 
-			User user = new User(currentUser);
+			UserIdentity user = new UserIdentity(currentUser, accessToken, refreshToken);
 
-			user.setAccessToken(accessToken);
-
-			return new User(currentUser);
+			return user;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return User.createDummyUser();
+		return UserIdentity.createDummyUser();
+	}
+
+	public void setTokens(String access, String refresh){
+		api.setAccessToken(access);
+		api.setRefreshToken(refresh);
 	}
 
 	public List<SimplePlaylist> getPlaylists(String displayname){
@@ -116,7 +120,7 @@ public class SpotifyService {
 
 			return playlistsPage.getItems();
 		} catch (Exception e) {
-			System.out.println("Something went wrong!" + e.getMessage());
+			e.printStackTrace();
 		}
 		return new ArrayList<>();
 	}

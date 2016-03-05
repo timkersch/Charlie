@@ -15,14 +15,13 @@ public class User {
     private String id;
     private String country;
     private String uri;
-    private String accessToken;
 
     public User() {
         this.uuid = UUID.randomUUID().toString();
     }
 
     public User(com.wrapper.spotify.models.User spotifyUser) {
-        this.uuid = UUID.randomUUID().toString();
+        this();
         this.displayName = spotifyUser.getDisplayName();
         this.email = spotifyUser.getEmail();
         this.href = spotifyUser.getHref();
@@ -53,14 +52,6 @@ public class User {
 
     public void setUri(String uri) {
         this.uri = uri;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
     }
 
     public String getUUID() {

@@ -1,11 +1,18 @@
 <div>
 	<h1>Lobby</h1>
 
-	<md-button ng-click="getPlaylists()">GET</md-button>
+	<md-button ng-click="getPlaylists()">Show Playlists</md-button>
+	<md-button ng-click="getUsers()">Show Users</md-button>
+	<h1>Playlists</h1>
 	<md-list>
 		<md-list-item class="ng-scope" layout="row" layout-align="start center" ng-repeat="playlist in playlists">
 			<div class="inset ng-binding">{{playlist.name}}</div>
-			<div class="md-ripple-container"></div>
+		</md-list-item>
+	</md-list>
+	<h1>Users</h1>
+	<md-list>
+		<md-list-item class="ng-scope" layout="row" layout-align="start center" ng-repeat="user in users">
+			<div class="inset ng-binding">{{user.id}}</div>
 		</md-list-item>
 	</md-list>
 </div>

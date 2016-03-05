@@ -9,6 +9,7 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,14 +27,14 @@ public class WebsocketServer {
     public void open(Session session) {
         System.out.println("Opened Session: " + session.getId());
         UserSession userSession = new UserSession(session);
-        userSession.setUser(User.createDummyUser());
         sessionHandler.addSession(userSession);
     }
 
     @OnClose
     public void close(Session session) {
         System.out.println("Closed Session: " + session.getId());
-        sessionHandler.removeSession(sessionHandler.getUserSession(session.getId()));
+        UserSession userSession = sessionHandler.getUserSession(session.getId());
+        sessionHandler.removeSession(userSession);
     }
 
     @OnError
@@ -54,9 +55,10 @@ public class WebsocketServer {
             JsonProvider provider = JsonProvider.provider();
             JsonObject response;
 
-            User user;
+            UserIdentity user;
             Gson gson = new Gson();
             String userAsString;
+            System.out.println(action);
             switch(action) {
                 case "getLoginURL":
                     String url = service.getAuthorizeURL();
@@ -67,8 +69,9 @@ public class WebsocketServer {
                     String code = data.getString("code");
                     System.out.println("Code: " + code);
                     user = service.getUser(code);
-                    userSession.setUser(user);
-                    userAsString = gson.toJson(user);
+                    userSession.setUserIdentity(user);
+                    sessionHandler.addUser(user);
+                    userAsString = gson.toJson(user.getUser());
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", userAsString).build();
                     System.out.println("User: " + userAsString);
                     System.out.println("Sessions: " + sessionHandler);
@@ -77,14 +80,13 @@ public class WebsocketServer {
                 case "setUser":
                     String uuid = data.getString("uuid");
                     System.out.println("uuid: " + uuid);
-                    System.out.println("Sessions: " + sessionHandler);
                     boolean success = false;
-                    if (!userSession.getUser().getUUID().equals(uuid)) {
+                    if (sessionHandler.userExists(uuid)) {
                         // fetch user
-                        UserSession otherSession = sessionHandler.getUserSessionByUUID(uuid);
-                        user = otherSession.getUser();
-                        userSession.setUser(user);
-                        sessionHandler.removeSession(otherSession);
+                        user = sessionHandler.getUser(uuid);
+                        userSession.setUserIdentity(user);
+                        service.setTokens(user.getAccessToken(), user.getRefreshToken());
+                        System.out.println("Tokens: " + user.getAccessToken() + " " + user.getRefreshToken());
                         success = true;
                     }
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", success).build();
@@ -92,15 +94,22 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response.toString());
                     break;
                 case "getPlaylists":
-                    System.out.println("User: " + gson.toJson(userSession.getUser()));
-                    List<SimplePlaylist> lists = service.getPlaylists(userSession.getUser().getId());
+                    System.out.println("User: " + gson.toJson(userSession.getUserIdentity()));
+                    List<SimplePlaylist> lists = service.getPlaylists(userSession.getUserIdentity().getUser().getId());
                     String playlists = gson.toJson(lists);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", playlists).build();
                     System.out.println("Playlists: " + playlists);
                     session.getBasicRemote().sendText(response.toString());
                     break;
+                case "getUsers":
+                    Collection<User> users = sessionHandler.getUsers();
+                    String usersString = gson.toJson(users);
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
+                    System.out.println("Users: " + usersString);
+                    session.getBasicRemote().sendText(response.toString());
+                    break;
                 case "logout":
-                    sessionHandler.getUserSession(session.getId()).setUser(User.createDummyUser());
+                    sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;
                 case "vote":
 
