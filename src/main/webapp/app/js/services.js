@@ -26,9 +26,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         };
 
         socket.onopen = function (event) {
-            console.log(event);
             isReady = true;
             $rootScope.$broadcast('service-ready');
+            console.log("Service ready");
         };
 
         return {
@@ -65,6 +65,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             invoke: function(name, data) {
+                console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
                 var request = {
                     action: name,
                     request_id: getRequestId(),
@@ -74,8 +75,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 callbacks[request.request_id] = deferred;
                 socket.send(angular.toJson(request));
                 return deferred.promise.then(function(response) {
+                    console.log("Invoke(" + name + "), response: ", response);
                     request.response = response;
-                    return response;
+                    try {
+                        response.data = JSON.parse(response.data);
+                    } catch(error) {}
+                    return response.data;
                 });
             },
 

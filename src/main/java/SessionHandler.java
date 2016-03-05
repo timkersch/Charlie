@@ -30,16 +30,17 @@ public class SessionHandler {
 
     public UserSession getUserSession(String sessionId) {
         for (UserSession session : sessions) {
-            if (Objects.equals(session.getSession().getId(), sessionId)) {
+            if (session.getSession().getId().equals(sessionId)) {
                 return session;
             }
         }
         return null;
     }
 
-    public UserSession getUserSession(long userId){
+    public UserSession getUserSessionByUUID(String uuid){
         for (UserSession session : sessions) {
-            if (session.getUser().getId() == userId) {
+            System.out.println("User uuid: " + session.getUser().getUUID());
+            if (session.getUser().getUUID().equals(uuid)) {
                 return session;
             }
         }
@@ -65,6 +66,15 @@ public class SessionHandler {
             sessions.remove(session);
             Logger.getLogger(SessionHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        for (UserSession session : sessions) {
+            sb.append("SessionId: ").append(session.getSession().getId()).append(", UserUUID: ").append(session.getUser().getUUID());
+        }
+        return sb.toString();
     }
 
     /*

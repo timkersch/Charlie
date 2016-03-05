@@ -1,3 +1,11 @@
 <div>
-	<h1>SUG MIG!</h1>
+	<h1>Lobby</h1>
+
+	<md-button ng-click="getPlaylists()">GET</md-button>
+	<md-list>
+		<md-list-item class="ng-scope" layout="row" layout-align="start center" ng-repeat="playlist in playlists">
+			<div class="inset ng-binding">{{playlist.name}}</div>
+			<div class="md-ripple-container"></div>
+		</md-list-item>
+	</md-list>
 </div>

@@ -29,17 +29,20 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <!--<base href="index.html" />-->
+    <base href="/">
 </head>
 <body ng-app="charlieApp">
-    <div layout="row" ng-controller="sidenavController">
+    <div layout="row" ng-controller="mainController">
         <md-toolbar class="md-toolbar-tools">
             <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
                 <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
             </md-button>
             <h2>SpotHoot</h2>
             <span flex="" class="flex"></span>
-            <md-button ng-show="!isLoggedIn" ng-click="login()">Login</md-button>
-            <md-button ng-show="isLoggedIn" ng-click="logout()">Logout</md-button>
+            <span>{{user.id}}</span>
+            <md-button ng-show="!user.id" ng-click="login()">Login</md-button>
+            <md-button ng-show="user.id" ng-click="logout()">Logout</md-button>
         </md-toolbar>
         <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
             <md-toolbar ng-click="toggleLeftMenu()">
