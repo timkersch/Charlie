@@ -3,13 +3,11 @@
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
 		'ngMaterial',
-		'ngMdIcons',
 		'charlieController'
 	]);
 
-	charlieApp.config(['$routeProvider',
-		function($routeProvider){
-			console.log("routeprovidder");
+	charlieApp.config(['$routeProvider', '$locationProvider',
+		function($routeProvider, $locationProvider){
 			$routeProvider.
 				when('/lobby', {
 					templateUrl: 'app/partials/lobby.html',
@@ -23,4 +21,8 @@
 					templateUrl: 'app/partials/question.html',
 					controller: 'questionController'
 			});
+
+
+			// use the HTML5 History API
+			$locationProvider.html5Mode(true);
 		}]);

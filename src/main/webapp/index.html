@@ -3,11 +3,10 @@
 <head>
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!--<script src="websocket.js"></script> -->
+
     <link rel="stylesheet" type="text/css" href="app/style.css">
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.4/angular-material.min.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
-    <!-- Latest compiled and minified CSS -->
+
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -27,11 +26,52 @@
 
 	<!-- Angular Material-->
 	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.4/angular-material.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.6.0/angular-material-icons.min.js"></script>
-
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 </head>
 <body ng-app="charlieApp">
+    <div layout="row" ng-controller="sidenavController">
+        <md-toolbar class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
+                <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
+            </md-button>
+            <h2>SpotHoot</h2>
+            <span flex="" class="flex"></span>
+            <md-button ng-show="!isLoggedIn" ng-click="login()">Login</md-button>
+            <md-button ng-show="isLoggedIn" ng-click="logout()">Logout</md-button>
+        </md-toolbar>
+        <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
+            <md-toolbar ng-click="toggleLeftMenu()">
+                <div layout="row" layout-padding>
+                    <h1 class="md-toolbar-tools">Menu</h1>
+                </div>
+            </md-toolbar>
+
+            <md-list>
+                <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('')">
+                        <div class="inset">
+                            <md-icon aria-label="Menu" class="material-icons">person</md-icon>
+                        </div>
+                        <div class="inset ng-binding">Profile</div>
+                        <div class="md-ripple-container"></div>
+                </md-list-item>
+                <md-list-item class="ng-scope" layout="row" layout-align="start center">
+                    <div class="inset">
+                        <md-icon aria-label="Menu" class="material-icons">person</md-icon>
+                    </div>
+                    <div class="inset ng-binding">Profile</div>
+                    <div class="md-ripple-container"></div>
+                </md-list-item>
+            </md-list>
+            <!--<md-content layout-padding="">
+                <md-list-item ng-click="">
+                    <md-icon aria-label="Menu" class="material-icons">person</md-icon>
+                    <p>Profile</p>
+                </md-list-item>
+            </md-content>-->
+        </md-sidenav>
+    </div>
 
 	<div ng-view></div>
 </body>

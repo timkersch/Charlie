@@ -3,6 +3,7 @@ import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonValue;
 import javax.json.spi.JsonProvider;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -45,19 +46,17 @@ public class WebsocketServer {
         try (JsonReader reader = Json.createReader(new StringReader(message))) {
             JsonObject jsonMessage = reader.readObject();
             String action = jsonMessage.getString("action");
+            int requestId = jsonMessage.getJsonNumber("request_id").intValue();
             JsonProvider provider = JsonProvider.provider();
-            JsonObject addMessage = provider.createObjectBuilder()
-                    .add("message", "hello")
-                    .build();
+            JsonObject response = null;
 
             long userId;
             User user;
             switch(action) {
-                case "login":
+                case "getLoginURL":
                     String url = service.getAuthorizeURL();
-                    System.out.println("URL: " + url);
-                    JsonObject urlObject = provider.createObjectBuilder().add("url", url).build();
-                    session.getBasicRemote().sendText(urlObject.toString());
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", url).build();
+                    session.getBasicRemote().sendText(response.toString());
                     break;
                 case "logout":
                     sessionHandler.getUserSession(session.getId()).setUser(User.createDummyUser());
@@ -73,7 +72,8 @@ public class WebsocketServer {
 
                     break;
                 default:
-                    sessionHandler.sendToAllConnectedSessions(addMessage);
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).build();
+                    sessionHandler.sendToAllConnectedSessions(response);
                     break;
             }
         } catch (IOException e) {

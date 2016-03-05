@@ -1,7 +1,8 @@
 'use strict';
 
 var charlieController = angular.module('charlieController', [
-    'charlieService'
+    'charlieService',
+    'ngMaterial'
 ]);
 
 charlieController.controller('mainController', ['$scope', '$route', '$routeParams', 'charlieProxy',
@@ -13,33 +14,9 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
 
-        $scope.url = "hej";
-
         $scope.publish = function () {
             console.log("Publish");
             charlieProxy.postAnswer();
-        };
-
-        $scope.login = function (){
-            console.log("login");
-            charlieProxy.login();
-
-        };
-
-        charlieProxy.onMessage(function(event){
-            var data = JSON.parse(event.data);
-            if (data.url) {
-                console.log(data.url);
-                $scope.$apply(function () {
-                    $scope.url = data.url;
-                });
-            }
-        });
-
-        $scope.logout = function (){
-            console.log("logout");
-            charlieProxy.logout();
-
         };
 
         $scope.create = function (){
@@ -51,6 +28,38 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
             console.log("register");
 
         };
+    }]);
+
+charlieController.controller('sidenavController', [ '$scope', '$routeParams', 'charlieProxy', '$mdSidenav',
+    function($scope, $routeParams, charlieProxy, $mdSidenav) {
+        $scope.toggleLeftMenu = function() {
+            $mdSidenav('left').toggle();
+        };
+
+        $scope.isLoggedIn = false;
+
+        $scope.url = "";
+
+        $scope.$on('service-ready', function(event, args) {
+            console.log("Service ready");
+            charlieProxy.invoke("getLoginURL").then(function(response){
+                console.log("response: ", response);
+                if (response.data) {
+                    $scope.url = response.data;
+                }
+            });
+        });
+
+        $scope.login = function (){
+            console.log("login");
+            window.location = $scope.url;
+        };
+
+        $scope.logout = function (){
+            console.log("logout");
+
+        };
+
     }]);
 
 charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'charlieProxy',

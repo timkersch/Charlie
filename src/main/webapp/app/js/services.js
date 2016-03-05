@@ -3,16 +3,32 @@
 var charlieService = angular.module('charlieService', []);
 
 
-charlieService.factory('charlieProxy', ['$http',
-    function($http){
+charlieService.factory('charlieProxy', ['$q', '$rootScope',
+    function($q, $rootScope){
         var socket = new WebSocket("ws://localhost:8080/actions");
-
+        var requestId = 0;
+        var getRequestId = function(){
+            return requestId++;
+        };
+        var isReady = false;
+        var callbacks = {};
+        var user = {};
         socket.onmessage = function(event){
             console.log(event);
+            var data = angular.fromJson(event.data);
+            if (angular.isDefined(callbacks[data.request_id])) {
+                var callback = callbacks[data.request_id];
+                delete callbacks[data.request_id];
+                callback.resolve(data);
+            } else {
+                console.error("Unhandled message: %o", data);
+            }
         };
 
         socket.onopen = function (event) {
             console.log(event);
+            isReady = true;
+            $rootScope.$broadcast('service-ready');
         };
 
         return {
@@ -25,6 +41,10 @@ charlieService.factory('charlieProxy', ['$http',
                     description: "description"
                 };
                 socket.send(JSON.stringify(message));
+            },
+
+            isReady: function(){
+                return isReady;
             },
 
             login: function(){
@@ -44,12 +64,23 @@ charlieService.factory('charlieProxy', ['$http',
                 socket.send(JSON.stringify(message));
             },
 
-            onMessage: function(callback){
-                socket.onmessage = callback;
+            invoke: function(name, data) {
+                var request = {
+                    action: name,
+                    request_id: getRequestId(),
+                    data: data
+                };
+                var deferred = $q.defer();
+                callbacks[request.request_id] = deferred;
+                socket.send(angular.toJson(request));
+                return deferred.promise.then(function(response) {
+                    request.response = response;
+                    return response;
+                });
             },
 
             getUser: function(id, callback){
-                //socket.invoke("getUser", id).success(callback);
+                return user;
             }
 
         };
