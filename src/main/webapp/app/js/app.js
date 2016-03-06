@@ -24,6 +24,10 @@
 				controller: 'createController',
 				css: 'app/css/partials/create.css'
 				}).
+				when('/scoreboard',{
+					templateUrl: 'app/partials/scoreboard.html',
+					controller: 'scoreboardController'
+				}).
 				when('/question',{
 					templateUrl: 'app/partials/question.html',
 					controller: 'questionController'
