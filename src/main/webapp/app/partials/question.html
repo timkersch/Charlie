@@ -1,39 +1,38 @@
-<div ng-controller="questionController">
+<div ng-controller="questionController" ng-cloak>
 	<div layout="column">
-		<button>Arne</button>
-		<md-button>Body</md-button>
-		<div flex>
-			<img src="http://www.surfacetoair.com/blog/wp-content/uploads/2011/09/Justice-cover-500x500.jpg"/>
-
+		<div>
+			<img src="http://www.surfacetoair.com/blog/wp-content/uploads/2011/09/Justice-cover-500x500.jpg">
 		</div>
-		<div flex>
-			<div layout="column">
-				<div flex="10"></div>
-				<div flex="80">
-					<md-button>Runk </md-button>
-					<md-grid-list>
-						<md-grid-title class="blue" md-rowspan="2" md-colspan="2">
-							<md-grid-title-footer><h3>Name1</h3></md-grid-title-footer>
-						</md-grid-title>
-						<md-grid-title class="green" md-rowspan="2" md-colspan="2">
-							<md-grid-title-footer><h3>Name2</h3></md-grid-title-footer>
-						</md-grid-title>
-					</md-grid-list>
-				</div>
-				<div flex="10"></div>
-			</div>
-			<div layout="column">
-				<div flex="10"></div>
-				<md-grid-list>
-					<md-grid-title class="yellow" md-rowspan="2" md-colspan="2">
-						<md-grid-title-footer><h3>Name3</h3></md-grid-title-footer>
-					</md-grid-title>
-					<md-grid-title class="red" md-rowspan="2" md-colspan="2">
-						<md-grid-title-footer><h3>Name4</h3></md-grid-title-footer>
-					</md-grid-title>
-				</md-grid-list>
-				<div flex="10"></div>
-			</div>
+		<div>
+			<md-grid-list
+				md-cols-xs="1" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="6"
+				md-row-height-gt-md="1:1" md-row-height="2:2"
+				md-gutter="12px" md-gutter-gt-sm="8px" >
+				<md-grid-tile class="gray"
+							  md-rowspan="1" md-colspan="2" md-colspan-sm="1">
+					<md-grid-tile-footer>
+						<h3>#1: (3r x 2c)</h3>
+					</md-grid-tile-footer>
+				</md-grid-tile>
+				<md-grid-tile class="gray"
+							  md-rowspan="1" md-colspan="2" md-colspan-sm="1">
+					<md-grid-tile-footer>
+						<h3>#1: (3r x 2c)</h3>
+					</md-grid-tile-footer>
+				</md-grid-tile>
+				<md-grid-tile class="gray"
+							  md-rowspan="1" md-colspan="2" md-colspan-sm="1">
+					<md-grid-tile-footer>
+						<h3>#1: (3r x 2c)</h3>
+					</md-grid-tile-footer>
+				</md-grid-tile>
+				<md-grid-tile class="gray"
+							  md-rowspan="1" md-colspan="2" md-colspan-sm="1">
+					<md-grid-tile-footer>
+						<h3>#1: (3r x 2c)</h3>
+					</md-grid-tile-footer>
+				</md-grid-tile>
+			</md-grid-list>
 		</div>
 	</div>
 </div>

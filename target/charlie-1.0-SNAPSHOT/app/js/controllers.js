@@ -9,22 +9,27 @@ charlieController.controller('mainController', ['$scope', '$route', '$routeParam
         $scope.$route = $route;
     }]);
 
-charlieController.controller('signupController'[ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
+        console.log("Init");
 
+        $scope.publish = function () {
+            charlieProxy.postAnswer("Hej");
+        };
     }]);
 
-charlieController.controller('lobbyController'[ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("hejaheja");
     }]);
 
-charlieController.controller('questionController'[ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('questionController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
+        console.log("HejH");
 
     }]);
 
-charlieController.controller('scoreboardController'[ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
-
+        console.log("HejH");
     }]);
