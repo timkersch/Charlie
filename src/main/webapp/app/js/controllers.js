@@ -12,49 +12,44 @@ charlieController.controller('mainController', ['$scope', '$routeParams', 'charl
             $mdSidenav('left').toggle();
         };
 
-        var login = function() {
-            charlieProxy.invoke("getLoginURL").then(function (url) {
-                if (url) {
-                    window.location.href = url;
-                    //window.location.href = "http://www.google.se";
-                }
+        var getLoginURL = function() {
+            charlieProxy.getLoginUrl(function(url){
+                //window.location.href = url;
+                $scope.url = url;
+                console.log("URL:" + url);
             });
         };
 
         var getUser = function() {
-            var data = {
-                code: $routeParams.code
-            };
-            charlieProxy.invoke("getUserByCode", data).then(function (user) {
-                if (user) {
-                    $scope.user = user;
-                    sessionStorage.user = angular.toJson(user);
-                }
+            charlieProxy.loginWithCode($routeParams.code, function(user){
+                $scope.user = user;
+                sessionStorage.user = angular.toJson(user);
             });
         };
 
         var getUserFromStorage = function() {
             $scope.user = angular.fromJson(sessionStorage.user);
-            var data2 = {
-                uuid: $scope.user.uuid
-            };
-            charlieProxy.invoke("setUser", data2).then(function (success) {
+            charlieProxy.loginWithUser($scope.user.uuid, function(success){
                 console.log("Success: " + success);
             });
         };
 
         var init = function(){
             if (!sessionStorage.user) {
-                if (!$routeParams.code)
-                    login();
+                // No user in storage
+                if (!$routeParams.code) // No redirect from spotify login
+                    getLoginURL();
+                    //setTimeout(getLoginURL, 2000);
                 else
                     getUser();
             } else {
+                // User in storage
                 getUserFromStorage();
             }
         };
 
         $scope.$on('$routeChangeSuccess', function() {
+            // Initialize when service is ready
             if (charlieProxy.isReady()){
                 init();
             }else{
@@ -69,14 +64,15 @@ charlieController.controller('mainController', ['$scope', '$routeParams', 'charl
 
         $scope.login = function (){
             console.log("login");
-            //login();
+            //getLoginURL();
+            window.location.href = $scope.url;
         };
 
         $scope.logout = function (){
             console.log("logout");
             sessionStorage.user = "";
             $scope.user = {};
-            charlieProxy.invoke("logout");
+            charlieProxy.logout();
         };
     }]);
 
@@ -86,7 +82,6 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
 
         $scope.publish = function () {
             console.log("Publish");
-            charlieProxy.postAnswer();
         };
 
         $scope.create = function (){
@@ -106,14 +101,14 @@ charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'cha
 
         $scope.getPlaylists = function (){
             console.log("login");
-            charlieProxy.invoke("getPlaylists").then(function(lists){
+            charlieProxy.getPlaylists(function(lists){
                 $scope.playlists = lists
             });
         };
 
         $scope.getUsers = function(){
             console.log("getUsers");
-            charlieProxy.invoke("getUsers").then(function(users){
+            charlieProxy.getUsers(function(users){
                 $scope.users = users;
             });
         };

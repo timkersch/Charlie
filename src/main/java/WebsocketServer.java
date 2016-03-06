@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ApplicationScoped
-@ServerEndpoint("/actions")
+@ServerEndpoint("/api")
 public class WebsocketServer {
 
     private SpotifyService service = new SpotifyService();

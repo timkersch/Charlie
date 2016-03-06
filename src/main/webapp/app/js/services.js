@@ -5,14 +5,15 @@ var charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$q', '$rootScope',
     function($q, $rootScope){
-        var socket = new WebSocket("ws://localhost:8080/actions");
+        var socket = new WebSocket("ws://localhost:8080/api");
+
         var requestId = 0;
         var getRequestId = function(){
             return requestId++;
         };
         var isReady = false;
         var callbacks = {};
-        var user = {};
+
         socket.onmessage = function(event){
             console.log(event);
             var data = angular.fromJson(event.data);
@@ -25,6 +26,26 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             }
         };
 
+        var invoke = function(name, data) {
+            console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
+            var request = {
+                action: name,
+                request_id: getRequestId(),
+                data: data
+            };
+            var deferred = $q.defer();
+            callbacks[request.request_id] = deferred;
+            socket.send(angular.toJson(request));
+            return deferred.promise.then(function(response) {
+                console.log("Invoke(" + name + "), response: ", response);
+                request.response = response;
+                try {
+                    response.data = JSON.parse(response.data);
+                } catch(error) {}
+                return response.data;
+            });
+        };
+
         socket.onopen = function (event) {
             isReady = true;
             $rootScope.$broadcast('service-ready');
@@ -32,60 +53,44 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         };
 
         return {
-            postAnswer: function(){
-                console.log("Posting...");
-                var message = {
-                    action: "action",
-                    name: "name",
-                    type: "type",
-                    description: "description"
-                };
-                socket.send(JSON.stringify(message));
-            },
 
             isReady: function(){
                 return isReady;
             },
 
-            login: function(){
-                console.log("Posting...");
-                var message = {
-                    action: "login",
-                    id: "3333"
+            // callback(user)
+            loginWithCode: function(code, callback){
+                var data = {
+                    code: code
                 };
-                socket.send(JSON.stringify(message));
+                invoke("getUserByCode", data).then(callback);
+            },
+
+            // callback(success)
+            loginWithUser: function(uuid, callback){
+                var data = {
+                    uuid: uuid
+                };
+                invoke("setUser", data).then(callback);
+            },
+
+            // callback(url)
+            getLoginUrl: function(callback) {
+                invoke("getLoginURL").then(callback);
             },
 
             logout: function(){
-                console.log("Posting...");
-                var message = {
-                    action: "logout"
-                };
-                socket.send(JSON.stringify(message));
+                invoke("logout");
             },
 
-            invoke: function(name, data) {
-                console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
-                var request = {
-                    action: name,
-                    request_id: getRequestId(),
-                    data: data
-                };
-                var deferred = $q.defer();
-                callbacks[request.request_id] = deferred;
-                socket.send(angular.toJson(request));
-                return deferred.promise.then(function(response) {
-                    console.log("Invoke(" + name + "), response: ", response);
-                    request.response = response;
-                    try {
-                        response.data = JSON.parse(response.data);
-                    } catch(error) {}
-                    return response.data;
-                });
+            // callback(users)
+            getUsers: function(callback){
+                invoke("getUsers").then(callback);
             },
 
-            getUser: function(id, callback){
-                return user;
+            // callback(lists)
+            getPlaylists: function(callback){
+                invoke("getPlaylists").then(callback);
             }
 
         };

@@ -8,8 +8,7 @@
 
 	charlieApp.config(['$routeProvider', '$locationProvider',
 		function($routeProvider, $locationProvider){
-			//$locationProvider.html5Mode(true);
-			$locationProvider.html5Mode(true).hashPrefix('!');
+			$locationProvider.html5Mode(true);
 
 			$routeProvider.
 				when('/', {
@@ -25,6 +24,5 @@
 					controller: 'questionController'
 			}).otherwise({redirectTo: '/'});
 
-
-			// use the HTML5 History API
+			//$locationProvider.html5Mode(true);//.hashPrefix('!');
 		}]);
