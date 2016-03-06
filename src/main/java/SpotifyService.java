@@ -1,7 +1,17 @@
+import com.google.appengine.repackaged.com.google.common.base.Flag;
+import com.google.common.primitives.Booleans;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
+
+import com.wrapper.spotify.exceptions.WebApiException;
+import com.wrapper.spotify.methods.*;
+import com.wrapper.spotify.models.*;
+
+import java.io.IOException;
+import java.util.*;
+
 import com.wrapper.spotify.methods.UserPlaylistsRequest;
 import com.wrapper.spotify.models.*;
 
@@ -63,6 +73,157 @@ public class SpotifyService {
 		        * the request will fail. Why it fails is written in the throwable's message. */
 			}
 		});
+	}
+
+	/**
+	 * Method that gathers and returns all playlists of the logged in user.
+	 * @return a list of SimplePlaylist
+	 */
+	public List<SimplePlaylist> getUsersPlaylists() {
+		try {
+			UserPlaylistsRequest request = api.getPlaylistsForUser(api.getMe().build().get().getId()).build();
+			Page<SimplePlaylist> playlistsPage = request.get();
+
+			return playlistsPage.getItems();
+
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns all songs in a playlist
+	 * @param simplePlaylist a SimplePlaylist
+	 * @return List of Track in the playlist
+	 */
+	public List<Track> getPlaylistSongs(SimplePlaylist simplePlaylist) {
+		try {
+			PlaylistTracksRequest request = api.getPlaylistTracks(api.getMe().build().get().getId(), simplePlaylist.getId()).build();
+
+			List<PlaylistTrack> playlistTracks = request.get().getItems();
+			List<Track> tracks = new ArrayList<>(playlistTracks.size());
+			for (PlaylistTrack pt : playlistTracks) {
+				tracks.add(pt.getTrack());
+			}
+
+			return tracks;
+
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Mathod that adds a list of tracks to a playlist
+	 * @param tracks a list of trackURIs
+	 * @param playlistId the id of the playlist
+	 */
+	public void addTracksToPlayList(List<String> tracks, String playlistId) {
+		try {
+			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, tracks).build();
+			request.get();
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+		}
+	}
+
+	/**
+	 * Method that creates a playlist and returns it
+	 * @return a new Playlist
+	 */
+	public Playlist createQuizPlaylist() {
+		try {
+			PlaylistCreationRequest request = api.createPlaylist(api.getMe().build().get().getId(), "quiz" + this.hashCode())
+					.publicAccess(false)
+					.build();
+
+			Playlist playlist = request.get();
+
+			System.out.println("You just created this playlist!");
+			System.out.println("Its title is " + playlist.getName());
+
+			return playlist;
+		} catch (Exception e) {
+			System.out.println("Something went wrong!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns four artist options for a track.
+	 * @param t the Track
+	 * @return a hashtable with artists as keys and boolans as values
+	 */
+	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+		List<SimpleArtist> artists = t.getArtists();
+		RelatedArtistsRequest request = api.getArtistRelatedArtists(artists.get(0).getId()).build();
+		try {
+			Hashtable<String, Boolean> ht = new Hashtable<>();
+			ht.put(t.getArtists().get(0).getName(), true);
+			for (Artist a : request.get()) {
+				ht.put(a.getName(), false);
+			}
+			return ht;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns a list of similar tracks based on the tracks specified
+	 * @param tracks the tracks to find similar tracks from
+	 * @param noTracks how many tracks to return
+	 * @return a list of tracks similar to the tracks given as parameter.
+	 */
+	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
+		List<Track> chosenTracks = new ArrayList<>(noTracks);
+		for(int i = 0; i < noTracks; i++) {
+			int randTrack = randomInt(0, tracks.size()-1);
+			int rand = randomInt(0, 1);
+			Track t = tracks.get(randTrack);
+			if (rand == 0) {
+				try {
+					List<Artist> relart = api.getArtistRelatedArtists(t.getArtists().get(0).getId()).build().get();
+					Track track;
+					do {
+						Artist a = relart.get(randomInt(0,relart.size()-1));
+						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), "SE").build().get();
+						track = popularTracks.get(randomInt(0, popularTracks.size()-1));
+					} while(chosenTracks.contains(track));
+					chosenTracks.add(track);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					SimpleAlbum album = t.getAlbum();
+					try {
+						Album a = api.getAlbum(album.getId()).build().get();
+						List<SimpleTrack> strack = a.getTracks().getItems();
+						Track tt;
+						do {
+							SimpleTrack st = strack.get(randomInt(0, strack.size()-1));
+							tt = api.getTrack(st.getId()).build().get();
+						} while(chosenTracks.contains(tt));
+						chosenTracks.add(tt);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return chosenTracks;
+	}
+
+
+	private int randomInt(int min, int max) {
+		Random random = new Random();
+		return random.nextInt(max - min + 1) + min;
 	}
 
 	public UserIdentity getUser(String code) {
