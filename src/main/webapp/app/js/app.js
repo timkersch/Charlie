@@ -3,13 +3,12 @@
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
 		'ngMaterial',
-		'ngMdIcons',
 		'charlieController'
 	]);
 
 	charlieApp.config(['$routeProvider',
 		function($routeProvider){
-			console.log("routeprovidder");
+			console.log("routeprovider");
 			$routeProvider.
 				when('/lobby', {
 					templateUrl: 'app/partials/lobby.html',
