@@ -3,15 +3,15 @@
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
 		'ngMaterial',
-		'ngMdIcons',
 		'charlieController'
 	]);
 
-	charlieApp.config(['$routeProvider',
-		function($routeProvider){
-			console.log("routeprovidder");
+	charlieApp.config(['$routeProvider', '$locationProvider',
+		function($routeProvider, $locationProvider){
+			$locationProvider.html5Mode(true);
+
 			$routeProvider.
-				when('/lobby', {
+				when('/', {
 					templateUrl: 'app/partials/lobby.html',
 					controller: 'lobbyController'
 				}).
@@ -19,8 +19,14 @@
 					templateUrl: 'app/partials/signup.html',
 					controller: 'signupController'
 				}).
+				when('/create', {
+				templateUrl: 'app/partials/create.html',
+				controller: 'createController'
+				}).
 				when('/question',{
 					templateUrl: 'app/partials/question.html',
 					controller: 'questionController'
-			});
+			}).otherwise({redirectTo: '/'});
+
+			//$locationProvider.html5Mode(true);//.hashPrefix('!');
 		}]);

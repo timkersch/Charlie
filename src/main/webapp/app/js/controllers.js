@@ -136,4 +136,10 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
+        $scope.readonly = false;
+        $scope.tags = [];
+
+        $scope.showTags = function(){
+            console.log($scope.tags);
+        };
     }]);
