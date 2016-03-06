@@ -19,6 +19,10 @@
 					templateUrl: 'app/partials/signup.html',
 					controller: 'signupController'
 				}).
+				when('/create', {
+				templateUrl: 'app/partials/create.html',
+				controller: 'createController'
+				}).
 				when('/question',{
 					templateUrl: 'app/partials/question.html',
 					controller: 'questionController'
