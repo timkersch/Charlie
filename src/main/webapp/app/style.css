@@ -145,3 +145,9 @@ h2 img {
 .menu {
     cursor: pointer;
 }
+
+/* Create view Style */
+
+.md-input-container {
+    width: 25em;
+}

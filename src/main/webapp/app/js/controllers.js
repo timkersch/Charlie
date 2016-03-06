@@ -6,8 +6,9 @@ var charlieController = angular.module('charlieController', [
     'ngMaterial'
 ]);
 
-charlieController.controller('mainController', ['$scope', '$routeParams', 'charlieProxy', '$mdSidenav',
-    function($scope, $routeParams, charlieProxy, $mdSidenav) {
+charlieController.controller('mainController', ['$scope', '$location', '$routeParams', 'charlieProxy', '$mdSidenav',
+    function($scope, $location, $routeParams, charlieProxy, $mdSidenav) {
+
         $scope.toggleLeftMenu = function() {
             $mdSidenav('left').toggle();
         };
@@ -57,7 +58,14 @@ charlieController.controller('mainController', ['$scope', '$routeParams', 'charl
                     init();
                 });
             }
+
+
         });
+
+        $scope.changeView = function(view){
+            $location.path(view); // path not hash
+            $scope.toggleLeftMenu();
+        };
 
         $scope.user = {};
         $scope.url = "";
@@ -116,11 +124,16 @@ charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'cha
 
 charlieController.controller('questionController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
-        console.log("Init");
+        console.log("Inside questionController");
 
     }]);
 
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
-        console.log("Init");
+        console.log("Inside scoreboardController");
+    }]);
+
+charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
+    function($scope, $routeParams, charlieProxy) {
+        console.log("Inside createController");
     }]);
