@@ -21,7 +21,8 @@
 				}).
 				when('/create', {
 				templateUrl: 'app/partials/create.html',
-				controller: 'createController'
+				controller: 'createController',
+				css: 'app/css/partials/create.css'
 				}).
 				when('/question',{
 					templateUrl: 'app/partials/question.html',
