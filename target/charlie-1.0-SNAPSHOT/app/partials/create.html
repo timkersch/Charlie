@@ -1,23 +1,21 @@
 <md-content class="autoScroll">
     <form>
-        <h3>Create new quiz!</h3>
+        <h3 class="md-title">Create new quiz!</h3>
         <md-input-container>
             <label>Quiz name</label>
-            <input ng-model="name">
+            <input ng-model="quiz.name">
         </md-input-container>
 
         <!-- TODO Do we need this -->
-        <!--
         <md-input-container>
             <label>Number of players</label>
-            <input ng-model="nbrPlayers">
+            <input ng-model="quiz.nbrPlayers">
             <!--
             <md-select ng-model="quiz.nbrPlayers">
                 <md-option value="2">2</md-option>
                 <md-option value="4">4</md-option>
-            </md-select>
-        </md-input-container>-->
-
+            </md-select>-->
+        </md-input-container>
         <md-input-container>
             <label>Invite Friends</label>
             <md-chips
