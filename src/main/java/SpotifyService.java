@@ -2,8 +2,10 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
-import com.wrapper.spotify.models.AuthorizationCodeCredentials;
+import com.wrapper.spotify.methods.UserPlaylistsRequest;
+import com.wrapper.spotify.models.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,6 +49,7 @@ public class SpotifyService {
 				System.out.println("Successfully retrieved an access token! " + authorizationCodeCredentials.getAccessToken());
 				System.out.println("The access token expires in " + authorizationCodeCredentials.getExpiresIn() + " seconds");
 				System.out.println("Luckily, I can refresh it using this refresh token! " +     authorizationCodeCredentials.getRefreshToken());
+				System.out.println("Access token: " +     authorizationCodeCredentials.getAccessToken());
 
 				/* Set the access token and refresh token so that they are used whenever needed */
 				api.setAccessToken(authorizationCodeCredentials.getAccessToken());
@@ -55,10 +58,70 @@ public class SpotifyService {
 
 			@Override
 			public void onFailure(Throwable throwable) {
-				System.out.println("Fail");
+				throwable.printStackTrace();
                 /* Let's say that the client id is invalid, or the code has been used more than once,
 		        * the request will fail. Why it fails is written in the throwable's message. */
 			}
 		});
+	}
+
+	public UserIdentity getUser(String code) {
+		try {
+			System.out.println("Getting user");
+
+			/* Retrieve an access token */
+			final AuthorizationCodeCredentials authorizationCodeCredentials = api.authorizationCodeGrant(code).build().get();
+			System.out.println("AuthCred: " + authorizationCodeCredentials.toString());
+
+			/* Set the access token and refresh token so that they are used whenever needed */
+			api.setAccessToken(authorizationCodeCredentials.getAccessToken());
+			api.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
+
+			/* The token response contains a refresh token, an accesstoken, and some other things.
+			* We only need the access token to retrieve the user's information.
+			*/
+			final String accessToken = authorizationCodeCredentials.getAccessToken();
+			final String refreshToken = authorizationCodeCredentials.getRefreshToken();
+			System.out.println("AccessToken: " + accessToken);
+
+			/* Retrieve information about the user.
+			* The amount of information that is set on the User object depends on the scopes that
+			* the user has allowed the application to read.
+			* Read about which scopes that are available on
+			* https://developer.spotify.com/spotify-web-api/get-users-profile/
+			*/
+			final com.wrapper.spotify.models.User currentUser = api.getMe().accessToken(accessToken).build().get();
+
+			/* Use the information about the user */
+			System.out.println("URI to currently logged in user is: " + currentUser.getUri());
+			System.out.println("The currently logged in user comes from: " + currentUser.getCountry());
+			System.out.println("You can reach this user at: " + currentUser.getEmail());
+			System.out.println("Users display name: " + currentUser.getDisplayName());
+
+			UserIdentity user = new UserIdentity(currentUser, accessToken, refreshToken);
+
+			return user;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return UserIdentity.createDummyUser();
+	}
+
+	public void setTokens(String access, String refresh){
+		api.setAccessToken(access);
+		api.setRefreshToken(refresh);
+	}
+
+	public List<SimplePlaylist> getPlaylists(String displayname){
+		final UserPlaylistsRequest request = api.getPlaylistsForUser(displayname).build();
+
+		try {
+			final Page<SimplePlaylist> playlistsPage = request.get();
+
+			return playlistsPage.getItems();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<>();
 	}
 }

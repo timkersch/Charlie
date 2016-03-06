@@ -141,3 +141,7 @@ p {
 h2 img {
     height: 30px;
 }
+
+.menu {
+    cursor: pointer;
+}
