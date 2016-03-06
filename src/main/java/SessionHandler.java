@@ -4,8 +4,6 @@
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
-import javax.json.spi.JsonProvider;
-import javax.websocket.Session;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -15,31 +13,57 @@ import java.util.logging.Logger;
 public class SessionHandler {
     private int deviceId = 0;
     private final Set<UserSession> sessions = new HashSet<>();
+    private final Map<String, UserIdentity> users = new HashMap<>();
 
     public void addSession(UserSession session) {
         sessions.add(session);
-        /*for (Device device : devices) {
-            JsonObject addMessage = createAddMessage(device);
-            sendToSession(session, addMessage);
-        }*/
     }
 
     public void removeSession(UserSession session) {
         sessions.remove(session);
     }
 
+    public void addUser(UserIdentity user){
+        if (userExists(user.getUser().getUUID()))
+            popUser(user.getUser().getUUID());
+
+        users.put(user.getUser().getUUID(), user);
+    }
+
+    public UserIdentity popUser(String uuid) {
+        return users.remove(uuid);
+    }
+
+    public UserIdentity getUser(String uuid) {
+        return users.get(uuid);
+    }
+
+    public List<User> getUsers(){
+        List<User> userList = new ArrayList<>();
+        Collection<UserIdentity> userIdentities = users.values();
+        for(UserIdentity userIdentity : userIdentities) {
+            userList.add(userIdentity.getUser());
+        }
+        return userList;
+    }
+
+    public boolean userExists(String uuid) {
+        return users.containsKey(uuid);
+    }
+
     public UserSession getUserSession(String sessionId) {
         for (UserSession session : sessions) {
-            if (Objects.equals(session.getSession().getId(), sessionId)) {
+            if (session.getSession().getId().equals(sessionId)) {
                 return session;
             }
         }
         return null;
     }
 
-    public UserSession getUserSession(long userId){
+    public UserSession getUserSessionByUUID(String uuid){
         for (UserSession session : sessions) {
-            if (session.getUser().getId() == userId) {
+            System.out.println("User uuid: " + session.getUserIdentity().getUser().getUUID());
+            if (session.getUserIdentity().getUser().getUUID().equals(uuid)) {
                 return session;
             }
         }
@@ -67,71 +91,13 @@ public class SessionHandler {
         }
     }
 
-    /*
-
-    private JsonObject createAddMessage(Device device) {
-        JsonProvider provider = JsonProvider.provider();
-        JsonObject addMessage = provider.createObjectBuilder()
-                .add("action", "add")
-                .add("id", device.getId())
-                .add("name", device.getName())
-                .add("type", device.getType())
-                .add("status", device.getStatus())
-                .add("description", device.getDescription())
-                .build();
-        return addMessage;
-    }
-
-    public List getDevices() {
-        return new ArrayList<>(devices);
-    }
-
-    public void addDevice(Device device) {
-        device.setId(deviceId);
-        devices.add(device);
-        deviceId++;
-        JsonObject addMessage = createAddMessage(device);
-        sendToAllConnectedSessions(addMessage);
-    }
-
-    public void removeDevice(int id) {
-        Device device = getDeviceById(id);
-        if (device != null) {
-            devices.remove(device);
-            JsonProvider provider = JsonProvider.provider();
-            JsonObject removeMessage = provider.createObjectBuilder()
-                    .add("action", "remove")
-                    .add("id", id)
-                    .build();
-            sendToAllConnectedSessions(removeMessage);
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        for (UserSession session : sessions) {
+            sb.append("SessionId: ").append(session.getSession().getId()).append(", UserUUID: ").append(session.getUserIdentity().getUser().getUUID());
         }
+        return sb.toString();
     }
-
-    public void toggleDevice(int id) {
-        JsonProvider provider = JsonProvider.provider();
-        Device device = getDeviceById(id);
-        if (device != null) {
-            if ("On".equals(device.getStatus())) {
-                device.setStatus("Off");
-            } else {
-                device.setStatus("On");
-            }
-            JsonObject updateDevMessage = provider.createObjectBuilder()
-                    .add("action", "toggle")
-                    .add("id", device.getId())
-                    .add("status", device.getStatus())
-                    .build();
-            sendToAllConnectedSessions(updateDevMessage);
-        }
-    }
-
-    private Device getDeviceById(int id) {
-        for (Device device : devices) {
-            if (device.getId() == id) {
-                return device;
-            }
-        }
-        return null;
-    }*/
 
 }

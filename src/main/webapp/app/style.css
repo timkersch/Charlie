@@ -141,3 +141,13 @@ p {
 h2 img {
     height: 30px;
 }
+
+.menu {
+    cursor: pointer;
+}
+
+/* Create view Style */
+
+.md-input-container {
+    width: 25em;
+}
