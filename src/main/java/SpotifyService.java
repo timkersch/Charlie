@@ -98,9 +98,7 @@ public class SpotifyService {
 			System.out.println("You can reach this user at: " + currentUser.getEmail());
 			System.out.println("Users display name: " + currentUser.getDisplayName());
 
-			UserIdentity user = new UserIdentity(currentUser, accessToken, refreshToken);
-
-			return user;
+			return new UserIdentity(currentUser, accessToken, refreshToken);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
