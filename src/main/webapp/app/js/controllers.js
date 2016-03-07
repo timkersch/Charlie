@@ -137,5 +137,7 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
 
         $scope.choosePlaylist = function(id) {
             console.log(id);
+
+
         };
     }]);
