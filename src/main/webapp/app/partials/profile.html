@@ -1,20 +1,28 @@
-<md-content class="autoScroll">
+<style>
 
-    <h1>{{user.id}}</h1>
-    <img />
+    md-content {
+    margin: -1em;
+    }
+
+    span md-icon {
+    margin-top: -0.12em;
+    margin-right: 0.5em;
+    }
+
+</style>
+<md-content class="autoScroll">
+    <md-toolbar md-scroll-shrink id="lobby" class="md-warn">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">person</md-icon>Profile</span></div>
+    </md-toolbar>
     <md-list>
-        <md-list-item class="ng-scope" layout="row" layout-align="start center">
-            <div class="inset ng-binding">{{user.href}}</div>
+        <md-list-item class="md-2-line">
+            <md-icon aria-label="Username" class="material-icons">portrait</md-icon>
+            <div class="md-list-item-text" ng-class="{'md-offset': $index == 2 }">
+                <h3> {{ user.id }} </h3>
+                <p>User ID</p>
+            </div>
         </md-list-item>
-        <md-list-item class="ng-scope" layout="row" layout-align="start center">
-            <div class="inset ng-binding">{{user.href}}</div>
-        </md-list-item>
-        <md-list-item class="ng-scope" layout="row" layout-align="start center">
-            <div class="inset ng-binding">{{user.href}}</div>
-        </md-list-item>
-        <md-list-item class="ng-scope" layout="row" layout-align="start center">
-            <div class="inset ng-binding">{{user.href}}</div>
-        </md-list-item>
+
     </md-list>
 
 </md-content>
