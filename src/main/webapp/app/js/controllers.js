@@ -8,79 +8,62 @@ var charlieController = angular.module('charlieController', [
 
 charlieController.controller('mainController', ['$scope', '$location', '$routeParams', 'charlieProxy', '$mdSidenav',
     function($scope, $location, $routeParams, charlieProxy, $mdSidenav) {
+        $scope.user = {};
+        $scope.url = "";
+
+        $scope.changeView = function(view){
+            console.log("Changing view to: " + view);
+            $location.path(view); // path not hash
+            $scope.toggleLeftMenu();
+        };
 
         $scope.toggleLeftMenu = function() {
             $mdSidenav('left').toggle();
         };
 
-        var getLoginURL = function() {
-            charlieProxy.getLoginUrl(function(url){
-                //window.location.href = url;
-                $scope.url = url;
-                console.log("URL:" + url);
-            });
-        };
-
-        var getUser = function() {
-            charlieProxy.loginWithCode($routeParams.code, function(user){
-                $scope.user = user;
-                sessionStorage.user = angular.toJson(user);
-            });
-        };
-
-        var getUserFromStorage = function() {
-            $scope.user = angular.fromJson(sessionStorage.user);
-            charlieProxy.loginWithUser($scope.user.uuid, function(success){
-                console.log("Success: " + success);
-            });
-        };
-
         var init = function(){
-            if (!sessionStorage.user) {
-                // No user in storage
-                if (!$routeParams.code) // No redirect from spotify login
-                    getLoginURL();
-                    //setTimeout(getLoginURL, 2000);
-                else
-                    getUser();
+            if (charlieProxy.isLoggedIn()) {
+                console.log("Not logged in");
+                charlieProxy.getUser(function(user){
+                   $scope.user = user;
+                });
             } else {
-                // User in storage
-                getUserFromStorage();
+                if ($routeParams.code){
+                    charlieProxy.login($routeParams.code, function(user){
+                        $scope.user = user;
+                    });
+                } else {
+                    charlieProxy.getLoginUrl(function(url){
+                        $scope.url = url;
+                    });
+                }
             }
         };
 
         $scope.$on('$routeChangeSuccess', function() {
             // Initialize when service is ready
             if (charlieProxy.isReady()){
+                console.log("Already done");
                 init();
             }else{
                 $scope.$on('service-ready', function(event, args) {
                     init();
                 });
             }
-
-
         });
-
-        $scope.changeView = function(view){
-            $location.path(view); // path not hash
-            $scope.toggleLeftMenu();
-        };
-
-        $scope.user = {};
-        $scope.url = "";
 
         $scope.login = function (){
             console.log("login");
-            //getLoginURL();
             window.location.href = $scope.url;
         };
 
         $scope.logout = function (){
             console.log("logout");
-            sessionStorage.user = "";
             $scope.user = {};
             charlieProxy.logout();
+            charlieProxy.getLoginUrl(function(url){
+                $scope.url = url;
+            });
         };
     }]);
 
@@ -147,23 +130,21 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
         console.log("Inside scoreboardController");
     }]);
 
+charlieController.controller('profileController', [ '$scope', '$routeParams', 'charlieProxy',
+    function($scope, $routeParams, charlieProxy) {
+        console.log("Inside profileController");
+    }]);
+
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
+        $scope.playlistSelected = 0;
         $scope.readonly = false;
         $scope.tags = [];
 
-        $scope.showTags = function(){
-            console.log($scope.tags);
-        };
 
         charlieProxy.getPlaylists(function(lists){
             $scope.playlists = lists
         });
 
-        $scope.choosePlaylist = function(id) {
-            console.log(id);
-
-
-        };
     }]);
