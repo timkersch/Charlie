@@ -70,6 +70,7 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
 charlieController.controller('lobbyController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy){
         console.log("LobbyController!");
+        $scope.lobbyName = "abc";
     }]);
 
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
@@ -116,6 +117,7 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
         $scope.determinateValue = 10;
         var incrementer = 0;
         $scope.activated = true;
+
         $interval(function(){
             incrementer += 1;
             if(incrementer > 9){
@@ -127,6 +129,8 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
                 }
             }
         }, 100, 0, true);
+
+
 
     }]);
 
