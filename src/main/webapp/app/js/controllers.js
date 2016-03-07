@@ -142,4 +142,12 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
         $scope.showTags = function(){
             console.log($scope.tags);
         };
+
+        charlieProxy.getPlaylists(function(lists){
+            $scope.playlists = lists
+        });
+
+        $scope.choosePlaylist = function(id) {
+            console.log(id);
+        };
     }]);

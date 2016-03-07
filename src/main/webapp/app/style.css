@@ -146,8 +146,8 @@ h2 img {
     cursor: pointer;
 }
 
-/* Create view Style */
+/* Cont Style */
 
-.md-input-container {
-    width: 25em;
+.partials-cont {
+    margin: 1em;
 }
