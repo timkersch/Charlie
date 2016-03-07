@@ -65,7 +65,7 @@ public class WebsocketServer {
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", url).build();
                     session.getBasicRemote().sendText(response.toString());
                     break;
-                case "getUserByCode":
+                case "login":
                     String code = data.getString("code");
                     System.out.println("Code: " + code);
                     user = service.getUser(code);

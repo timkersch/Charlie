@@ -13,6 +13,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         };
         var isReady = false;
         var callbacks = {};
+        var user = {};
 
         socket.onmessage = function(event){
             console.log(event);
@@ -50,6 +51,18 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             isReady = true;
             $rootScope.$broadcast('service-ready');
             console.log("Service ready");
+
+            if (sessionStorage.user){
+                // User in storage
+                user = angular.fromJson(sessionStorage.user);
+                var data = {
+                    uuid: user.uuid
+                };
+                invoke("setUser", data).then(function(success){
+                    if (!success)
+                        sessionStorage.user = "";
+                });
+            }
         };
 
         return {
@@ -58,20 +71,28 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 return isReady;
             },
 
-            // callback(user)
-            loginWithCode: function(code, callback){
+            isLoggedIn: function(){
+                return ("id" in user);
+            },
+
+            login: function(code, callback){
                 var data = {
                     code: code
                 };
-                invoke("getUserByCode", data).then(callback);
+                invoke("login", data).then(function(userData){
+                    user = userData;
+                    sessionStorage.user = angular.toJson(user);
+                    callback(user);
+                });
             },
 
-            // callback(success)
-            loginWithUser: function(uuid, callback){
-                var data = {
-                    uuid: uuid
-                };
-                invoke("setUser", data).then(callback);
+            // callback(user)
+            getUser: function(callback){
+                if (this.isLoggedIn())
+                    // No user in storage
+                    callback(user);
+                else
+                    callback({});
             },
 
             // callback(url)
@@ -80,6 +101,8 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             logout: function(){
+                sessionStorage.user = "";
+                user = {};
                 invoke("logout");
             },
 

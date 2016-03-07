@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <!--<base href="index.html" />-->
     <base href="/" />
 </head>
 <body ng-app="charlieApp">
@@ -57,16 +56,14 @@
                 <div class="inset">
                     <md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>
                 </div>
-
                 <div class="inset ng-binding">New Quiz</div>
                 <div class="md-ripple-container"></div>
             </md-list-item>
 
-            <md-list-item class="ng-scope" layout="row" layout-align="start center">
+            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/profile')">
                 <div class="inset">
                     <md-icon aria-label="Menu" class="material-icons">person</md-icon>
                 </div>
-
                 <div class="inset ng-binding">Profile</div>
                 <div class="md-ripple-container"></div>
             </md-list-item>
