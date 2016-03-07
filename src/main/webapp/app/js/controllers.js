@@ -105,9 +105,23 @@ charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'cha
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$routeParams', '$interval', 'charlieProxy',
+    function($scope, $routeParams, $interval, charlieProxy) {
         console.log("Inside questionController");
+        $scope.determinateValue = 10;
+        var incrementer = 0;
+        $scope.activated = true;
+        $interval(function(){
+            incrementer += 1;
+            if(incrementer > 9){
+                incrementer = 0;
+                $scope.determinateValue -= 1;
+                if($scope.determinateValue === -1){
+                    /*Call a new question from here, because the time has passed*/
+                    $scope.determinateValue = 10;
+                }
+            }
+        }, 100, 0, true);
 
     }]);
 
@@ -124,20 +138,13 @@ charlieController.controller('profileController', [ '$scope', '$routeParams', 'c
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
+        $scope.playlistSelected = 0;
         $scope.readonly = false;
         $scope.tags = [];
 
-        $scope.showTags = function(){
-            console.log($scope.tags);
-        };
 
         charlieProxy.getPlaylists(function(lists){
             $scope.playlists = lists
         });
 
-        $scope.choosePlaylist = function(id) {
-            console.log(id);
-
-
-        };
     }]);
