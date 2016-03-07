@@ -1,23 +1,11 @@
-import com.google.appengine.repackaged.com.google.common.base.Flag;
-import com.google.common.primitives.Booleans;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
-
-import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
 
-import java.io.IOException;
 import java.util.*;
-
-import com.wrapper.spotify.methods.UserPlaylistsRequest;
-import com.wrapper.spotify.models.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by: Tim Kerschbaumer
@@ -41,7 +29,7 @@ public class SpotifyService {
 		List<String> scopes = Arrays.asList("user-read-private", "user-read-email");
 
 		/* Set a state. This is used to prevent cross site request forgeries. */
-		String state = "someExpectedStateString";
+		String state = "someState";
 
 		return api.createAuthorizeURL(scopes, state);
 	}

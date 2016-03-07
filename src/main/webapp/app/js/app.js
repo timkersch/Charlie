@@ -8,7 +8,7 @@
 
 	charlieApp.config(['$routeProvider', '$locationProvider',
 		function($routeProvider, $locationProvider){
-			$locationProvider.html5Mode(true);
+			//$locationProvider.html5Mode(true);
 
 			$routeProvider.
 				when('/', {
@@ -20,9 +20,14 @@
 					controller: 'signupController'
 				}).
 				when('/create', {
-				templateUrl: 'app/partials/create.html',
-				controller: 'createController',
-				css: 'app/css/partials/create.css'
+					templateUrl: 'app/partials/create.html',
+					controller: 'createController',
+					css: 'app/css/partials/create.css'
+				}).
+				when('/profile', {
+					templateUrl: 'app/partials/profile.html',
+					controller: 'profileController',
+					css: 'app/css/partials/profile.css'
 				}).
 				when('/scoreboard',{
 					templateUrl: 'app/partials/scoreboard.html',
