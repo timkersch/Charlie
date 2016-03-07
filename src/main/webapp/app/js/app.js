@@ -12,6 +12,10 @@
 
 			$routeProvider.
 				when('/', {
+					templateUrl: 'app/partials/home.html',
+					controller: 'homeController'
+				}).
+				when('/lobby',{
 					templateUrl: 'app/partials/lobby.html',
 					controller: 'lobbyController'
 				}).

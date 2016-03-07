@@ -67,6 +67,11 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
+charlieController.controller('lobbyController', ['$scope', '$routeParams', 'charlieProxy',
+    function($scope, $routeParams, charlieProxy){
+        console.log("LobbyController!");
+    }]);
+
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
@@ -86,7 +91,7 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
         };
     }]);
 
-charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('homeController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
 
@@ -128,6 +133,8 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
+
+
     }]);
 
 charlieController.controller('profileController', [ '$scope', '$routeParams', 'charlieProxy',
