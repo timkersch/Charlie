@@ -26,7 +26,7 @@ public class SpotifyService {
 	*/
 	public String getAuthorizeURL() {
 		/* Set the necessary scopes that the application will need from the user */
-		List<String> scopes = Arrays.asList("user-read-private", "user-read-email");
+		List<String> scopes = new ArrayList<>(); //Arrays.asList("user-read-private", "user-read-email");
 
 		/* Set a state. This is used to prevent cross site request forgeries. */
 		String state = "someState";
