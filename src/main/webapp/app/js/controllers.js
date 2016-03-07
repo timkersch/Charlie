@@ -124,13 +124,18 @@ charlieController.controller('profileController', [ '$scope', '$routeParams', 'c
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
-        $scope.playlistSelected = 0;
+        $scope.name = null;
+        $scope.nbrOfQuestions = 0;
+        $scope.playlistSelected = null;
         $scope.readonly = false;
         $scope.tags = [];
-
 
         charlieProxy.getPlaylists(function(lists){
             $scope.playlists = lists
         });
+
+        $scope.submit = function() {
+            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected)
+        };
 
     }]);
