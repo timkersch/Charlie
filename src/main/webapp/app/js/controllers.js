@@ -136,20 +136,13 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
+        $scope.playlistSelected = 0;
         $scope.readonly = false;
         $scope.tags = [];
 
-        $scope.showTags = function(){
-            console.log($scope.tags);
-        };
 
         charlieProxy.getPlaylists(function(lists){
             $scope.playlists = lists
         });
 
-        $scope.choosePlaylist = function(id) {
-            console.log(id);
-
-
-        };
     }]);
