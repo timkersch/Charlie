@@ -70,6 +70,10 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
 charlieController.controller('lobbyController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy){
         console.log("LobbyController!");
+        $scope.$on("user-joined", function(data) {
+            $scope.users = [];
+            $scope.users.push(data);
+        });
     }]);
 
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
@@ -146,7 +150,7 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
-        $scope.nbrOfQuestions = 0;
+        $scope.nbrOfQuestions = "";
         $scope.playlistSelected = null;
         $scope.readonly = false;
         $scope.tags = [];

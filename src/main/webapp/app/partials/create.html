@@ -1,6 +1,22 @@
+<style>
+    md-content {
+        margin: -1em;
+    }
+
+    form {
+        padding: 1em;
+    }
+
+    span md-icon {
+        margin-top: -0.1em;
+        margin-right: 0.5em;
+    }
+</style>
 <md-content class="autoScroll">
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>Create quiz</span></div>
+    </md-toolbar>
     <form ng-submit="submit()">
-        <h3>Create new quiz!</h3>
         <md-input-container class="md-block">
             <label>Quiz name</label>
             <input ng-model="name">

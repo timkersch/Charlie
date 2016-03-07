@@ -1,3 +1,22 @@
-<div>
-	<h1>Lobby</h1>
-</div>
+<style>
+    md-content {
+        margin: -1em;
+    }
+
+    span md-icon {
+        margin-top: -0.1em;
+        margin-right: 0.5em;
+    }
+</style>
+<md-content>
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>Quiz lobby</span></div>
+    </md-toolbar>
+
+    <md-list>
+        <md-list-item ng-repeat="user in users">
+            {{user.name}}
+        </md-list-item>
+    </md-list>
+    <md-button class="md-primary md-raised">START QUIZ</md-button>
+</md-content>

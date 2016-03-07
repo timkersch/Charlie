@@ -17,7 +17,8 @@
 				}).
 				when('/lobby',{
 					templateUrl: 'app/partials/lobby.html',
-					controller: 'lobbyController'
+					controller: 'lobbyController',
+					css: 'app/css/partials/lobby.css'
 				}).
 				when('/signup', {
 					templateUrl: 'app/partials/signup.html',
