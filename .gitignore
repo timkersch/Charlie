@@ -22,4 +22,5 @@ npm-debug.log
 *.iml
 /src/main/java/Main.java
 /src/main/java/SpotifyCredentials.java
+target/
 
