@@ -2,7 +2,6 @@
 package persistence;
 
 import java.io.Serializable;
-import java.util.UUID;
 import javax.persistence.*;
 
 /**

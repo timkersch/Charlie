@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.json.*;
 import javax.json.spi.JsonProvider;
 import javax.persistence.EntityManager;
@@ -15,7 +13,6 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,16 +22,10 @@ public class WebsocketServer {
 
 
     @Inject
-    private DB db;// = new DB();
+    private DB db;
 
     @PersistenceContext(unitName = "db")
     EntityManager em; 
-
-    /*@EJB
-    private UserCatalogue userCatalogue;
-
-    @EJB
-    private QuizCatalogue quizCatalogue;*/
 
     private final SpotifyService service = new SpotifyService();
 
@@ -82,7 +73,6 @@ public class WebsocketServer {
                     String url = service.getAuthorizeURL();
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", url).build();
                     session.getBasicRemote().sendText(response.toString());
-                    //userCatalogue.create(UserIdentity.createDummyUser());
                     break;
                 case "login":
                     String code = data.getString("code");
@@ -135,17 +125,11 @@ public class WebsocketServer {
                     String playlistId = jsonMessage.getString("playlist");
                     int nbrOfSongs = jsonMessage.getInt("nbrOfSongs");
 
-                    // Create a new playlist for the quiz
-                    //Playlist playlist = service.createQuizPlaylist();
                     List<Track> tracks = service.getPlaylistSongs(playlistId);
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
                     List<String> similarTrackIds = new ArrayList<>();
                     for(Track track : similarTracks)
                         similarTrackIds.add(track.getId());
-                    /*List<String> trackIds = new ArrayList<>();
-                    for (Track track : similarTracks)
-                        trackIds.add(track.getId());*/
-                    //service.addTracksToPlayList(trackIds, playlist.getId());
 
                     Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), similarTrackIds);
                     

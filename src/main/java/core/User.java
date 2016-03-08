@@ -1,7 +1,6 @@
 package core;
 
 import java.io.Serializable;
-import persistence.AbstractEntity;
 
 import javax.persistence.Embeddable;
 
