@@ -160,7 +160,53 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
         var incrementer = 0;
         var answer = "";
         $scope.activated = true;
-        $scope.isDisabled = false;
+
+        var hasIndex = '';
+        var hasAnswerd = false;
+        $scope.isDisabled = function(index){
+            if (hasAnswerd) {
+                if (hasIndex === index) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        };
+        $scope.selectedAnswer = function(data, index){
+            if (!hasAnswerd) {
+                answer = data.artist;
+                console.log(index);
+                hasAnswerd = true;
+                hasIndex = index;
+            }
+        };
+
+        $scope.retriveCursor = function() {
+            if (hasAnswerd) {
+                return 'selected';
+            } else {
+                return 'notSelected';
+            }
+        }
+
+        $scope.setColor = function(index) {
+          switch (index) {
+              case 0: return 'green';
+                      break;
+              case 1: return 'red';
+                      break;
+              case 2: return 'blue';
+                      break;
+              case 3: return 'yellow';
+                      break;
+              default:return 'grey';
+                      break;
+          }
+        };
+
         var question1 = [{
                 artist: "The killers"
             },
@@ -192,19 +238,12 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
         /*Test the js-fiddle here*/
         $scope.isSelected = function(data){
             return $scope.selected === data;
-        }
+        };
 
         $scope.setAnswer2 = function(data){
             $scope.selected = data.artist;
-        }
+        };
         /*-------*/
-
-        $scope.selectedAnswer = function(data, index){
-            answer = data.artist;
-            console.log(index);
-            $scope.isDisabled = true;
-
-        }
 
         $interval(function(){
             incrementer += 1;
@@ -220,7 +259,8 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
 
                     $scope.suggestions = question2;
                     $scope.determinateValue = 20;
-                    $scope.isDisabled = false;
+                    hasAnswerd = false;
+                    hasIndex = '';
                 }
             }
         }, 100, 0, true);
