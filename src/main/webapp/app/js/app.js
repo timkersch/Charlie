@@ -3,6 +3,7 @@
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
 		'ngMaterial',
+		'ngMessages',
 		'charlieController'
 	]);
 
@@ -12,8 +13,13 @@
 
 			$routeProvider.
 				when('/', {
+					templateUrl: 'app/partials/home.html',
+					controller: 'homeController'
+				}).
+				when('/lobby',{
 					templateUrl: 'app/partials/lobby.html',
-					controller: 'lobbyController'
+					controller: 'lobbyController',
+					css: 'app/css/partials/lobby.css'
 				}).
 				when('/signup', {
 					templateUrl: 'app/partials/signup.html',

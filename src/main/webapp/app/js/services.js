@@ -65,6 +65,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             }
         };
 
+
         return {
 
             isReady: function(){
@@ -123,6 +124,5 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             getPlaylists: function(callback){
                 invoke("getPlaylists").then(callback);
             }
-
         };
     }]);

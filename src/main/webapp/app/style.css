@@ -142,6 +142,10 @@ h2 img {
     height: 30px;
 }
 
+md-list {
+    padding: 0 !important;
+}
+
 .menu {
     cursor: pointer;
 }

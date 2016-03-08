@@ -67,6 +67,34 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
+charlieController.controller('lobbyController', ['$scope', '$location', '$routeParams', 'charlieProxy',
+    function($scope, $location,  $routeParams, charlieProxy){
+        console.log("LobbyController!");
+        $scope.status = '  ';
+
+        /*var quizname = charlieProxy.getQuizname();*/
+        $scope.quizname = "Simpas Quiz";
+        var users = [{
+            name: "Simon"
+        },{
+            name: "Erik"
+        },{
+            name: "Joakim"
+        },{
+            name: "Tim"
+            }];
+        $scope.users = users;
+
+        $scope.$on("user-joined", function(data) {
+            $scope.users = [];
+            $scope.users.push(data);
+        });
+
+        $scope.startQuiz = function(){
+            $location.path('/question');
+        }
+    }]);
+
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
@@ -86,7 +114,7 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
         };
     }]);
 
-charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'charlieProxy',
+charlieController.controller('homeController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Init");
 
@@ -105,46 +133,176 @@ charlieController.controller('lobbyController', [ '$scope', '$routeParams', 'cha
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$routeParams', '$interval', 'charlieProxy',
-    function($scope, $routeParams, $interval, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$location','$routeParams', '$interval', 'charlieProxy',
+    function($scope, $location, $routeParams, $interval, charlieProxy) {
         console.log("Inside questionController");
-        $scope.determinateValue = 10;
+        $scope.determinateValue = 20;
         var incrementer = 0;
+        var questionNumber = 0;
+        var answer = "";
         $scope.activated = true;
+
+        var hasIndex = '';
+        var hasAnswerd = false;
+        $scope.isDisabled = function(index){
+            if (hasAnswerd) {
+                if (hasIndex === index) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+
+        };
+        $scope.selectedAnswer = function(data, index){
+            if (!hasAnswerd) {
+                answer = data.artist;
+                console.log(index);
+                hasAnswerd = true;
+                hasIndex = index;
+            }
+        };
+
+        $scope.retriveCursor = function() {
+            if (hasAnswerd) {
+                return 'selected';
+            } else {
+                return 'notSelected';
+            }
+        }
+
+        $scope.setColor = function(index) {
+          switch (index) {
+              case 0: return 'green';
+                      break;
+              case 1: return 'red';
+                      break;
+              case 2: return 'blue';
+                      break;
+              case 3: return 'yellow';
+                      break;
+              default:return 'grey';
+                      break;
+          }
+        };
+
+        var question1 = [{
+                artist: "The killers"
+            },
+            {
+                artist: "Gavin Degraw"
+            },
+            {
+                artist: "The sons of Erik"
+            },
+            {
+                artist: "Army of Bertssons"
+            }];
+
+        var question2 = [{
+            artist: "The Beatles"
+        },
+            {
+                artist: "Darin"
+            },
+            {
+                artist: "Lill Lindfors"
+            },
+            {
+                artist: "Muse"
+            }];
+
+        $scope.suggestions = question1;
+
+        /*Test the js-fiddle here*/
+        $scope.isSelected = function(data){
+            return $scope.selected === data;
+        };
+
+        $scope.setAnswer2 = function(data){
+            $scope.selected = data.artist;
+        };
+        /*-------*/
+
         $interval(function(){
             incrementer += 1;
             if(incrementer > 9){
                 incrementer = 0;
                 $scope.determinateValue -= 1;
                 if($scope.determinateValue === -1){
-                    /*Call a new question from here, because the time has passed*/
-                    $scope.determinateValue = 10;
+                    questionNumber += 1;
+                    console.log("questionnumber: " + questionNumber);
+                    if(questionNumber > 2){
+                         $location.path('/scoreboard');
+                     }
+                    /*
+                    * 1. Get the answer and send to the backend.
+                    * 2. Get the next question
+                    */
+                    console.log(answer);
+
+                    $scope.suggestions = question2;
+                    $scope.determinateValue = 20;
+                    hasAnswerd = false;
+                    hasIndex = '';
                 }
             }
         }, 100, 0, true);
+
+        $scope.$on('newQuestion', function(){
+           charlieProxy.getCurrentQuestion();
+
+        });
+
+        /*
+        * 1. Get the quiz
+        * 2. Get the question
+        * 3. Get the artists
+        * 4. Place it in $scope.questions to repeat it.
+        */
+
+        /*
+        * 1. When the time has exceeded call the next question.
+        * 2. Do the same as above.
+        */
 
     }]);
 
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
+
+
     }]);
 
 charlieController.controller('profileController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside profileController");
+
+        charlieProxy.getUser(function(user){
+            $scope.user = user;
+            console.log(user);
+        });
+
     }]);
 
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside createController");
-        $scope.playlistSelected = 0;
+        $scope.name = null;
+        $scope.nbrOfQuestions = "";
+        $scope.playlistSelected = null;
         $scope.readonly = false;
         $scope.tags = [];
-
 
         charlieProxy.getPlaylists(function(lists){
             $scope.playlists = lists
         });
+
+        $scope.submit = function() {
+            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected)
+        };
 
     }]);
