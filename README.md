@@ -1,2 +1,4 @@
-# SpotHoot
-Project for course web applications.
+appengine-skeleton
+=============================
+
+This is a generated application from the appengine-skeleton archetype.

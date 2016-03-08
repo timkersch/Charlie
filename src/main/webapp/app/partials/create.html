@@ -1,0 +1,35 @@
+<md-content class="autoScroll">
+    <form ng-submit="submit()">
+        <h3>Create new quiz!</h3>
+        <md-input-container class="md-block">
+            <label>Quiz name</label>
+            <input ng-model="name">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label>Number of questions</label>
+            <input ng-model="nbrOfQuestions">
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label>Invite Friends</label>
+            <md-chips
+                    ng-model="tags"
+                    readonly="readonly"
+                    placeholder="+Friend"
+                    delete-button-label="Remove Tag"
+                    delete-hint="Press delete to remove tag"
+                    secondary-placeholder="Enter a Friend">
+            </md-chips>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label for="playlists">Choose playlist</label>
+
+                <md-radio-group ng-model="playlistSelected" id="playlists">
+                    <md-radio-button ng-repeat="playlist in playlists" ng-value="playlist.id" class="md-primary">{{playlist.name}}</md-radio-button>
+                </md-radio-group>
+
+        </md-input-container>
+
+        <md-button class="md-primary md-raised">CREATE</md-button>
+    </form>
+</md-content>
