@@ -131,11 +131,12 @@ charlieController.controller('homeController', [ '$scope', '$routeParams', 'char
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$routeParams', '$interval', 'charlieProxy',
-    function($scope, $routeParams, $interval, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$location','$routeParams', '$interval', 'charlieProxy',
+    function($scope, $location, $routeParams, $interval, charlieProxy) {
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         var incrementer = 0;
+        var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
         $scope.isDisabled = false;
@@ -174,7 +175,7 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
 
         $scope.setAnswer2 = function(data){
             $scope.selected = data.artist;
-        }
+        };
         /*-------*/
 
         $scope.selectedAnswer = function(data, index){
@@ -182,7 +183,9 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
             console.log(index);
             $scope.isDisabled = true;
 
-        }
+        };
+
+
 
         $interval(function(){
             incrementer += 1;
@@ -190,6 +193,11 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
                 incrementer = 0;
                 $scope.determinateValue -= 1;
                 if($scope.determinateValue === -1){
+                    questionNumber += 1;
+                    console.log("questionnumber: " + questionNumber);
+                    if(questionNumber > 2){
+                         $location.path('/scoreboard');
+                     }
                     /*
                     * 1. Get the answer and send to the backend.
                     * 2. Get the next question
