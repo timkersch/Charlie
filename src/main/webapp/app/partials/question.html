@@ -15,7 +15,7 @@
 
 	<section layout="row" layout-align="center center">
 		<section layout="column" layout-align="center center" ng-repeat="sug in suggestions">
-			<md-button md-disable="true" ng-disabled="isDisabled" md-class="md-primary" ng-click="selectedAnswer(sug)">{{sug.artist}}</md-button>
+			<md-button id="$index" md-disable="true" ng-disabled="isDisabled" md-class="md-primary" ng-click="selectedAnswer(sug, $index)">{{sug.artist}}</md-button>
 		</section>
 	</section>
 	<!--

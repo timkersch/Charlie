@@ -37,7 +37,7 @@
         <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
             <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
         </md-button>
-        <h2>SpotHoot</h2>
+        <h2> <a ng-href="/#/">SpotHoot</a></h2>
         <span flex="" class="flex"></span>
         <span>{{user.id}}</span>
         <md-button ng-show="!user.id" ng-click="login()">Login</md-button>
@@ -51,6 +51,13 @@
         </md-toolbar>
 
         <md-list>
+            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/')">
+                <div class="inset">
+                    <md-icon aria-label="Menu" class="material-icons">home</md-icon>
+                </div>
+                <div class="inset ng-binding">Home</div>
+                <div class="md-ripple-container"></div>
+            </md-list-item>
 
             <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/create')">
                 <div class="inset">

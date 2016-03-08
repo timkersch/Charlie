@@ -177,9 +177,11 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
         }
         /*-------*/
 
-        $scope.selectedAnswer = function(data){
+        $scope.selectedAnswer = function(data, index){
             answer = data.artist;
+            console.log(index);
             $scope.isDisabled = true;
+
         }
 
         $interval(function(){
