@@ -98,9 +98,7 @@ public class WebsocketServer {
                     userSession.setUserIdentity(user);
                     
                     // Create user json
-                    JsonElement jsonElement = gson.toJsonTree(user.getUser());
-                    jsonElement.getAsJsonObject().addProperty("id", user.getId());;
-                    String userAsString = gson.toJson(jsonElement);
+                    String userAsString = gson.toJson(user.toJsonElement());
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", userAsString).build();
                     
                     // Send back result
@@ -144,8 +142,13 @@ public class WebsocketServer {
                     // Retrieve online users from session handler
                     List<UserIdentity> onlineUsers = sessionHandler.getUsers();
                     
+                    // Create user json
+                    List<JsonElement> onlineUsersAsJson = new ArrayList<>();
+                    for(UserIdentity userIdentity : onlineUsers)
+                        onlineUsersAsJson.add(userIdentity.toJsonElement());
+                    
                     // Send them back as json
-                    String usersString = gson.toJson(onlineUsers);
+                    String usersString = gson.toJson(onlineUsersAsJson);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
                     System.out.println("Users: " + usersString);
                     session.getBasicRemote().sendText(response.toString());

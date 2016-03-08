@@ -1,5 +1,7 @@
 package core;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import persistence.AbstractEntity;
 
 import javax.persistence.*;
@@ -47,5 +49,12 @@ public class UserIdentity extends AbstractEntity{
         dummy.user = new User();
         dummy.user.setName("dummy");
         return dummy;
+    }
+    
+    public JsonElement toJsonElement(){
+        Gson gson = new Gson();
+        JsonElement element = gson.toJsonTree(this.getUser());
+        element.getAsJsonObject().addProperty("id", this.getId());;
+        return element;
     }
 }
