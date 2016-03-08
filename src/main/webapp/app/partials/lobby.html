@@ -20,7 +20,7 @@
 </style>
 <md-content>
     <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
-        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>Quiz lobby</span></div>
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>{{quizname}}</span></div>
     </md-toolbar>
 
     <md-list>
@@ -28,8 +28,8 @@
             {{user.name}}
         </md-list-item>
     </md-list>
-    <md-button class="md-primary md-raised">START QUIZ</md-button>
     <md-button class="md-primary md-raised" ng-click="showConfirm($event)"  flex="100"  flex-gt-md="auto">
         Confirm Dialog
     </md-button>
+    <md-button class="md-primary md-raised" ng-click="startQuiz()">START QUIZ</md-button>
 </md-content>

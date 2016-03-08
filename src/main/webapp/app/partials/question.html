@@ -1,3 +1,8 @@
+<style>
+	.active{
+		color: red;
+	}
+</style>
 <div>
 	<div ng-cloak>
 		<h1>Who´s the artist?</h1>
@@ -7,14 +12,16 @@
 
 		<br>
 	</div>
+
 	<section layout="row" layout-align="center center">
-		<section layout="column" layout-align="center center">
-			<md-button md-disable="true" md-class="md-primary">Answer 1</md-button>
-			<md-button md-disable="true" md-class="md-primary">Answer 2</md-button>
-		</section>
-		<section layout="column" layout-align="center center">
-			<md-button md-disable="true" md-class="md-primary">Answer 3</md-button>
-			<md-button md-disable="true" md-class="md-primary">Answer 4</md-button>
+		<section layout="column" layout-align="center center" ng-repeat="sug in suggestions">
+			<md-button id="$index" md-disable="true" ng-disabled="isDisabled" md-class="md-primary" ng-click="selectedAnswer(sug, $index)">{{sug.artist}}</md-button>
 		</section>
 	</section>
+	<!--
+	<section layout="row" layout-align="center center">
+		<section layout="column" layout-align="center center" ng-repeat="sug in suggestions" ng-class="{active : isSelected(suggestion)}">
+			<md-button md-disable="true" md-class="md-primary" ng-click="setAnswer(sug)">{{sug.artist}}</md-button>
+		</section>
+	</section> -->
 </div>
