@@ -67,11 +67,10 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
-charlieController.controller('lobbyController', ['$scope', '$location', '$mdDialog', '$mdMedia', '$routeParams', 'charlieProxy',
-    function($scope, $location, $mdDialog, $mdMedia, $routeParams, charlieProxy){
+charlieController.controller('lobbyController', ['$scope', '$location', '$routeParams', 'charlieProxy',
+    function($scope, $location,  $routeParams, charlieProxy){
         console.log("LobbyController!");
         $scope.status = '  ';
-        $scope.customFullscreen = $mdMedia('xs') || $mdMedia('sm');
 
         /*var quizname = charlieProxy.getQuizname();*/
         $scope.quizname = "Simpas Quiz";
@@ -91,25 +90,6 @@ charlieController.controller('lobbyController', ['$scope', '$location', '$mdDial
             $scope.users.push(data);
         });
 
-        $scope.showConfirm = function(ev) {
-            console.log(ev);
-            // Appending dialog to document.body to cover sidenav in docs app
-            var confirm = $mdDialog.confirm()
-                .title('Would you like to join a quiz?')
-                .textContent('Name would like you to join his/her quiz.')
-                .ariaLabel('Quiz invite')
-                .targetEvent(ev)
-                .ok('Accept')
-                .cancel('Decline');
-
-            console.log(confirm);
-
-            $mdDialog.show(confirm).then(function() {
-                $scope.status = 'You decided to get rid of your debt.';
-            }, function() {
-                $scope.status = 'You decided to keep your debt.';
-            });
-        };
         $scope.startQuiz = function(){
             $location.path('/question');
         }
@@ -153,11 +133,12 @@ charlieController.controller('homeController', [ '$scope', '$routeParams', 'char
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$routeParams', '$interval', 'charlieProxy',
-    function($scope, $routeParams, $interval, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$location','$routeParams', '$interval', 'charlieProxy',
+    function($scope, $location, $routeParams, $interval, charlieProxy) {
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         var incrementer = 0;
+        var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
 
@@ -251,6 +232,11 @@ charlieController.controller('questionController', [ '$scope', '$routeParams', '
                 incrementer = 0;
                 $scope.determinateValue -= 1;
                 if($scope.determinateValue === -1){
+                    questionNumber += 1;
+                    console.log("questionnumber: " + questionNumber);
+                    if(questionNumber > 2){
+                         $location.path('/scoreboard');
+                     }
                     /*
                     * 1. Get the answer and send to the backend.
                     * 2. Get the next question

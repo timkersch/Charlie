@@ -28,8 +28,24 @@
             {{user.name}}
         </md-list-item>
     </md-list>
-    <md-button class="md-primary md-raised" ng-click="showConfirm($event)"  flex="100"  flex-gt-md="auto">
+
+
+    <md-button class="md-primary md-raised" data-toggle="modal" data-target=".bs-example-modal-sm" flex="100"  flex-gt-md="auto">
         Confirm Dialog
     </md-button>
+    <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <p> Simon want's to play a quiz with you, do you wanna play?</p>
+                <md-button class="md-primary md-raised" flex="100"  flex-gt-md="auto" ng-click="goToGameLobby()">
+                    Yes
+                </md-button>
+                <md-button class="md-primary md-raised" flex="100"  flex-gt-md="auto" ng-click="hideModal()">
+                    No
+                </md-button>
+            </div>
+        </div>
+    </div>
     <md-button class="md-primary md-raised" ng-click="startQuiz()">START QUIZ</md-button>
+
 </md-content>
