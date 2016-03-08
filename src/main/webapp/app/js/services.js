@@ -56,7 +56,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 // User in storage
                 user = angular.fromJson(sessionStorage.user);
                 var data = {
-                    uuid: user.uuid
+                    id: user.id
                 };
                 invoke("setUser", data).then(function(success){
                     if (!success)
@@ -72,7 +72,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             isLoggedIn: function(){
-                return ("id" in user);
+                return ("name" in user);
             },
 
             login: function(code, callback){

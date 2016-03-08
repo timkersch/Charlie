@@ -50,5 +50,10 @@ public abstract class AbstractEntity implements Serializable {
         AbstractEntity other = (AbstractEntity) obj;
         return getId().equals(other.getId());
     }
+    
+    @Override
+    public String toString(){
+        return "Entity[id: " + id + "]";
+    }
 
 }
