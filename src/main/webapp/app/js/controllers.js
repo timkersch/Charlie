@@ -67,9 +67,12 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
-charlieController.controller('lobbyController', ['$scope', '$location','$routeParams', 'charlieProxy',
-    function($scope, $location, $routeParams, charlieProxy){
+charlieController.controller('lobbyController', ['$scope', '$location', '$mdDialog', '$mdMedia', '$routeParams', 'charlieProxy',
+    function($scope, $location, $mdDialog, $mdMedia, $routeParams, charlieProxy){
         console.log("LobbyController!");
+        $scope.status = '  ';
+        $scope.customFullscreen = $mdMedia('xs') || $mdMedia('sm');
+
         /*var quizname = charlieProxy.getQuizname();*/
         $scope.quizname = "Simpas Quiz";
         var users = [{
@@ -82,15 +85,34 @@ charlieController.controller('lobbyController', ['$scope', '$location','$routePa
             name: "Tim"
             }];
         $scope.users = users;
+
         $scope.$on("user-joined", function(data) {
             $scope.users = [];
             $scope.users.push(data);
         });
 
+        $scope.showConfirm = function(ev) {
+            console.log(ev);
+            // Appending dialog to document.body to cover sidenav in docs app
+            var confirm = $mdDialog.confirm()
+                .title('Would you like to join a quiz?')
+                .textContent('Name would like you to join his/her quiz.')
+                .ariaLabel('Quiz invite')
+                .targetEvent(ev)
+                .ok('Accept')
+                .cancel('Decline');
+
+            console.log(confirm);
+
+            $mdDialog.show(confirm).then(function() {
+                $scope.status = 'You decided to get rid of your debt.';
+            }, function() {
+                $scope.status = 'You decided to keep your debt.';
+            });
+        };
         $scope.startQuiz = function(){
             $location.path('/question');
         }
-
     }]);
 
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',

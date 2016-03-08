@@ -3,6 +3,7 @@
 	var charlieApp = angular.module('charlieApp', [
 		'ngRoute',
 		'ngMaterial',
+		'ngMessages',
 		'charlieController'
 	]);
 
