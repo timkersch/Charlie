@@ -1,5 +1,6 @@
 package core;
 
+import java.util.List;
 import persistence.AbstractDAO;
 
 import javax.ejb.Stateless;
@@ -23,5 +24,14 @@ public class UserCatalogue extends AbstractDAO<UserIdentity, Long> {
     @Override
     protected EntityManager getEntityManager() {
         return em;
+    }
+    
+    public UserIdentity getByName(String name) {
+        List<UserIdentity> users = this.findAll();
+        for(UserIdentity user : users) {
+            if (user.getUser().getName().equals(name))
+                return user;
+        }
+        return null;
     }
 }

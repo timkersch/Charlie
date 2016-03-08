@@ -87,12 +87,14 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 });
             },
 
-            createQuiz: function(){
-                invoke("createQuiz", {}).then(function(userData){
-                    //user = userData;
-                    //sessionStorage.user = angular.toJson(user);
-                    //callback(user);
-                });
+            // callback(quiz)
+            createQuiz: function(userIds, playlistId, nbrOfSongs, callback){
+                var data = {
+                    users: userIds,
+                    playlist: playlistId,
+                    nbrOfSongs: nbrOfSongs
+                };
+                invoke("createQuiz", data).then(callback);
             },
 
             // callback(user)
