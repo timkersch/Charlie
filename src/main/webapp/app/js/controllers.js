@@ -230,6 +230,12 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
 charlieController.controller('profileController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside profileController");
+
+        charlieProxy.getUser(function(user){
+            $scope.user = user;
+            console.log(user);
+        });
+
     }]);
 
 charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
