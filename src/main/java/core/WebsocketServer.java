@@ -1,6 +1,7 @@
 package core;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 
@@ -80,7 +81,10 @@ public class WebsocketServer {
                     user = service.getUser(code);
                     db.getUserCatalogue().create(user);
                     userSession.setUserIdentity(user);
-                    userAsString = gson.toJson((user.getUser()));
+                    //userAsString = gson.toJson(user);
+                    JsonElement jsonElement = gson.toJsonTree(user.getUser());
+                    jsonElement.getAsJsonObject().addProperty("id", user.getId());;
+                    userAsString = gson.toJson(jsonElement);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", userAsString).build();
                     System.out.println("User: " + userAsString);
                     session.getBasicRemote().sendText(response.toString());
@@ -93,6 +97,8 @@ public class WebsocketServer {
                     if (user == null) {
                         user = UserIdentity.createDummyUser();
                         success = false;
+                    }else{
+                        service.setTokens(user.getAccessToken(), user.getRefreshToken());
                     }
                     userSession.setUserIdentity(user);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", success).build();

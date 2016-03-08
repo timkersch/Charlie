@@ -41,9 +41,9 @@
         </md-button>
         <h2> <a ng-href="/#/">SpotHoot</a></h2>
         <span flex="" class="flex"></span>
-        <span>{{user.id}}</span>
-        <md-button ng-show="!user.id" ng-click="login()">Login</md-button>
-        <md-button ng-show="user.id" ng-click="logout()">Logout</md-button>
+        <span>{{user.name}}</span>
+        <md-button ng-show="!user.name" ng-click="login()">Login</md-button>
+        <md-button ng-show="user.name" ng-click="logout()">Logout</md-button>
     </md-toolbar>
     <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
         <md-toolbar ng-click="toggleLeftMenu()">
