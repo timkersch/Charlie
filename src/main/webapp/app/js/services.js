@@ -5,7 +5,7 @@ var charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$q', '$rootScope',
     function($q, $rootScope){
-        var socket = new WebSocket("ws://localhost:8080/api");
+        var socket = new WebSocket("ws://localhost:8080/SpotHoot/api");
 
         var requestId = 0;
         var getRequestId = function(){
@@ -83,6 +83,14 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     user = userData;
                     sessionStorage.user = angular.toJson(user);
                     callback(user);
+                });
+            },
+
+            createQuiz: function(){
+                invoke("createQuiz", {}).then(function(userData){
+                    //user = userData;
+                    //sessionStorage.user = angular.toJson(user);
+                    //callback(user);
                 });
             },
 
