@@ -4,10 +4,14 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
+import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
+import java.io.IOException;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by: Tim Kerschbaumer
@@ -255,10 +259,21 @@ public class SpotifyService {
 		}
 		return UserIdentity.createDummyUser();
 	}
+        
+        public String refreshAccessToken(String refreshToken){
+            try {
+                api.setRefreshToken(refreshToken);
+                String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
+                return newAccessToken;
+            } catch (IOException | WebApiException ex) {
+                Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null;
+        }
 
 	public void setTokens(String access, String refresh){
-		api.setAccessToken(access);
-		api.setRefreshToken(refresh);
+            api.setRefreshToken(refresh);
+            api.setAccessToken(access);
 	}
 
 	public List<SimplePlaylist> getPlaylists(String displayname){

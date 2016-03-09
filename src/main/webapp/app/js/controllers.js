@@ -297,9 +297,19 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
         $scope.readonly = false;
         $scope.tags = [];
 
-        charlieProxy.getPlaylists(function(lists){
-            $scope.playlists = lists
-        });
+        var init = function (){
+            charlieProxy.getPlaylists(function(lists){
+                $scope.playlists = lists;
+            }); 
+        };
+        
+        if (charlieProxy.isReady()){
+            init();
+        }else{
+            $scope.$on('service-ready', function(event, args) {
+                init();
+            });
+        }
 
         $scope.submit = function() {
             console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected)

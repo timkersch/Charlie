@@ -26,6 +26,10 @@ public class UserIdentity extends AbstractEntity{
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
+    
+    public void setAccessToken(String token) {
+        this.accessToken = token;
+    }
 
     public String getRefreshToken() {
         return refreshToken;

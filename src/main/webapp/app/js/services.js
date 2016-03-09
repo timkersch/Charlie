@@ -23,7 +23,8 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 delete callbacks[data.request_id];
                 callback.resolve(data);
             } else {
-                console.error("Unhandled message: %o", data);
+                console.log("Broadcasting: %o", event.action);
+                $rootScope.$broadcast(event.action, data);
             }
         };
 
@@ -49,7 +50,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
         socket.onopen = function (event) {
             isReady = true;
-            $rootScope.$broadcast('service-ready');
             console.log("Service ready");
 
             if (sessionStorage.user){
@@ -62,7 +62,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     if (!success)
                         sessionStorage.user = "";
                 });
-            }
+            } 
+            
+            $rootScope.$broadcast('service-ready');
         };
 
 

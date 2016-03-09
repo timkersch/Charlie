@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 @ServerEndpoint("/api")
 public class WebsocketServer {
 
-
     @Inject
     private DB db;
 
@@ -29,12 +28,15 @@ public class WebsocketServer {
     EntityManager em; 
 
     private final SpotifyService service = new SpotifyService();
+    
+    private Logger logger;
 
     @Inject
     private SessionHandler sessionHandler;
 
     @OnOpen
     public void open(Session session) {
+        log("OnOpen: " + session.getId());
         System.out.println("Opened Session: " + session.getId());
         UserSession userSession = new UserSession(session);
         sessionHandler.addSession(userSession);
@@ -42,15 +44,18 @@ public class WebsocketServer {
 
     @OnClose
     public void close(Session session) {
-        System.out.println("Closed Session: " + session.getId());
+        log("OnClose: " + session.getId());
         UserSession userSession = sessionHandler.getUserSession(session.getId());
         sessionHandler.removeSession(userSession);
     }
 
     @OnError
     public void onError(Throwable error) {
-        System.out.println("Error: " + error.toString());
-        Logger.getLogger(WebsocketServer.class.getName()).log(Level.SEVERE, null, error);
+        log("OnError: " + error.toString());
+    }
+    
+    private void log(String msg){
+        logger.log(Level.INFO, msg);
     }
 
     @OnMessage
@@ -71,7 +76,7 @@ public class WebsocketServer {
             UserIdentity user;
             Gson gson = new Gson();
             
-            System.out.println(action);
+            log(action + " - DATA: " + data.toString());
             switch(action) {
                 case "getLoginURL":
                     // Retrieve login URL from spotify service
@@ -84,7 +89,6 @@ public class WebsocketServer {
                 case "login":
                     // Extract spotify code
                     String code = data.getString("code");
-                    System.out.println("Code: " + code);
                     
                     // Get user from spotify
                     user = service.getUser(code);
@@ -108,7 +112,6 @@ public class WebsocketServer {
                 case "setUser":
                     // Extract user id
                     Long id = data.getJsonNumber("id").longValue();
-                    System.out.println("id: " + id);
                     
                     // Check if user exists
                     boolean success = true;
@@ -117,6 +120,8 @@ public class WebsocketServer {
                         user = UserIdentity.createDummyUser();
                         success = false;
                     }else{
+                        String newAccessToken = service.refreshAccessToken(user.getRefreshToken());
+                        user.setAccessToken(newAccessToken);
                         service.setTokens(user.getAccessToken(), user.getRefreshToken());
                     }
                     userSession.setUserIdentity(user);
@@ -127,8 +132,6 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response.toString());
                     break;
                 case "getPlaylists":
-                    System.out.println("User: " + gson.toJson(userSession.getUserIdentity()));
-                    
                     // Get users playlist from spotfiy service
                     List<SimplePlaylist> lists = service.getUsersPlaylists();
                     
@@ -150,7 +153,7 @@ public class WebsocketServer {
                     // Send them back as json
                     String usersString = gson.toJson(onlineUsersAsJson);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
-                    System.out.println("Users: " + usersString);
+                    log("Users: " + usersString);
                     session.getBasicRemote().sendText(response.toString());
                     break;
                 case "logout":
@@ -189,7 +192,7 @@ public class WebsocketServer {
                     break;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log(e.toString());
         }
     }
 
