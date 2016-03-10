@@ -176,6 +176,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 };
                 invoke('nextQuestion', data).then(callback);
             },
+
+            getQuiz: function() {
+                return currentQuiz;
+            },
             
             /* action: 
              *      userJoined      --> callback(newUser)
