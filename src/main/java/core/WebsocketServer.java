@@ -160,24 +160,47 @@ public class WebsocketServer {
                 case "logout":
                     sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;
-                case "answer":
+                case "answerQuestion":
+                    String artist = data.getString("artistName");
+                    boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
+                    
+                    
                     // TODO
+                    break;
+                case "joinQuiz":
+                    String quizId = data.getString("quizId");
+                    Quiz quizToJoin = db.getQuizCatalogue().findQuiz(quizId);
+                    boolean joinSuccess = false;
+                    
+                    if (quizToJoin != null) {
+                        userSession.setCurrentQuiz(quizToJoin);
+                        sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", userSession.getUserIdentity().toJsonElement().toString());
+                        joinSuccess = true;
+                    }
+                    
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", joinSuccess).build();
+                    System.out.println("Response: " + response);
+                    session.getBasicRemote().sendText(response.toString());
+                    break;
+                case "leaveQuiz":
+                    userSession.getCurrentQuiz().leavePlayer(userSession.getUserIdentity());
+                    userSession.setCurrentQuiz(null);
                     break;
                 case "nextQuestion":
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
                     
                     // TODO Send wrong anser for last question.
+                    //sessionHandler.sendToQuizMemebrs(userSession.getCurrentQuiz(), "answer", false);
                     
                     // Send them back as json
                     String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                    System.out.println("Nexttrack: " + nextTrack);
-                    String nextQuestionAsJson = gson.toJson(nextQuestion);
-                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestionAsJson).build();
+                    String artistsAsJson = gson.toJson(nextQuestion.getArtists());
+                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson).build();
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
                     System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response.toString());
-                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestionAsJson);
+                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", trackData.toString());
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
@@ -185,13 +208,21 @@ public class WebsocketServer {
                     String name = data.getString("name");
                     String playlistId = data.getString("playlist");
                     int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
+                    boolean generate = data.getBoolean("generated");
 
-                    // Get the tracks to base the quiz on
-                    List<Track> tracks = service.getPlaylistSongs(playlistId);
-                    List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
-	                List<Question> questions = new ArrayList<>();
-                    for(int i = 0; i < similarTracks.size(); i++) {
-                        questions.add(new Question(similarTracks.get(i), service.getQuizOptions(similarTracks.get(i))));
+                    List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
+                    List<Track> quizTracks;
+
+                    if (generate) {
+                            quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
+                    } else {
+                            Collections.shuffle(playlistTracks);
+                            quizTracks = playlistTracks.subList(0, nbrOfSongs);
+                    }
+
+                    List<Question> questions = new ArrayList<>();
+                    for(int i = 0; i < quizTracks.size(); i++) {
+                        questions.add(new Question(quizTracks.get(i), service.getQuizOptions(quizTracks.get(i))));
                     }
                     
                     // Get users
@@ -214,7 +245,7 @@ public class WebsocketServer {
                     break;
 	            case "savePlaylist":
 		            String name1 = userSession.getCurrentQuiz().getName();
-		            List<Question> question1 = userSession.getCurrentQuiz().getQuestion();
+		            List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
 		            List<String> trackids = new ArrayList<>(question1.size());
 		            for (Question q : question1) {
 			            trackids.add(q.getTrackId().getId());

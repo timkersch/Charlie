@@ -1,5 +1,7 @@
 package core;
 
+import java.util.ArrayList;
+import java.util.List;
 import persistence.AbstractDAO;
 
 import javax.ejb.Stateless;
@@ -10,18 +12,23 @@ import javax.persistence.PersistenceContext;
  * Created by jcber on 2016-03-07.
  */
 
-@Stateless
-public class QuizCatalogue extends AbstractDAO<Quiz, Long> {
+public class QuizCatalogue {
 
-    @PersistenceContext
-    private EntityManager em;
-
-    public QuizCatalogue() {
-        super(Quiz.class);
+    private List<Quiz> quizes = new ArrayList<>();
+    
+    private void addQuiz(Quiz quiz){
+        quizes.add(quiz);
     }
-
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
+    
+    public Quiz findQuiz(String quizId){
+        for (Quiz quiz : quizes) {
+            if (quiz.getUUID().equals(quizId))
+                return quiz;
+        }
+        return null;
+    }
+    
+    public List<Quiz> getQuizes(){
+        return quizes;
     }
 }

@@ -2,7 +2,6 @@ package core; /**
  * Created by jcber on 2016-03-01.
  */
 
-import com.google.gson.Gson;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
 import java.io.IOException;
@@ -14,7 +13,7 @@ import javax.json.spi.JsonProvider;
 @ApplicationScoped
 public class SessionHandler {
     private final Set<UserSession> sessions = new HashSet<>();
-    private static final JsonProvider provider = JsonProvider.provider();
+    private static final JsonProvider PROVIDER = JsonProvider.provider();
 
     public void addSession(UserSession session) {
         sessions.add(session);
@@ -67,16 +66,29 @@ public class SessionHandler {
 
     public void sendToSessions(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
-        for (UserIdentity user: quiz.getPlayers()){
+        for (UserIdentity user: quiz.getJoinedPlayers()){
             this.sendToSession(this.getUserSessionById(user.getId()), response);
         }
     }
     
+    public void sendToQuizMemebrs(Quiz quiz, String action, String data){
+        JsonObject response = createJson(action, data);
+        for (UserIdentity user: quiz.getJoinedPlayers()){
+            this.sendToSession(this.getUserSessionById(user.getId()), response);
+        }
+        this.sendToSession(this.getUserSessionById(quiz.getOwner().getId()), response);
+    }
+    
+    public void sendToUser(UserIdentity user, String action, String data) {
+        JsonObject response = createJson(action, data);
+        this.sendToSession(this.getUserSessionById(user.getId()), response);
+    }
+    
     private JsonObject createJson(String action, String data){
-        return provider.createObjectBuilder().add("action", action).add("data", data).build();
+        return PROVIDER.createObjectBuilder().add("action", action).add("data", data).build();
     }
 
-    public void sendToSession(UserSession session, String message) {
+    private void sendToSession(UserSession session, String message) {
         try {
             session.getSession().getBasicRemote().sendText(message);
         } catch (IOException ex) {
@@ -85,7 +97,7 @@ public class SessionHandler {
         }
     }
 
-    public void sendToSession(UserSession session, JsonObject data) {
+    private void sendToSession(UserSession session, JsonObject data) {
         try {
             session.getSession().getBasicRemote().sendText(data.toString());
         } catch (IOException ex) {

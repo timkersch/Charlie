@@ -1,46 +1,58 @@
 package core;
 
-import com.google.appengine.repackaged.com.google.common.base.Flag;
-import com.wrapper.spotify.models.Track;
-import persistence.AbstractEntity;
-
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by jcber on 2016-03-04.
  */
 
-public class Quiz extends AbstractEntity {
+public class Quiz {
+    private String uuid;
     private String name;
-    private final List<UserIdentity> players = new ArrayList<>();
+    private final Map<UserIdentity, Integer> joinedPlayers = new HashMap<>();
+    private final List<UserIdentity> unjoinedPlayers = new ArrayList<>();
     private final List<Question> questions = new ArrayList<>();
     private int currentQuestion;
     private UserIdentity owner;
 
     public Quiz(){
-        super();
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public Quiz(String name, UserIdentity owner, List<UserIdentity> players, List<Question> questions){
         this();
         this.name = name;
         this.owner = owner;
-        this.players.addAll(players);
+        this.unjoinedPlayers.addAll(players);
         this.questions.addAll(questions);
         this.currentQuestion = 0;
     }
 
-    public List<UserIdentity> getPlayers() {
-        return players;
+    public List<UserIdentity> getUnjoinedPlayers() {
+        return unjoinedPlayers;
+    }
+    
+    public List<UserIdentity> getJoinedPlayers() {
+        return new ArrayList<>(joinedPlayers.keySet());
+    }
+    
+    public boolean joinPlayer(UserIdentity user) {
+        if (unjoinedPlayers.remove(user)) {
+            joinedPlayers.put(user, 0);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean leavePlayer(UserIdentity user) {
+        return joinedPlayers.remove(user) > 0;
     }
 
     public UserIdentity getOwner() {
         return owner;
     }
 
-    public List<Question> getQuestion() {
+    public List<Question> getQuestions() {
         return this.questions;
     }
     
@@ -48,8 +60,20 @@ public class Quiz extends AbstractEntity {
         return questions.get(currentQuestion);
     }
     
+    public boolean answerQuestion(UserIdentity user, String artistName) {
+        if (this.getCurrentQuestion().answer(artistName)) {
+            joinedPlayers.put(user, joinedPlayers.get(user));
+            return true;
+        }
+        return false;
+    }
+    
     public Question getNextQuestion(){
         return questions.get(currentQuestion++);
+    }
+    
+    public String getUUID(){
+        return uuid;
     }
 
     public String getName() {

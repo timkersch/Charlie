@@ -16,8 +16,8 @@ public class DB {
     //private TestCatalogue testCatalogue;
     @EJB
     private UserCatalogue userCatalogue;
-    @EJB
-    private QuizCatalogue quizCatalogue;
+    
+    private static QuizCatalogue quizCatalogue = new QuizCatalogue();
 
     public UserCatalogue getUserCatalogue() {
         return userCatalogue;

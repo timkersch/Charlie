@@ -14,18 +14,76 @@
     #player4{
         color: #B48EAD;
     }
+    
+    md-content {
+        text-align: center;
+    }
+    
+    md-list-item {
+        max-width: 70%;
+        text-align: center;
+        margin:  0 auto;
+    }
+    
+    md-list-item .md-icon {
+        text-align: center;
+
+    }
+    
+    md-list-item p{
+        text-align: center;
+        margin-top: 5px;
+    }
+    
+    md-content {
+            margin: -1em;
+    }
+
+    span {
+    margin-left: 7px;
+    }
+
+    span md-icon {
+            margin-top: -0.12em;
+            margin-right: 0.5em;
+    }
+    
+    div .chart {
+        margin: 1.5em 0 1.2em 0;
+    }
+    
+    div .end {
+        width: 100%;
+        margin: -1em;
+    }
+
+    div .end .md-button {
+        min-width: 100%;
+        min-height: 3em;
+        padding: 0;
+        margin: 0;
+        position: fixed;
+        bottom: 0px;
+        background: #1A237E !important;
+    }
 </style>
 
-<div layout="column" layout-margin>
-	<div flex>
+<md-content>
+    	<md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+		<div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
+	</md-toolbar>
+	<div flex class="chart">
             <canvas id="scoreboardChart" width="200" height="200"></canvas>
             <br>
         </div>
-        <div layout="row">
-            <div class="user" ng-repeat="person in scoreData">
-                <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}};}">person</md-icon>
-                <p>{{person.userName}}: {{person.value}}p</p>
-            </div>
-	</div>
-	<md-button ng-href="/#/" class="md-primary">Go to main menu</md-button>
+        <md-list>
+            <md-list-item class="user" ng-repeat="person in scoreData">
+                <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}}">person</md-icon>
+                <p style="font-weight: 900; color:{{person.color}}">{{person.userName}}</p>
+                <p>POINTS</p>
+            </md-list-item>
+	</md-list>
+</md-content>
+<div class="end">
+    <md-button ng-click="changeView('/')" class="md-primary md-raised">GO TO HOME</md-button>
 </div>

@@ -102,12 +102,13 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             // callback(quiz)
-            createQuiz: function(name, userIds, playlistId, nbrOfSongs, callback){
+            createQuiz: function(name, userIds, playlistId, nbrOfSongs, generated, callback){
                 var data = {
                     name: name,
                     users: userIds,
                     playlist: playlistId,
-                    nbrOfSongs: nbrOfSongs
+                    nbrOfSongs: nbrOfSongs,
+                    generated: generated
                 };
                 invoke("createQuiz", data).then(function(quiz){
                     currentQuiz = quiz;
@@ -169,6 +170,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('joinQuiz', data).then(callback);
             },
 
+            // callback(data[track_url, question])
             nextQuestion: function(quizId, callback) {
                 var data = {
                     quizId: quizId
