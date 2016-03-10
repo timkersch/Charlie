@@ -141,7 +141,11 @@ public class SpotifyService {
 	 */
 	public void addTracksToPlayList(List<String> tracks, String playlistId) {
 		try {
-			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, tracks).build();
+			List<String> trackUris = new ArrayList<>(tracks.size());
+			for (String track : tracks) {
+				trackUris.add(api.getTrack(track).build().get().getUri());
+			}
+			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, trackUris).build();
 			request.get();
 		} catch (Exception e) {
 			System.out.println("Something went wrong in addTracksToPlayList!" + e.getMessage());
