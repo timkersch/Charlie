@@ -2,16 +2,16 @@
     .user{
         width: 100%
     }
-    #first{
+    #player1{
         color: #F7464A;
     }
-    #second{
+    #player2{
         color: #46BFBD;
     }
-    #third{
+    #player3{
         color: #FDB45C;
     }
-    #fourth{
+    #player4{
         color: #B48EAD;
     }
 </style>
@@ -22,21 +22,9 @@
             <br>
         </div>
         <div layout="row">
-            <div class="user">
-                <md-icon aria-label="Menu" class="material-icons" id="first">person</md-icon>
-                <p>Simon</p>
-            </div>
-            <div class="user">
-                <md-icon aria-label="Menu" class="material-icons" id="second">person</md-icon>
-                <p>Erik</p>
-            </div>
-            <div class="user">
-                <md-icon aria-label="Menu" class="material-icons" id="third">person</md-icon>
-                <p>Joakim</p>
-            </div>
-            <div class="user">
-                <md-icon aria-label="Menu" class="material-icons" id="fourth">person</md-icon>
-                <p>Tim</p>
+            <div class="user" ng-repeat="person in scoreData">
+                <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}};}">person</md-icon>
+                <p>{{person.userName}}</p>
             </div>
 	</div>
 	<md-button ng-href="/#/" class="md-primary">Go to main menu</md-button>

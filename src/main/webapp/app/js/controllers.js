@@ -129,9 +129,12 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         var incrementer = 0;
+        $scope.currentTrack = charlieProxy.nextQuestion().track_url;
+        console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
+        
 
         var hasIndex = '';
         var hasAnswerd = false;
@@ -264,19 +267,22 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
-        var data = [
+        $scope.scoreData = [
     {
         value: 5,
-        color:"#F7464A",
+        userName: "simon",
+        color: "#F7464A",
         highlight: "#FF5A5E"
     },
     {
         value: 4,
+        userName: "erik",
         color: "#46BFBD",
         highlight: "#5AD3D1"
     },
     {
         value: 3,
+        userName: "tim",
         color: "#FDB45C",
         highlight: "#FFC870"
     }
@@ -284,12 +290,12 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
 
 
         var ctx = document.getElementById("scoreboardChart").getContext("2d");
-        var sChart = new Chart(ctx).Doughnut(data);
-        sChart.addData({
-            value: 10,
-            color: "#B48EAD",
-            highlight: "#C69CBE"
-        });
+        var sChart = new Chart(ctx).Doughnut();
+        
+        for(var i = 0; i < $scope.scoreData.length; i++){
+            sChart.addData($scope.scoreData[i]);
+        };
+        
 
 
     }]);
