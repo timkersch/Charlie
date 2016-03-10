@@ -69,6 +69,8 @@ public class Quiz {
     }
     
     public Question getNextQuestion(){
+        if (questions.size() == currentQuestion)
+            return null;
         return questions.get(currentQuestion++);
     }
     
