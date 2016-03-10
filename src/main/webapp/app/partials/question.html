@@ -57,10 +57,10 @@
 			md-cols-xs="2" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="4"
 			md-row-height-gt-md="4:4" md-row-height="2:2"
 			md-gutter="0" md-gutter-gt-sm="0">
-		<md-grid-tile ng-repeat="sug in suggestions" class="{{setColor($index)}}" id={{retriveCursor()}}
+		<md-grid-tile ng-repeat="artist in possibleArtists" class="{{setColor($index)}}" id={{retriveCursor()}}
 					  ng-click="selectedAnswer(sug, $index)" md-disable="true" ng-disabled="isDisabled($index)">
 			<md-button id="{{$index}}" md-disable="true" ng-disabled="isDisabled($index)" md-class="md-primary"
-					   ng-click="selectedAnswer(sug, $index)">{{sug.artist}}</md-button>
+					   ng-click="selectedAnswer(sug, $index)">{{artist.artist}}</md-button>
 		</md-grid-tile>
 	</md-grid-list>
 	<!--

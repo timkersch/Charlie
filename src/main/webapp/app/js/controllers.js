@@ -6,8 +6,8 @@ var charlieController = angular.module('charlieController', [
     'ngMaterial'
 ]);
 
-charlieController.controller('mainController', ['$scope', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
-    function($scope, $location, $mdToast, charlieProxy, $mdSidenav) {
+charlieController.controller('mainController', ['$scope', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = {};
         $scope.url = "";
 
@@ -152,6 +152,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(1, function(data){
             console.log("TRACK: " + data);
+            console.log("----------ShowArtists--------: " + data);
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();   
             //$scope.$apply(function(){
@@ -211,31 +212,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
           }
         };
 
-        var question1 = [{
-                artist: "The killers"
-            },
-            {
-                artist: "Gavin Degraw"
-            },
-            {
-                artist: "The sons of Erik"
-            },
-            {
-                artist: "Army of Bertssons"
-            }];
-
-        var question2 = [{
-            artist: "The Beatles"
-        },
-            {
-                artist: "Darin"
-            },
-            {
-                artist: "Lill Lindfors"
-            },
-            {
-                artist: "Muse"
-            }];
 
         $scope.suggestions = question1;
 
@@ -265,8 +241,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                     * 2. Get the next question
                     */
                     console.log(answer);
-
-                    $scope.suggestions = question2;
                     $scope.determinateValue = 20;
                     hasAnswerd = false;
                     hasIndex = '';
