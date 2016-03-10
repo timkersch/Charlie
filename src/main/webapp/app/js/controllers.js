@@ -52,10 +52,6 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
             }
         });
         
-        charlieProxy.listenTo("invitedTo", function(quiz) {
-            showActionToast(quiz);
-        });
-        
         var showActionToast = function(quiz) {
             var toast = $mdToast.simple()
             .textContent('You are invited to ' + quiz.name)
@@ -65,7 +61,7 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
             $mdToast.show(toast).then(function(response) {
                 if ( response == 'ok' ) {
                     alert('You accepted the '+ quiz.name + ' invite.');
-                    charlieProxy.joinQuiz(quiz.id, function(success) {
+                    charlieProxy.joinQuiz(quiz.uuid, function(success) {
                        if (success) {
                            alert('Successfully joined the quiz!');
                        } else {
@@ -75,6 +71,10 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
                 }
             });
         };
+        
+        charlieProxy.listenTo("invitedTo", function(quiz) {
+            showActionToast(quiz);
+        });
 
         $scope.login = function (){
             console.log("login");
