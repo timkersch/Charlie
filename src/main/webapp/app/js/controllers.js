@@ -67,8 +67,8 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
-charlieController.controller('lobbyController', ['$scope', '$location', '$routeParams', 'charlieProxy',
-    function($scope, $location,  $routeParams, charlieProxy){
+charlieController.controller('lobbyController', ['$scope', '$location', '$mdToast', '$routeParams', 'charlieProxy',
+    function($scope, $location, $mdToast,  $routeParams, charlieProxy){
         console.log("LobbyController!");
         $scope.status = '  ';
 
@@ -93,6 +93,19 @@ charlieController.controller('lobbyController', ['$scope', '$location', '$routeP
         $scope.startQuiz = function(){
             $location.path('/question');
         }
+        
+        $scope.showActionToast = function() {
+            var toast = $mdToast.simple()
+            .textContent('You are invited to a quiz')
+            .action('ACCEPT')
+            .highlightAction(true)
+            $mdToast.show(toast).then(function(response) {
+                console.log("The toast: " + toast); 
+                if ( response == 'ok' ) {
+                    alert('You accepted the \'ACCEPT\' invite.');
+                }
+            });
+        };
     }]);
 
 charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
