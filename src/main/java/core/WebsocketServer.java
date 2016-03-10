@@ -218,7 +218,7 @@ public class WebsocketServer {
                     String name = data.getString("name");
                     String playlistId = data.getString("playlist");
                     int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
-                    boolean generate = data.getBoolean("generated");
+                    boolean generate = Boolean.parseBoolean(data.getString("generated"));
 
                     List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
                     List<Track> quizTracks;
