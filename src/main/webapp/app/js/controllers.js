@@ -88,6 +88,7 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
                 $scope.url = url;
             });
         };
+        
     }]);
 
 charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
@@ -133,11 +134,6 @@ charlieController.controller('signupController', [ '$scope', 'charlieProxy',
 charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy',
     function($scope, $location, charlieProxy) {
         console.log("Init");
-
-      $scope.changeView = function(view){
-            console.log("Changing view to: " + view);
-            $location.path(view); // path not hash
-        };
     }]);
 
 charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy', '$document',
@@ -262,8 +258,8 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 
     }]);
 
-charlieController.controller('scoreboardController', [ '$scope', 'charlieProxy',
-    function($scope, charlieProxy) {
+charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
+    function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
 
 
@@ -301,6 +297,11 @@ charlieController.controller('scoreboardController', [ '$scope', 'charlieProxy',
         
         for(var i = 0; i < $scope.scoreData.length; i++){
             sChart.addData($scope.scoreData[i]);
+        };
+        
+        $scope.changeView = function(view){
+            console.log("Changing view to: " + view);
+            $location.path(view); // path not hash
         };
         
 
