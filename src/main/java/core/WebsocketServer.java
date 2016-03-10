@@ -173,12 +173,14 @@ public class WebsocketServer {
                     // Get the tracks to base the quiz on
                     List<Track> tracks = service.getPlaylistSongs(playlistId);
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
-                    List<String> similarTrackIds = new ArrayList<>();
-                    for(Track track : similarTracks)
-                        similarTrackIds.add(track.getId());
+	                List<Question> questions = new ArrayList<>();
+                    for(int i = 0; i < similarTracks.size(); i++) {
+						questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
+                    }
 
                     // Create quiz
-                    Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), similarTrackIds);
+	                Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
+
                     db.getQuizCatalogue().create(quiz);
                     
                     // TODO invite users to quiz

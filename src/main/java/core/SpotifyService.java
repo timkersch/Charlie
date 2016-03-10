@@ -137,6 +137,15 @@ public class SpotifyService {
 		}
 	}
 
+	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
+		try {
+			return getArtistOptions(api.getTrack(trackId).build().get());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	/**
 	 * Method that returns a list of similar tracks based on the tracks specified
 	 * @param tracks the tracks to find similar tracks from

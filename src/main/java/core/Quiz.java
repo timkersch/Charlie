@@ -16,38 +16,33 @@ import java.util.*;
 public class Quiz extends AbstractEntity {
     @ElementCollection
     private final List<Long> playerIds = new ArrayList<>();
-    @ElementCollection
-    private final List<String> trackIds = new ArrayList<>();
-    @ElementCollection
-    private final Map<String, Boolean> artistIds = new HashMap<String, Boolean>();
+
+	@ElementCollection
+	private final List<Question> questions = new ArrayList<>();
+
     private Long ownerId;
 
     public Quiz(){
         super();
     }
 
-    public Quiz(Long ownerId, List<Long> playerIds, List<String> trackIds, Map<String, Boolean> artistIds){
+    public Quiz(Long ownerId, List<Long> playerIds, List<Question> questions){
         this();
         this.ownerId = ownerId;
-        this.artistIds.putAll(artistIds);
         this.playerIds.addAll(playerIds);
-        this.trackIds.addAll(trackIds);
+	    this.questions.addAll(questions);
     }
 
     public List<Long> getPlayerIds() {
         return playerIds;
     }
 
-    public List<String> getTrackIds() {
-        return trackIds;
-    }
-
     public Long getOwnerId() {
         return ownerId;
     }
 
-    public Map<String, Boolean> getArtistiIds() {
-        return artistIds;
-    }
+	public List<Question> getQuestion() {
+		return this.questions;
+	}
 
 }
