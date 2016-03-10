@@ -146,7 +146,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         console.log("Inside questionController");
         $scope.determinateValue = 30;
         var incrementer = 0;
-        $scope.currentTrack = "mp3test";
         
         var quiz = charlieProxy.getQuiz();
         var audioElement = $document[0].createElement('audio');
