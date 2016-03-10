@@ -156,3 +156,22 @@ md-list {
     margin: 1em;
 }
 
+/* TOAST */
+md-toast {
+    min-width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 100;
+}
+
+.md-toast-content {
+    min-width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 1em;
+    min-height: 100px;
+    max-height: 100px;
+    height: 100px;
+    z-index: 100;
+}
