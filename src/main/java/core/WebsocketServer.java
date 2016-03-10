@@ -15,7 +15,6 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ServerEndpoint("/api")
@@ -214,7 +213,7 @@ public class WebsocketServer {
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
 	                List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < similarTracks.size(); i++) {
-                        questions.add(new Question(similarTracks.get(i), service.getArtistOptions(similarTracks.get(i))));
+                        questions.add(new Question(similarTracks.get(i), service.getQuizOptions(similarTracks.get(i))));
                     }
                     
                     // Get users
@@ -235,6 +234,15 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response.toString());
                     sessionHandler.sendToSessions(quiz, "invitedTo", jsonQuiz);
                     break;
+	            case "savePlaylist":
+		            String name1 = userSession.getCurrentQuiz().getName();
+		            List<Question> question1 = userSession.getCurrentQuiz().getQuestion();
+		            List<String> trackids = new ArrayList<>(question1.size());
+		            for (Question q : question1) {
+			            trackids.add(q.getTrackId().getId());
+		            }
+		            service.createAndPopulatePlaylist(trackids, name1);
+		            break;
                 default:
                     sessionHandler.sendToAllConnectedSessions("noRequest", "error");
                     break;

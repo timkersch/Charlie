@@ -146,11 +146,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             // callback(isCorrect)
-            answerQuestion: function(quizId, questionId, answerId, callback){
+            answerQuestion: function(artistName, callback){
                 var data = {
-                    answerId: answerId,
-                    questionId: questionId,
-                    quizId: quizId
+                    artistName: artistName,
                 };
                 invoke('answerQuestion', data).then(callback);
             },
@@ -177,6 +175,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     quizId: quizId
                 };
                 invoke('nextQuestion', data).then(callback);
+            },
+
+            savePlaylist: function() {
+                invoke('savePlaylist');
             },
 
             getQuiz: function() {

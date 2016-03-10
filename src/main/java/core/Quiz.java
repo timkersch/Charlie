@@ -76,4 +76,8 @@ public class Quiz {
         return uuid;
     }
 
+    public String getName() {
+        return name;
+    }
+
 }
