@@ -183,20 +183,11 @@ public class SpotifyService {
 	 * @param t the Track
 	 * @return a hashtable with artists as keys and boolans as values
 	 */
-	public Hashtable<String, Boolean> getQuizOptions(Track t) {
+	public Hashtable<String, Boolean> getArtistOptions(Track t) {
 		List<SimpleArtist> artists = t.getArtists();
 		try {
 			List<Artist> relatedArtists = api.getArtistRelatedArtists(artists.get(0).getId()).build().get();
 			Hashtable<String, Boolean> ht = new Hashtable<>();
-
-			//StringBuilder sb = new StringBuilder();
-			//for (int i = 0; i < artists.size() - 1; i++) {
-			//	sb.append(artists.get(i).getName());
-			//	sb.append(" and ");
-			//}
-			//sb.append(artists.get(artists.size()-1).getName());
-			//ht.put(sb.toString(), true);
-
 			ht.put(artists.get(0).getName(), true);
 
 			for (int i = 0; i < 3; i++) {
@@ -215,10 +206,10 @@ public class SpotifyService {
 	 * @param trackId the trackId
 	 * @return a hashtable with the artists as keys and booleans as values
 	 */
-	public Hashtable<String, Boolean> getQuizOptions(String trackId) {
+	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
 		try {
 			api.getTrack(trackId);
-			return getQuizOptions(api.getTrack(trackId).build().get());
+			return getArtistOptions(api.getTrack(trackId).build().get());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

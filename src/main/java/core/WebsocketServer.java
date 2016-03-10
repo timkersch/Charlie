@@ -245,7 +245,7 @@ public class WebsocketServer {
 
                     List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < quizTracks.size(); i++) {
-                        questions.add(new Question(quizTracks.get(i), service.getQuizOptions(quizTracks.get(i))));
+                        questions.add(new Question(quizTracks.get(i), service.getArtistOptions(quizTracks.get(i))));
                     }
                     
                     // Get users
