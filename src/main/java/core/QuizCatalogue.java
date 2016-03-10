@@ -34,4 +34,14 @@ public class QuizCatalogue {
         }
         return null;
     }
+    
+    public void removeUserFromQuizes(UserIdentity user){
+        for (int i = quizes.size() - 1; i >= 0; i--){
+            Quiz quiz = quizes.get(i);
+            if (quiz.getOwner().equals(user))
+                quizes.remove(i);
+            else if(quiz.getJoinedPlayers().contains(user))
+                quiz.leavePlayer(user);
+        }
+    }
 }

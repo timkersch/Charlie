@@ -143,40 +143,50 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
     function($scope, $location, $interval, charlieProxy, $document) {
         console.log("Inside questionController");
         $scope.determinateValue = 20;
-        
+        $scope.activated = true;
         var audioElement = $document[0].createElement('audio');
-        charlieProxy.nextQuestion(function(data){
+        var hasIndex = '';
+        var hasAnswered = false;
+        
+        var play = function(url) {
             // Play song
-            audioElement.src = data.track_url + ".mp3";
+            audioElement.src = url + ".mp3";
             audioElement.play();
-            
-            $scope.possibleArtists = data.artists;
-        });
+        };
+        
+        var init = function(){
+            if(charlieProxy.isQuizStarted()){
+                charlieProxy.getQuestion(function(data){
+                    play(data.track_url);
+                    $scope.possibleArtists = data.artists;
+                });
+            }else{
+                charlieProxy.nextQuestion(function(data){
+                    play(data.track_url);
+                    $scope.possibleArtists = data.artists;
+                });
+            }
+        };
+        
+        if (charlieProxy.isReady()){
+            init();
+        }else{
+            $scope.$on('service-ready', function(event, args) {
+                init();
+            });
+        }
         
         charlieProxy.listenTo("gameOver", function(users){
            $location.path("/scoreboard"); 
         });
         
-        $scope.activated = true;
-        
-        var hasIndex = '';
-        var hasAnswerd = false;
         $scope.isDisabled = function(index){
-            if (hasAnswerd) {
-                if (hasIndex === index) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } else {
-                return false;
-            }
-
+            return hasAnswered && hasIndex !== index;
         };
+        
         $scope.selectedAnswer = function(data, index){
-            if (!hasAnswerd) {
-                console.log(index + data);
-                hasAnswerd = true;
+            if (!hasAnswered) {
+                hasAnswered = true;
                 hasIndex = index;
                 charlieProxy.answerQuestion(data, function(correct){
                    console.log("Answer correct: " + correct); 
@@ -185,11 +195,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         };
 
         $scope.retriveCursor = function() {
-            if (hasAnswerd) {
-                return 'selected';
-            } else {
-                return 'notSelected';
-            }
+            return hasAnswered ? 'selected' : 'notSelected';
         }
 
         $scope.setColor = function(index) {
@@ -214,15 +220,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             $scope.determinateValue--;
             if($scope.determinateValue === -1){
                 charlieProxy.nextQuestion(function(data){
-                    // Play song
-                    audioElement.src = data.track_url + ".mp3";
-                    audioElement.play();
-
+                    play(data.track_url);
                     $scope.possibleArtists = data.artists;
                 });
                 
                 $scope.determinateValue = 20;
-                hasAnswerd = false;
+                hasAnswered = false;
                 hasIndex = '';
             }
         }, 1000, 0, true);

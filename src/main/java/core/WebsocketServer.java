@@ -306,6 +306,7 @@ public class WebsocketServer {
 
                     // Create quiz
                     Quiz quiz = new Quiz(name, userSession.getUserIdentity(), players, questions);
+                    db.getQuizCatalogue().removeUserFromQuizes(userSession.getUserIdentity());
                     userSession.setCurrentQuiz(quiz);
                     db.getQuizCatalogue().addQuiz(quiz);
 
