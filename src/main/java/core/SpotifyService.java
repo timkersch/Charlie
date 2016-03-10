@@ -59,7 +59,7 @@ public class SpotifyService {
 
 	/**
 	 * Method that returns all songs in a playlist
-	 * @param simplePlaylist a SimplePlaylist
+	 * @param playlistId a playlist id
 	 * @return List of Track in the playlist
 	 */
 	public List<Track> getPlaylistSongs(String playlistId) {
@@ -139,6 +139,7 @@ public class SpotifyService {
 
 	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
 		try {
+			api.getTrack(trackId);
 			return getArtistOptions(api.getTrack(trackId).build().get());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -240,16 +241,30 @@ public class SpotifyService {
 		return UserIdentity.createDummyUser();
 	}
         
-        public String refreshAccessToken(String refreshToken){
-            try {
-                api.setRefreshToken(refreshToken);
-                String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
-                return newAccessToken;
-            } catch (IOException | WebApiException ex) {
-                Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
-        }
+	public String refreshAccessToken(String refreshToken){
+		try {
+			api.setRefreshToken(refreshToken);
+			String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
+			return newAccessToken;
+		} catch (IOException | WebApiException ex) {
+			Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return null;
+	}
+
+	public String getTrackUrl(Track t) {
+		return t.getPreviewUrl();
+	}
+
+	public String getTrackUrl(String trackId) {
+		try {
+			Track t = api.getTrack(trackId).build().get();
+			return t.getPreviewUrl();
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	public void setTokens(String access, String refresh){
             api.setRefreshToken(refresh);

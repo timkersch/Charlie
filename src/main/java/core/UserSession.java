@@ -8,6 +8,7 @@ import javax.websocket.Session;
 public class UserSession {
     private UserIdentity user;
     private Session session;
+    private Quiz currentQuiz;
 
     public UserSession(Session session) {
         this.session = session;
@@ -24,5 +25,13 @@ public class UserSession {
 
     public UserIdentity getUserIdentity(){
         return user;
+    }
+    
+    public Quiz getCurrentQuiz(){
+        return currentQuiz;
+    }
+    
+    public void setCurrentQuiz(Quiz quiz){
+        this.currentQuiz = quiz;
     }
 }

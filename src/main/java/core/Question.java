@@ -17,28 +17,25 @@ import java.util.Map;
  * Time: 10:31
  */
 
-@Embeddable
 public class Question extends AbstractEntity {
 	private String trackId;
-
-	@ElementCollection
 	private final Map<String, Boolean> artistsIds = new HashMap<String, Boolean>();
 
 	public Question() {
-		super();
+            super();
 	}
 
 	public Question(String trackId, Map<String, Boolean> artistsIds) {
-		this.trackId = trackId;
-		this.artistsIds.putAll(artistsIds);
+            this.trackId = trackId;
+            this.artistsIds.putAll(artistsIds);
 	}
 
 	public Map<String, Boolean> getArtistsIds() {
-		return this.artistsIds;
+            return this.artistsIds;
 	}
 
 	public String getTrackId() {
-		return this.trackId;
+            return this.trackId;
 	}
 
 }
