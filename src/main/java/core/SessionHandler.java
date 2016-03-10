@@ -2,7 +2,6 @@ package core; /**
  * Created by jcber on 2016-03-01.
  */
 
-import com.google.gson.Gson;
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
 import java.io.IOException;
@@ -14,7 +13,7 @@ import javax.json.spi.JsonProvider;
 @ApplicationScoped
 public class SessionHandler {
     private final Set<UserSession> sessions = new HashSet<>();
-    private static final JsonProvider provider = JsonProvider.provider();
+    private static final JsonProvider PROVIDER = JsonProvider.provider();
 
     public void addSession(UserSession session) {
         sessions.add(session);
@@ -73,7 +72,7 @@ public class SessionHandler {
     }
     
     private JsonObject createJson(String action, String data){
-        return provider.createObjectBuilder().add("action", action).add("data", data).build();
+        return PROVIDER.createObjectBuilder().add("action", action).add("data", data).build();
     }
 
     public void sendToSession(UserSession session, String message) {

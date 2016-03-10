@@ -1,18 +1,13 @@
 package core;
 
-import com.google.appengine.repackaged.com.google.common.base.Flag;
-import com.wrapper.spotify.models.Track;
-import persistence.AbstractEntity;
-
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by jcber on 2016-03-04.
  */
 
-public class Quiz extends AbstractEntity {
+public class Quiz {
+    private String uuid;
     private String name;
     private final List<UserIdentity> players = new ArrayList<>();
     private final List<Question> questions = new ArrayList<>();
@@ -20,7 +15,7 @@ public class Quiz extends AbstractEntity {
     private UserIdentity owner;
 
     public Quiz(){
-        super();
+        this.uuid = UUID.randomUUID().toString();
     }
 
     public Quiz(String name, UserIdentity owner, List<UserIdentity> players, List<Question> questions){
@@ -50,6 +45,10 @@ public class Quiz extends AbstractEntity {
     
     public Question getNextQuestion(){
         return questions.get(currentQuestion++);
+    }
+    
+    public String getUUID(){
+        return uuid;
     }
 
 }

@@ -162,7 +162,29 @@ public class WebsocketServer {
                     sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;
                 case "answer":
+                    String artist = data.getString("artist");
+                    
+                    
                     // TODO
+                    break;
+                case "joinQuiz":
+                    String quizId = data.getString("quizId");
+                    Quiz quizToJoin = db.getQuizCatalogue().findQuiz(quizId);
+                    boolean joinSuccess = false;
+                    
+                    if (quizToJoin != null) {
+                        userSession.setCurrentQuiz(quizToJoin);
+                        joinSuccess = true;
+                    }
+                    
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", joinSuccess).build();
+                    System.out.println("Response: " + response);
+                    session.getBasicRemote().sendText(response.toString());
+                    break;
+                case "leaveQuiz":
+                    String quiz = data.getString("quizId");
+                   
+                    userSession.setCurrentQuiz(null);
                     break;
                 case "nextQuestion":
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();

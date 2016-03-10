@@ -171,6 +171,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('joinQuiz', data).then(callback);
             },
 
+            // callback(data[track_url, question])
             nextQuestion: function(quizId, callback) {
                 var data = {
                     quizId: quizId
