@@ -175,7 +175,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         };
         $scope.selectedAnswer = function(data, index){
             if (!hasAnswerd) {
-                answer = data.artist;
                 console.log(index + data);
                 hasAnswerd = true;
                 hasIndex = index;
