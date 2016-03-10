@@ -162,6 +162,7 @@ public class WebsocketServer {
                     break;
                 case "answerQuestion":
                     String artist = data.getString("artistName");
+                    System.out.println("Answer: " + artist);
                     boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
                     
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", right).build();
@@ -188,6 +189,8 @@ public class WebsocketServer {
                     userSession.setCurrentQuiz(null);
                     break;
                 case "nextQuestion":
+                    if (userSession.getCurrentQuiz().getOwner().getId() != userSession.getUserIdentity().getId())
+                        return;
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
                     
@@ -215,7 +218,7 @@ public class WebsocketServer {
                     String name = data.getString("name");
                     String playlistId = data.getString("playlist");
                     int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
-                    boolean generate = true;/*data.getBoolean("generated")*/;
+                    boolean generate = data.getBoolean("generated");
 
                     List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
                     List<Track> quizTracks;

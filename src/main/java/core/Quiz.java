@@ -25,7 +25,7 @@ public class Quiz {
         this.owner = owner;
         this.unjoinedPlayers.addAll(players);
         this.questions.addAll(questions);
-        this.currentQuestion = 0;
+        this.currentQuestion = -1;
     }
 
     public List<UserIdentity> getUnjoinedPlayers() {
@@ -57,12 +57,15 @@ public class Quiz {
     }
     
     public Question getCurrentQuestion(){
+        if (currentQuestion < 0)
+            return null;
         return questions.get(currentQuestion);
     }
     
     public boolean answerQuestion(UserIdentity user, String artistName) {
         if (this.getCurrentQuestion().answer(artistName)) {
-            joinedPlayers.put(user, joinedPlayers.get(user));
+            int currentPoints = joinedPlayers.getOrDefault(user, 0);
+            joinedPlayers.replace(user, currentPoints+1);
             return true;
         }
         return false;
@@ -71,7 +74,7 @@ public class Quiz {
     public Question getNextQuestion(){
         if (questions.size() == currentQuestion)
             return null;
-        return questions.get(currentQuestion++);
+        return questions.get(++currentQuestion);
     }
     
     public String getUUID(){

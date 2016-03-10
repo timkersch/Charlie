@@ -67,6 +67,7 @@
 					   ng-click="selectedAnswer(artist, $index)">{{artist}}</md-button>
 		</md-grid-tile>
 	</md-grid-list>
+    <p ng-repeat="artist in possibleArtists">{{artist}}</p>
 	<!--
 	<section layout="row" layout-align="center center">
 		<section layout="column" layout-align="center center" ng-repeat="sug in suggestions" ng-class="{active : isSelected(suggestion)}">

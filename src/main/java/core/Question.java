@@ -24,9 +24,9 @@ import javax.json.spi.JsonProvider;
  * Time: 10:31
  */
 
-public class Question extends AbstractEntity {
+public class Question {
 	private Track track;
-	private final Map<String, Boolean> artistsIds = new HashMap<String, Boolean>();
+	private final Map<String, Boolean> artistNames = new HashMap<>();
         private static final JsonProvider PROVIDER = JsonProvider.provider();
 
 	public Question() {
@@ -35,11 +35,11 @@ public class Question extends AbstractEntity {
 
 	public Question(Track track, Map<String, Boolean> artistsIds) {
             this.track = track;
-            this.artistsIds.putAll(artistsIds);
+            this.artistNames.putAll(artistsIds);
 	}
 
 	public Map<String, Boolean> getArtistsIds() {
-            return this.artistsIds;
+            return this.artistNames;
 	}
 
 	public Track getTrackId() {
@@ -47,10 +47,15 @@ public class Question extends AbstractEntity {
 	}
         
         public boolean answer(String artistName) {
-            return artistsIds.get(artistName);
+            return artistNames.getOrDefault(artistName, Boolean.FALSE);
         }
 
         public List<String> getArtists(){
-            return new ArrayList<>(artistsIds.keySet());
+            return new ArrayList<>(artistNames.keySet());
+        }
+        
+        @Override
+        public String toString(){
+            return "Question[track: " + track.getName() + ", artistsLength: " + artistNames.size() + "]";
         }
 }

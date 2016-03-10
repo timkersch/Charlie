@@ -139,20 +139,16 @@ charlieController.controller('homeController', [ '$scope', '$location', 'charlie
 charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy', '$document',
     function($scope, $location, $interval, charlieProxy, $document) {
         console.log("Inside questionController");
-        $scope.determinateValue = 30;
-        var incrementer = 0;
+        $scope.determinateValue = 20;
         
         var quiz = charlieProxy.getQuiz();
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(1, function(data){
-            console.log("DATA: " + JSON.stringify(data));
-            
             // Play song
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();
             
-            $scope.possibleArtists = data.artists;  
-            
+            $scope.possibleArtists = JSON.parse(data.artists);
         });
         
         var questionNumber = 0;
@@ -177,9 +173,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         $scope.selectedAnswer = function(data, index){
             if (!hasAnswerd) {
                 answer = data.artist;
-                console.log(index);
+                console.log(index + data);
                 hasAnswerd = true;
                 hasIndex = index;
+                charlieProxy.answerQuestion(data, function(correct){
+                   console.log("Answer correct: " + correct); 
+                });
             }
         };
 
@@ -218,32 +217,21 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         /*-------*/
 
         $interval(function(){
-            incrementer += 1;
-            if(incrementer > 9){
-                incrementer = 0;
-                $scope.determinateValue -= 1;
-                if($scope.determinateValue === -1){
-                    questionNumber += 1;
-                    console.log("questionnumber: " + questionNumber);
-                    if(questionNumber > 2){
-                         $location.path('/scoreboard');
-                     }
-                    /*
-                    * 1. Get the answer and send to the backend.
-                    * 2. Get the next question
-                    */
-                    console.log(answer);
-                    $scope.determinateValue = 20;
-                    hasAnswerd = false;
-                    hasIndex = '';
-                }
+            $scope.determinateValue--;
+            if($scope.determinateValue === -1){
+                charlieProxy.nextQuestion(1, function(data){
+                    // Play song
+                    audioElement.src = data.track_url + ".mp3";
+                    audioElement.play();
+
+                    $scope.possibleArtists = JSON.parse(data.artists);
+                });
+                
+                $scope.determinateValue = 20;
+                hasAnswerd = false;
+                hasIndex = '';
             }
-        }, 100, 0, true);
-
-        $scope.$on('newQuestion', function(){
-           charlieProxy.getCurrentQuestion();
-
-        });
+        }, 1000, 0, true);
 
         /*
         * 1. Get the quiz
