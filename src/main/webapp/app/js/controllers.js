@@ -6,8 +6,8 @@ var charlieController = angular.module('charlieController', [
     'ngMaterial'
 ]);
 
-charlieController.controller('mainController', ['$scope', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
-    function($scope, $location, $mdToast, charlieProxy, $mdSidenav) {
+charlieController.controller('mainController', ['$scope', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = {};
         $scope.url = "";
 
@@ -148,6 +148,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(1, function(data){
             console.log("TRACK: " + data);
+            console.log("----------ShowArtists--------: " + data);
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();   
             //$scope.$apply(function(){
@@ -207,31 +208,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
           }
         };
 
-        var question1 = [{
-                artist: "The killers"
-            },
-            {
-                artist: "Gavin Degraw"
-            },
-            {
-                artist: "The sons of Erik"
-            },
-            {
-                artist: "Army of Bertssons"
-            }];
-
-        var question2 = [{
-            artist: "The Beatles"
-        },
-            {
-                artist: "Darin"
-            },
-            {
-                artist: "Lill Lindfors"
-            },
-            {
-                artist: "Muse"
-            }];
 
         $scope.suggestions = question1;
 
@@ -261,8 +237,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                     * 2. Get the next question
                     */
                     console.log(answer);
-
-                    $scope.suggestions = question2;
                     $scope.determinateValue = 20;
                     hasAnswerd = false;
                     hasIndex = '';
@@ -292,24 +266,33 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
     function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
+
+
+        var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
         $scope.scoreData = [
     {
         value: 5,
         userName: "simon",
-        color: "#F7464A",
-        highlight: "#FF5A5E"
+        color: color[0],
+        /*highlight: "#8ef0aa"*/
     },
     {
         value: 4,
         userName: "erik",
-        color: "#46BFBD",
-        highlight: "#5AD3D1"
+        color: color[1],
+        /*highlight: "#ffff66"*/
     },
     {
         value: 3,
         userName: "tim",
-        color: "#FDB45C",
-        highlight: "#FFC870"
+        color: color[2],
+        /*highlight: "#66ffff"*/
+    },
+    {
+        value: 3,
+        userName: "tim",
+        color: color[3],
+        /*highlight: "#ff5b4d"*/
     }
 ];
 

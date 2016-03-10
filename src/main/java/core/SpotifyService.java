@@ -4,6 +4,7 @@ import com.wrapper.spotify.Api;
 import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
+
 import java.io.IOException;
 
 import java.util.*;
@@ -182,15 +183,26 @@ public class SpotifyService {
 	 * @param t the Track
 	 * @return a hashtable with artists as keys and boolans as values
 	 */
-	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+	public Hashtable<String, Boolean> getQuizOptions(Track t) {
 		List<SimpleArtist> artists = t.getArtists();
-		RelatedArtistsRequest request = api.getArtistRelatedArtists(artists.get(0).getId()).build();
 		try {
+			List<Artist> relatedArtists = api.getArtistRelatedArtists(artists.get(0).getId()).build().get();
 			Hashtable<String, Boolean> ht = new Hashtable<>();
-			ht.put(t.getArtists().get(0).getName(), true);
+
+			//StringBuilder sb = new StringBuilder();
+			//for (int i = 0; i < artists.size() - 1; i++) {
+			//	sb.append(artists.get(i).getName());
+			//	sb.append(" and ");
+			//}
+			//sb.append(artists.get(artists.size()-1).getName());
+			//ht.put(sb.toString(), true);
+
+			ht.put(artists.get(0).getName(), true);
+
 			for (int i = 0; i < 3; i++) {
-				ht.put(artists.get(i).getName(), false);
+				ht.put(relatedArtists.get(i).getName(), false);
 			}
+
 			return ht;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -203,10 +215,10 @@ public class SpotifyService {
 	 * @param trackId the trackId
 	 * @return a hashtable with the artists as keys and booleans as values
 	 */
-	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
+	public Hashtable<String, Boolean> getQuizOptions(String trackId) {
 		try {
 			api.getTrack(trackId);
-			return getArtistOptions(api.getTrack(trackId).build().get());
+			return getQuizOptions(api.getTrack(trackId).build().get());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
