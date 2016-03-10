@@ -30,6 +30,7 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
                 if ($routeParams.code){
                     charlieProxy.login($routeParams.code, function(user){
                         $scope.user = user;
+                        $location.path("/");
                     });
                 } else {
                     charlieProxy.getLoginUrl(function(url){
@@ -42,7 +43,6 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
         $scope.$on('$routeChangeSuccess', function() {
             // Initialize when service is ready
             if (charlieProxy.isReady()){
-                console.log("Already done");
                 init();
             }else{
                 $scope.$on('service-ready', function(event, args) {
@@ -144,7 +144,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         
-        var quiz = charlieProxy.getQuiz();
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(function(data){
             // Play song
@@ -154,11 +153,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             $scope.possibleArtists = data.artists;
         });
         
-        var questionNumber = 0;
-        var answer = "";
+        charlieProxy.listenTo("gameOver", function(users){
+           $location.path("/scoreboard"); 
+        });
+        
         $scope.activated = true;
         
-
         var hasIndex = '';
         var hasAnswerd = false;
         $scope.isDisabled = function(index){
@@ -195,21 +195,14 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 
         $scope.setColor = function(index) {
           switch (index) {
-              case 0: return 'green';
-                      break;
-              case 1: return 'red';
-                      break;
-              case 2: return 'blue';
-                      break;
-              case 3: return 'yellow';
-                      break;
-              default:return 'grey';
-                      break;
+            case 0: return 'green';
+            case 1: return 'red';
+            case 2: return 'blue';
+            case 3: return 'yellow';
+            default: return 'grey';
           }
         };
 
-
-        /*Test the js-fiddle here*/
         $scope.isSelected = function(data){
             return $scope.selected === data;
         };
@@ -217,7 +210,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         $scope.setAnswer2 = function(data){
             $scope.selected = data.artist;
         };
-        /*-------*/
 
         $interval(function(){
             $scope.determinateValue--;
@@ -236,18 +228,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             }
         }, 1000, 0, true);
 
-        /*
-        * 1. Get the quiz
-        * 2. Get the question
-        * 3. Get the artists
-        * 4. Place it in $scope.questions to repeat it.
-        */
-
-        /*
-        * 1. When the time has exceeded call the next question.
-        * 2. Do the same as above.
-        */
-
     }]);
 
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
@@ -255,25 +235,38 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         console.log("Inside scoreboardController");
         var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
         var dataArray = [];
-        charlieProxy.listenTo("gameover", function(users){
-           for(var i = 0; i < users.length; i++){
-               var data = {
-                   value : users[i].points,
-                   userName: users[i].name,
-                   color: color[i]
-               };
-               dataArray.push(data);
-           }
-        });
-        $scope.scoreData = dataArray;
-    
+        
         var ctx = document.getElementById("scoreboardChart").getContext("2d");
         var sChart = new Chart(ctx).Doughnut();
         
-        for(var i = 0; i < $scope.scoreData.length; i++){
-            sChart.addData($scope.scoreData[i]);
+        var init = function(){
+            charlieProxy.getResults(function(users){
+                for(var i = 0; i < users.length; i++){
+                    var data = {
+                        value : users[i].points,
+                        userName: users[i].name,
+                        color: color[i]
+                    };
+                    dataArray.push(data);
+                }
+                $scope.scoreData = dataArray;
+
+                for(var i = 0; i < $scope.scoreData.length; i++){
+                    sChart.addData($scope.scoreData[i]);
+                };
+            });
         };
-        
+
+        // Initialize when service is ready
+        if (charlieProxy.isReady()){
+            console.log("Ready now?")
+            init();
+        }else{
+            $scope.$on('service-ready', function(event, args) {
+                init();
+            });
+        }
+    
         $scope.changeView = function(view){
             console.log("Changing view to: " + view);
             $location.path(view); // path not hash

@@ -2,6 +2,7 @@ package core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import java.util.Objects;
 import persistence.AbstractEntity;
 
 import javax.persistence.*;
@@ -60,5 +61,30 @@ public class UserIdentity extends AbstractEntity{
         JsonElement element = gson.toJsonTree(this.getUser());
         element.getAsJsonObject().addProperty("id", this.getId());;
         return element;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 47 * hash + Objects.hashCode(this.user);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UserIdentity other = (UserIdentity) obj;
+        if (!Objects.equals(this.user, other.user)) {
+            return false;
+        }
+        return true;
     }
 }

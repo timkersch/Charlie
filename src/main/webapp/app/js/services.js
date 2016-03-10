@@ -15,7 +15,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var callbacks = {};
         var listenCallbacks = {};
         var user = {};
-        var currentQuiz = {};
+        var currentQuiz;
 
         socket.onmessage = function(event){
             console.log(event);
@@ -59,24 +59,33 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 return response.data;
             });
         };
+        
+        var setReady = function(){
+            console.log("service-ready");
+            isReady = true;
+            $rootScope.$broadcast('service-ready');
+        };
 
         socket.onopen = function (event) {
-            isReady = true;
-            console.log("Service ready: " + event);
 
             if (sessionStorage.user){
+                console.log("Reading user from storage");
                 // User in storage
                 user = angular.fromJson(sessionStorage.user);
                 var data = {
                     id: user.id
                 };
                 invoke("setUser", data).then(function(success){
-                    if (!success)
+                    if (!success) 
                         sessionStorage.user = "";
+                    else{
+                        
+                    }
+                    setReady();
                 });
-            } 
-            
-            $rootScope.$broadcast('service-ready');
+            } else {
+                setReady();
+            }
         };
 
 
@@ -154,6 +163,11 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('answerQuestion', data).then(callback);
             },
             
+            // callback(artists)
+            getQuestion: function(callback) {
+                invoke('getQuestion').then(callback);
+            },
+            
             // callback(users)
             getUsersInQuiz: function(quizId, callback){
                 var data = {
@@ -178,9 +192,18 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             savePlaylist: function() {
                 invoke('savePlaylist');
             },
+            
+            // callback(users)
+            getResults: function(callback){
+                invoke('getResults').then(callback);
+            },
 
-            getQuiz: function() {
-                return currentQuiz;
+            // callback(quiz)
+            getQuiz: function(callback) {
+                if (currentQuiz)
+                    callback(currentQuiz);
+                else
+                    invoke("getQuiz", callback);
             },
             
             /* action: 

@@ -2,11 +2,6 @@ package core;
 
 import java.util.ArrayList;
 import java.util.List;
-import persistence.AbstractDAO;
-
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 /**
  * Created by jcber on 2016-03-07.
@@ -30,5 +25,13 @@ public class QuizCatalogue {
     
     public List<Quiz> getQuizes(){
         return quizes;
+    }
+    
+    public Quiz getQuiz(UserIdentity user) {
+        for (Quiz quiz : quizes){
+            if (quiz.getOwner().equals(user) || quiz.getJoinedPlayers().contains(user))
+                return quiz;
+        }
+        return null;
     }
 }

@@ -131,6 +131,7 @@ public class WebsocketServer {
                         String newAccessToken = service.refreshAccessToken(user.getRefreshToken());
                         user.setAccessToken(newAccessToken);
                         service.setTokens(user.getAccessToken(), user.getRefreshToken());
+                        userSession.setCurrentQuiz(db.getQuizCatalogue().getQuiz(user));
                     }
                     userSession.setUserIdentity(user);
 
@@ -149,6 +150,19 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, playlists);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", playlists).build();
                     System.out.println("Playlists: " + playlists);
+                    session.getBasicRemote().sendText(response);
+                    break;
+                case "getQuestion":
+                    Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
+                    // Send them back as json
+                    String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
+                    JsonElement artistsJson = GSON.toJsonTree(currentQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
+                    JsonObject object = new JsonObject();
+                    object.addProperty("track_url", trackUrl);
+                    object.add("artists", artistsJson);
+                    String objAsString = object.toString();
+
+                    response = createResponse(requestId, action, objAsString);
                     session.getBasicRemote().sendText(response);
                     break;
                 case "getUsers":
@@ -216,7 +230,7 @@ public class WebsocketServer {
                         log("GameOver: " + results);
                         JsonArray array = new JsonArray();
                         for (UserIdentity identity : results.keySet()) {
-                            JsonObject o = GSON.toJsonTree(identity).getAsJsonObject();
+                            JsonObject o = identity.toJsonElement().getAsJsonObject();
                             o.addProperty("points", results.get(identity));
                             array.add(o);
                         }
@@ -242,6 +256,20 @@ public class WebsocketServer {
                         response = createResponse(requestId, action, objString);
                         session.getBasicRemote().sendText(response);
                     }
+                    break;
+                case "getResults":
+                    Quiz over = userSession.getCurrentQuiz();
+                    Map<UserIdentity, Integer> results = over.getResults();
+                    JsonArray array = new JsonArray();
+                    for (UserIdentity identity : results.keySet()) {
+                        JsonObject o = identity.toJsonElement().getAsJsonObject();
+                        o.addProperty("points", results.get(identity));
+                        array.add(o);
+                    }
+                    String arrayString = GSON.toJson(array);
+                    
+                    response = createResponse(requestId, action, arrayString);
+                    session.getBasicRemote().sendText(response);
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
@@ -296,6 +324,12 @@ public class WebsocketServer {
                         trackids.add(q.getTrackId().getId());
                     }
                     service.createAndPopulatePlaylist(trackids, name1);
+                    break;
+                case "getQuiz":
+                    // Send back the resulting quiz
+                    String quizAsJson = GSON.toJson(userSession.getCurrentQuiz());
+                    response = createResponse(requestId, action, quizAsJson);
+                    session.getBasicRemote().sendText(response);
                     break;
                 default:
                     sessionHandler.sendToAllConnectedSessions("noRequest", "error");
