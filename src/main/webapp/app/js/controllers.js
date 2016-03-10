@@ -52,10 +52,6 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
             }
         });
         
-        charlieProxy.listenTo("invitedTo", function(quiz) {
-            showActionToast(quiz);
-        });
-        
         var showActionToast = function(quiz) {
             var toast = $mdToast.simple()
             .textContent('You are invited to ' + quiz.name)
@@ -65,7 +61,7 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
             $mdToast.show(toast).then(function(response) {
                 if ( response == 'ok' ) {
                     alert('You accepted the '+ quiz.name + ' invite.');
-                    charlieProxy.joinQuiz(quiz.id, function(success) {
+                    charlieProxy.joinQuiz(quiz.uuid, function(success) {
                        if (success) {
                            alert('Successfully joined the quiz!');
                        } else {
@@ -75,6 +71,10 @@ charlieController.controller('mainController', ['$scope', '$location', '$mdToast
                 }
             });
         };
+        
+        charlieProxy.listenTo("invitedTo", function(quiz) {
+            showActionToast(quiz);
+        });
 
         $scope.login = function (){
             console.log("login");
@@ -296,24 +296,33 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 charlieController.controller('scoreboardController', [ '$scope', 'charlieProxy',
     function($scope, charlieProxy) {
         console.log("Inside scoreboardController");
+
+
+        var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
         $scope.scoreData = [
     {
         value: 5,
         userName: "simon",
-        color: "#F7464A",
-        highlight: "#FF5A5E"
+        color: color[0],
+        /*highlight: "#8ef0aa"*/
     },
     {
         value: 4,
         userName: "erik",
-        color: "#46BFBD",
-        highlight: "#5AD3D1"
+        color: color[1],
+        /*highlight: "#ffff66"*/
     },
     {
         value: 3,
         userName: "tim",
-        color: "#FDB45C",
-        highlight: "#FFC870"
+        color: color[2],
+        /*highlight: "#66ffff"*/
+    },
+    {
+        value: 3,
+        userName: "tim",
+        color: color[3],
+        /*highlight: "#ff5b4d"*/
     }
 ];
 
