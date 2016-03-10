@@ -102,8 +102,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             // callback(quiz)
-            createQuiz: function(userIds, playlistId, nbrOfSongs, callback){
+            createQuiz: function(name, userIds, playlistId, nbrOfSongs, callback){
                 var data = {
+                    name: name,
                     users: userIds,
                     playlist: playlistId,
                     nbrOfSongs: nbrOfSongs

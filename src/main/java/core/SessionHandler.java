@@ -67,8 +67,8 @@ public class SessionHandler {
 
     public void sendToSessions(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
-        for (Long user: quiz.getPlayerIds()){
-            this.sendToSession(this.getUserSessionById(user), response);
+        for (UserIdentity user: quiz.getPlayers()){
+            this.sendToSession(this.getUserSessionById(user.getId()), response);
         }
     }
     

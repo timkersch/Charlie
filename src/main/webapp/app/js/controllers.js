@@ -131,11 +131,10 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
         var incrementer = 0;
         
         var quiz = charlieProxy.getQuiz();
-        quiz.nextQuestion(function(data){
+        charlieProxy.nextQuestion(function(data){
            $scope.currentTrack = data.track_url; 
         });
         
-        console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
@@ -342,7 +341,7 @@ charlieController.controller('createController', ['$scope', '$location', '$route
         $scope.submit = function() {
             console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
             
-            charlieProxy.createQuiz($scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
                $location.path('/lobby'); 
             });
             
