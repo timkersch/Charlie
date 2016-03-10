@@ -174,6 +174,7 @@ public class WebsocketServer {
                     
                     if (quizToJoin != null) {
                         userSession.setCurrentQuiz(quizToJoin);
+                        sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", userSession.getUserIdentity().toJsonElement().toString());
                         joinSuccess = true;
                     }
                     
@@ -182,8 +183,7 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response.toString());
                     break;
                 case "leaveQuiz":
-                    String quiz = data.getString("quizId");
-                   
+                    userSession.getCurrentQuiz().leavePlayer(userSession.getUserIdentity());
                     userSession.setCurrentQuiz(null);
                     break;
                 case "nextQuestion":
@@ -191,6 +191,7 @@ public class WebsocketServer {
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
                     
                     // TODO Send wrong anser for last question.
+                    //sessionHandler.sendToQuizMemebrs(userSession.getCurrentQuiz(), "answer", false);
                     
                     // Send them back as json
                     String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());

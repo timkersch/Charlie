@@ -9,7 +9,8 @@ import java.util.*;
 public class Quiz {
     private String uuid;
     private String name;
-    private final List<UserIdentity> players = new ArrayList<>();
+    private final List<UserIdentity> joinedPlayers = new ArrayList<>();
+    private final List<UserIdentity> unjoinedPlayers = new ArrayList<>();
     private final List<Question> questions = new ArrayList<>();
     private int currentQuestion;
     private UserIdentity owner;
@@ -22,20 +23,36 @@ public class Quiz {
         this();
         this.name = name;
         this.owner = owner;
-        this.players.addAll(players);
+        this.unjoinedPlayers.addAll(players);
         this.questions.addAll(questions);
         this.currentQuestion = 0;
     }
 
-    public List<UserIdentity> getPlayers() {
-        return players;
+    public List<UserIdentity> getUnjoinedPlayers() {
+        return unjoinedPlayers;
+    }
+    
+    public List<UserIdentity> getJoinedPlayers() {
+        return joinedPlayers;
+    }
+    
+    public boolean joinPlayer(UserIdentity user) {
+        if (unjoinedPlayers.remove(user)) {
+            joinedPlayers.add(user);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean leavePlayer(UserIdentity user) {
+        return joinedPlayers.remove(user);
     }
 
     public UserIdentity getOwner() {
         return owner;
     }
 
-    public List<Question> getQuestion() {
+    public List<Question> getQuestions() {
         return this.questions;
     }
     

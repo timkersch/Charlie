@@ -66,16 +66,29 @@ public class SessionHandler {
 
     public void sendToSessions(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
-        for (UserIdentity user: quiz.getPlayers()){
+        for (UserIdentity user: quiz.getJoinedPlayers()){
             this.sendToSession(this.getUserSessionById(user.getId()), response);
         }
+    }
+    
+    public void sendToQuizMemebrs(Quiz quiz, String action, String data){
+        JsonObject response = createJson(action, data);
+        for (UserIdentity user: quiz.getJoinedPlayers()){
+            this.sendToSession(this.getUserSessionById(user.getId()), response);
+        }
+        this.sendToSession(this.getUserSessionById(quiz.getOwner().getId()), response);
+    }
+    
+    public void sendToUser(UserIdentity user, String action, String data) {
+        JsonObject response = createJson(action, data);
+        this.sendToSession(this.getUserSessionById(user.getId()), response);
     }
     
     private JsonObject createJson(String action, String data){
         return PROVIDER.createObjectBuilder().add("action", action).add("data", data).build();
     }
 
-    public void sendToSession(UserSession session, String message) {
+    private void sendToSession(UserSession session, String message) {
         try {
             session.getSession().getBasicRemote().sendText(message);
         } catch (IOException ex) {
@@ -84,7 +97,7 @@ public class SessionHandler {
         }
     }
 
-    public void sendToSession(UserSession session, JsonObject data) {
+    private void sendToSession(UserSession session, JsonObject data) {
         try {
             session.getSession().getBasicRemote().sendText(data.toString());
         } catch (IOException ex) {
