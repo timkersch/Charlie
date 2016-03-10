@@ -1,7 +1,6 @@
 package core;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -14,8 +13,8 @@ import javax.persistence.PersistenceContext;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @ServerEndpoint("/api")
@@ -27,14 +26,13 @@ public class WebsocketServer {
     @PersistenceContext(unitName = "db")
     EntityManager em; 
 
-    private final SpotifyService service = new SpotifyService();
-    
-    private static final Logger logger = Logger.getLogger(WebsocketServer.class.getName());
-
     @Inject
     private SessionHandler sessionHandler;
     
-    private static final Gson gson = new Gson();
+    private final SpotifyService service = new SpotifyService();
+    
+    private static final Gson GSON = new Gson();
+    private static final Logger LOGGER = Logger.getLogger(WebsocketServer.class.getName());
 
     @OnOpen
     public void open(Session session) {
@@ -54,12 +52,11 @@ public class WebsocketServer {
     @OnError
     public void onError(Throwable error) {
         error.printStackTrace();
-        log("OnError: " + error.toString());
+        LOGGER.log(Level.WARNING, error.toString());
     }
     
     private void log(String msg){
-        System.out.println(msg);
-        //logger.log(Level.INFO, msg);
+        LOGGER.log(Level.INFO, msg);
     }
     
     private String createResponse(int requestId, String action, Object data){
@@ -67,13 +64,13 @@ public class WebsocketServer {
         r.request_id = requestId;
         r.action = action;
         r.data = data;
-        return gson.toJson(r);
+        return GSON.toJson(r);
     }
 
     @OnMessage
     public void handleMessage(String message, Session session) {
         try{
-            JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
+            JsonObject jsonMessage = GSON.fromJson(message, JsonObject.class);
 
             // Extract the action, requestId and data from the json message
             JsonObject data = jsonMessage.getAsJsonObject("data");
@@ -84,7 +81,7 @@ public class WebsocketServer {
             UserSession userSession = sessionHandler.getUserSession(session.getId());
 
             // Create objects needed by action
-            String response, responseData;
+            String response = "";
             UserIdentity user;
 
             log(action + " - DATA: " + data);
@@ -113,7 +110,7 @@ public class WebsocketServer {
                     userSession.setUserIdentity(user);
 
                     // Create user json
-                    String userAsString = gson.toJson(user.toJsonElement());
+                    String userAsString = GSON.toJson(user.toJsonElement());
                     response = createResponse(requestId, action, userAsString);
 
                     // Send back result
@@ -148,7 +145,7 @@ public class WebsocketServer {
                     List<SimplePlaylist> lists = service.getUsersPlaylists();
 
                     // Send them back as json
-                    String playlists = gson.toJson(lists);
+                    String playlists = GSON.toJson(lists);
                     response = createResponse(requestId, action, playlists);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", playlists).build();
                     System.out.println("Playlists: " + playlists);
@@ -164,7 +161,7 @@ public class WebsocketServer {
                         onlineUsersAsJson.add(userIdentity.toJsonElement());
 
                     // Send them back as json
-                    String usersString = gson.toJson(onlineUsersAsJson);
+                    String usersString = GSON.toJson(onlineUsersAsJson);
                     response = createResponse(requestId, action, usersString);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
                     log("Users: " + usersString);
@@ -209,48 +206,59 @@ public class WebsocketServer {
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
 
                     // TODO Send wrong anser for last question.
-                    //sessionHandler.sendToQuizMemebrs(userSession.getCurrentQuiz(), "answer", false);
+                    
 
                     if (nextQuestion == null) {
                         // Quiz is over
                         Quiz over = userSession.getCurrentQuiz();
                         Map<UserIdentity, Integer> results = over.getResults();
-                        responseData = "";
-                        //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
-
-                        //sessionHandler.sendToQuizMemebrs(over, "gameOver", gson.toJson(over.getJoinedPlayers()));
+                        JsonObject object = new JsonObject();
+                        JsonArray array = new JsonArray();
+                        for (UserIdentity identity : results.keySet()) {
+                            JsonObject o = GSON.toJsonTree(identity).getAsJsonObject();
+                            o.addProperty("points", results.get(identity));
+                            array.add(o);
+                        }
+                        String arrayString = array.getAsJsonObject().getAsString();
+                        
+                        sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
+                        
+                        response = createResponse(requestId, action, "");
+                        session.getBasicRemote().sendText(response);
                     } else {
                         // Send them back as json
                         String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                        JsonElement artistsAsJson = gson.toJsonTree(nextQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
+                        JsonElement artistsAsJson = GSON.toJsonTree(nextQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
                         JsonObject obj = new JsonObject();
                         obj.addProperty("track_url", nextTrack);
                         obj.add("artists", artistsAsJson);
-                        responseData = obj.toString();
+                        String objString = obj.toString();
                         //JsonObjectBuilder trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson);
                         
-                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", responseData);
+                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", objString);
+                        
+                        response = createResponse(requestId, action, objString);
+                        session.getBasicRemote().sendText(response);
                     }
-                    response = createResponse(requestId, action, responseData);
-                    System.out.println("Response: " + response);
-                    session.getBasicRemote().sendText(response.toString());
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
+
                     JsonArray usernames = data.getAsJsonArray("users");
                     String name = data.getAsJsonPrimitive("name").getAsString(); //getString("name");
                     String playlistId = data.getAsJsonPrimitive("playlist").getAsString();//data.getString("playlist");
                     int nbrOfSongs = data.getAsJsonPrimitive("nbrOfSongs").getAsInt(); //Integer.parseInt(data.getString("nbrOfSongs"));
                     boolean generate = data.getAsJsonPrimitive("generated").getAsBoolean(); //data.getBoolean("generated");
 
+
                     List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
                     List<Track> quizTracks;
 
                     if (generate) {
-                            quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
+                        quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
                     } else {
-                            Collections.shuffle(playlistTracks);
-                            quizTracks = playlistTracks.subList(0, nbrOfSongs);
+                        Collections.shuffle(playlistTracks);
+                        quizTracks = playlistTracks.subList(0, nbrOfSongs);
                     }
 
                     List<Question> questions = new ArrayList<>();
@@ -271,7 +279,7 @@ public class WebsocketServer {
                     userSession.setCurrentQuiz(quiz);
 
                     // Send back the resulting quiz
-                    String jsonQuiz = gson.toJson(quiz);
+                    String jsonQuiz = GSON.toJson(quiz);
                     response = createResponse(requestId, action, jsonQuiz);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", jsonQuiz).build();
                     session.getBasicRemote().sendText(response);
@@ -282,16 +290,18 @@ public class WebsocketServer {
                     List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
                     List<String> trackids = new ArrayList<>(question1.size());
                     for (Question q : question1) {
-                            trackids.add(q.getTrackId().getId());
+                        trackids.add(q.getTrackId().getId());
                     }
                     service.createAndPopulatePlaylist(trackids, name1);
                     break;
                 default:
                     sessionHandler.sendToAllConnectedSessions("noRequest", "error");
                     break;
-            }   
+            }
+            log("Response: " + response);
         }catch(IOException exception) {
             exception.printStackTrace();
+            LOGGER.log(Level.WARNING, exception.toString());
         }
     }
 

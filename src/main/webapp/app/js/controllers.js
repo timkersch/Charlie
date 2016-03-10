@@ -133,6 +133,9 @@ charlieController.controller('signupController', [ '$scope', 'charlieProxy',
 
 charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy',
     function($scope, $location, charlieProxy) {
+        $scope.changeView = function(data){
+            $location.path(data);
+        }
         console.log("Init");
     }]);
 
