@@ -51,11 +51,13 @@ public class WebsocketServer {
 
     @OnError
     public void onError(Throwable error) {
+        error.printStackTrace();
         log("OnError: " + error.toString());
     }
     
     private void log(String msg){
-        logger.log(Level.INFO, msg);
+        System.out.println(msg);
+        //logger.log(Level.INFO, msg);
     }
 
     @OnMessage
@@ -76,7 +78,7 @@ public class WebsocketServer {
             UserIdentity user;
             Gson gson = new Gson();
             
-            log(action + " - DATA: " + data.toString());
+            log(action + " - DATA: " + data);
             switch(action) {
                 case "getLoginURL":
                     // Retrieve login URL from spotify service
