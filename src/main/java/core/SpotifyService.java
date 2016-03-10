@@ -1,8 +1,5 @@
 package core;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
@@ -27,9 +24,7 @@ public class SpotifyService {
 			.redirectURI(SpotifyCredentials.redirectURI)
 			.build();
 
-	/* Continue by sending the user to the authorizeURL, which will look something like
-	https://accounts.spotify.com:443/authorize?client_id=5fe01282e44241328a84e7c5cc169165&response_type=code&redirect_uri=https://example.com/callback&scope=user-read-private%20user-read-email&state=some-state-of-my-choice
-	*/
+
 	public String getAuthorizeURL() {
 		/* Set the necessary scopes that the application will need from the user */
 		List<String> scopes = new ArrayList<>(); //Arrays.asList("user-read-private", "user-read-email");
@@ -38,6 +33,57 @@ public class SpotifyService {
 		String state = "someState";
 
 		return api.createAuthorizeURL(scopes, state);
+	}
+
+	public UserIdentity getUser(String code) {
+		try {
+			System.out.println("Getting user");
+
+			/* Retrieve an access token */
+			final AuthorizationCodeCredentials authorizationCodeCredentials = api.authorizationCodeGrant(code).build().get();
+			System.out.println("AuthCred: " + authorizationCodeCredentials.toString());
+
+			/* Set the access token and refresh token so that they are used whenever needed */
+			api.setAccessToken(authorizationCodeCredentials.getAccessToken());
+			api.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
+
+			/* The token response contains a refresh token, an accesstoken, and some other things.
+			* We only need the access token to retrieve the user's information.
+			*/
+			final String accessToken = authorizationCodeCredentials.getAccessToken();
+			final String refreshToken = authorizationCodeCredentials.getRefreshToken();
+			System.out.println("AccessToken: " + accessToken);
+
+			/* Retrieve information about the user.
+			* The amount of information that is set on the User object depends on the scopes that
+			* the user has allowed the application to read.
+			* Read about which scopes that are available on
+			* https://developer.spotify.com/spotify-web-api/get-users-profile/
+			*/
+			final com.wrapper.spotify.models.User currentUser = api.getMe().accessToken(accessToken).build().get();
+
+			/* Use the information about the user */
+			System.out.println("URI to currently logged in user is: " + currentUser.getUri());
+			System.out.println("The currently logged in user comes from: " + currentUser.getCountry());
+			System.out.println("You can reach this user at: " + currentUser.getEmail());
+			System.out.println("Users display name: " + currentUser.getDisplayName());
+
+			return new UserIdentity(currentUser, accessToken, refreshToken);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return UserIdentity.createDummyUser();
+	}
+
+	public String refreshAccessToken(String refreshToken){
+		try {
+			api.setRefreshToken(refreshToken);
+			String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
+			return newAccessToken;
+		} catch (IOException | WebApiException ex) {
+			Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
+		}
+		return null;
 	}
 
 	/**
@@ -94,13 +140,18 @@ public class SpotifyService {
 		}
 	}
 
+
+	public void createAndPopulatePlaylist(List<String> trackids, String name) {
+		Playlist p = this.createQuizPlaylist(name);
+	}
+
 	/**
 	 * Method that creates a playlist and returns it
 	 * @return a new Playlist
 	 */
-	public Playlist createQuizPlaylist() {
+	public Playlist createQuizPlaylist(String name) {
 		try {
-			PlaylistCreationRequest request = api.createPlaylist(api.getMe().build().get().getId(), "quiz" + this.hashCode())
+			PlaylistCreationRequest request = api.createPlaylist(api.getMe().build().get().getId(), name)
 					.publicAccess(false)
 					.build();
 
@@ -127,8 +178,8 @@ public class SpotifyService {
 		try {
 			Hashtable<String, Boolean> ht = new Hashtable<>();
 			ht.put(t.getArtists().get(0).getName(), true);
-			for (Artist a : request.get()) {
-				ht.put(a.getName(), false);
+			for (int i = 0; i < 3; i++) {
+				ht.put(artists.get(i).getName(), false);
 			}
 			return ht;
 		} catch (Exception e) {
@@ -137,6 +188,11 @@ public class SpotifyService {
 		}
 	}
 
+	/**
+	 * Method that returns four artist options for a track.
+	 * @param trackId the trackId
+	 * @return a hashtable with the artists as keys and booleans as values
+	 */
 	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
 		try {
 			api.getTrack(trackId);
@@ -199,57 +255,6 @@ public class SpotifyService {
 	private int randomInt(int min, int max) {
 		Random random = new Random();
 		return random.nextInt(max - min + 1) + min;
-	}
-
-	public UserIdentity getUser(String code) {
-		try {
-			System.out.println("Getting user");
-
-			/* Retrieve an access token */
-			final AuthorizationCodeCredentials authorizationCodeCredentials = api.authorizationCodeGrant(code).build().get();
-			System.out.println("AuthCred: " + authorizationCodeCredentials.toString());
-
-			/* Set the access token and refresh token so that they are used whenever needed */
-			api.setAccessToken(authorizationCodeCredentials.getAccessToken());
-			api.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
-
-			/* The token response contains a refresh token, an accesstoken, and some other things.
-			* We only need the access token to retrieve the user's information.
-			*/
-			final String accessToken = authorizationCodeCredentials.getAccessToken();
-			final String refreshToken = authorizationCodeCredentials.getRefreshToken();
-			System.out.println("AccessToken: " + accessToken);
-
-			/* Retrieve information about the user.
-			* The amount of information that is set on the User object depends on the scopes that
-			* the user has allowed the application to read.
-			* Read about which scopes that are available on
-			* https://developer.spotify.com/spotify-web-api/get-users-profile/
-			*/
-			final com.wrapper.spotify.models.User currentUser = api.getMe().accessToken(accessToken).build().get();
-
-			/* Use the information about the user */
-			System.out.println("URI to currently logged in user is: " + currentUser.getUri());
-			System.out.println("The currently logged in user comes from: " + currentUser.getCountry());
-			System.out.println("You can reach this user at: " + currentUser.getEmail());
-			System.out.println("Users display name: " + currentUser.getDisplayName());
-
-			return new UserIdentity(currentUser, accessToken, refreshToken);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return UserIdentity.createDummyUser();
-	}
-        
-	public String refreshAccessToken(String refreshToken){
-		try {
-			api.setRefreshToken(refreshToken);
-			String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
-			return newAccessToken;
-		} catch (IOException | WebApiException ex) {
-			Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		return null;
 	}
 
 	public String getTrackUrl(Track t) {
