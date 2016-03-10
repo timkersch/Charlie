@@ -190,6 +190,8 @@ public class WebsocketServer {
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", jsonQuiz).build();
                     session.getBasicRemote().sendText(response.toString());
                     break;
+	            case "nextQuestion":
+		            break;
                 default:
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).build();
                     sessionHandler.sendToAllConnectedSessions(response.toString());
