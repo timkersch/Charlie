@@ -31,6 +31,21 @@
         top: 43%;
         left: 50%;
     }
+    
+    div .end {
+        width: 100%;
+        margin: -1em;
+    }
+
+    div .end .md-button {
+        min-width: 100%;
+        min-height: 3em;
+        padding: 0;
+        margin: 0;
+        position: fixed;
+        bottom: 0px;
+        background: #1A237E !important;
+    }
 </style>
 <md-content class="autoScroll" ng-cloak>
     <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
@@ -64,6 +79,8 @@
                     secondary-placeholder="Enter a Friend">
             </md-chips>
         </md-input-container>
-        <md-button type="submit" class="md-primary md-raised">CREATE</md-button>
+        <div class="end">
+            <md-button type="submit" class="md-primary md-raised">CREATE</md-button>
+        </div>
     </form>
 </md-content>

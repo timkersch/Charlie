@@ -114,22 +114,13 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
         };
     }]);
 
-charlieController.controller('homeController', [ '$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('homeController', [ '$scope', '$location', '$routeParams', 'charlieProxy',
+    function($scope, $location, $routeParams, charlieProxy) {
         console.log("Init");
 
-        $scope.getPlaylists = function (){
-            console.log("login");
-            charlieProxy.getPlaylists(function(lists){
-                $scope.playlists = lists
-            });
-        };
-
-        $scope.getUsers = function(){
-            console.log("getUsers");
-            charlieProxy.getUsers(function(users){
-                $scope.users = users;
-            });
+      $scope.changeView = function(view){
+            console.log("Changing view to: " + view);
+            $location.path(view); // path not hash
         };
     }]);
 
