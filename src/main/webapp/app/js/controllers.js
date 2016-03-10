@@ -299,7 +299,7 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.playlistSelected = null;
         $scope.readonly = false;
         $scope.tags = [];
-
+        $scope.toggleSwitch = true;
         var init = function (){
             charlieProxy.getPlaylists(function(lists){
                 $scope.playlists = lists;
@@ -315,10 +315,10 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         }
 
         $scope.submit = function() {
-            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
+            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected + "  toggleSwitch: " + $scope.toggleSwitch);
             
             // TODO generate quiz
-            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, true, function(quiz){
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, $scope.toggleSwitch, function(quiz){
                $location.path('/lobby'); 
             });
             
