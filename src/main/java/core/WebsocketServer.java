@@ -32,6 +32,9 @@ public class WebsocketServer {
 
     @Inject
     private SessionHandler sessionHandler;
+    
+    private static final Gson gson = new Gson();
+    private static final JsonProvider provider = JsonProvider.provider();
 
     @OnOpen
     public void open(Session session) {
@@ -72,10 +75,8 @@ public class WebsocketServer {
             UserSession userSession = sessionHandler.getUserSession(session.getId());
 
             // Create objects needed by action
-            JsonProvider provider = JsonProvider.provider();
             JsonObject response;
             UserIdentity user;
-            Gson gson = new Gson();
             
             log(action + " - DATA: " + data);
             switch(action) {
@@ -200,12 +201,24 @@ public class WebsocketServer {
                     if (nextQuestion == null) {
                         // Quiz is over
                         Quiz over = userSession.getCurrentQuiz();
-                        sessionHandler.sendToQuizMemebrs(over, "gameOver", gson.toJson(over.getJoinedPlayers()));
+                        Map<UserIdentity, Integer> results = over.getResults();
+                        List<JsonObjectBuilder> usersWithPoints = new ArrayList<>();
+                        for (UserIdentity identity : results.keySet()) {
+                            int points = results.get(identity);
+                            com.google.gson.JsonObject userAsObject = identity.toJsonElement().getAsJsonObject();
+                            userAsObject.addProperty("points", points);
+                            JsonObjectBuilder userWithPoints = provider.createObjectBuilder().add("user", userAsObject.toString());
+                            usersWithPoints.add(userWithPoints);
+                        }
+                        
+                        //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
+                        
+                        //sessionHandler.sendToQuizMemebrs(over, "gameOver", gson.toJson(over.getJoinedPlayers()));
                     } else {
                         // Send them back as json
                         String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
                         String artistsAsJson = gson.toJson(nextQuestion.getArtists());
-                        JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson).build();
+                        JsonObjectBuilder trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson);
                         response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
                         System.out.println("Response: " + response);
                         session.getBasicRemote().sendText(response.toString());

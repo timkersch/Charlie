@@ -36,6 +36,10 @@ public class Quiz {
         return new ArrayList<>(joinedPlayers.keySet());
     }
     
+    public Map<UserIdentity, Integer> getResults() {
+        return joinedPlayers;
+    }
+    
     public boolean joinPlayer(UserIdentity user) {
         if (unjoinedPlayers.remove(user)) {
             joinedPlayers.put(user, 0);
