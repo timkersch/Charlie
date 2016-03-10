@@ -148,7 +148,18 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(1, function(data){
             console.log("TRACK: " + data);
-            console.log("----------ShowArtists--------: " + data);
+            console.log("----------ShowArtists--------: ");
+            console.log(data);
+            console.log(data.question);
+            console.log(JSON.stringify(data));
+            
+            console.log("Artistids");
+            console.log(data.question.artistIds);
+            /*
+            console.log(data.question.artists[1].name);
+            console.log(data.question.artists[2].name);
+            console.log(data.question.artists[3].name);
+            */
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();   
             //$scope.$apply(function(){
@@ -208,8 +219,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
           }
         };
 
-
-        $scope.suggestions = question1;
 
         /*Test the js-fiddle here*/
         $scope.isSelected = function(data){
