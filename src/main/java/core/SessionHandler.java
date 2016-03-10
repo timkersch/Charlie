@@ -47,21 +47,21 @@ public class SessionHandler {
         return null;
     }
 
-    public void sendToAllConnectedSessions(JsonObject message) {
+    public void sendToAllConnectedSessions(String message) {
         for (UserSession session : sessions) {
             sendToSession(session, message);
         }
     }
 
-    public void sendToSessions(Quiz quiz, JsonObject message){
-        /*for (UserIdentity user: quiz.getPlayers()){
-            this.sendToSession(this.getUserSessionById(user.getId()), message);
-        }*/
+    public void sendToSessions(Quiz quiz, String message){
+        for (Long user: quiz.getPlayerIds()){
+            this.sendToSession(this.getUserSessionById(user), message);
+        }
     }
 
-    public void sendToSession(UserSession session, JsonObject message) {
+    public void sendToSession(UserSession session, String message) {
         try {
-            session.getSession().getBasicRemote().sendText(message.toString());
+            session.getSession().getBasicRemote().sendText(message);
         } catch (IOException ex) {
             sessions.remove(session);
             Logger.getLogger(SessionHandler.class.getName()).log(Level.SEVERE, null, ex);

@@ -173,15 +173,17 @@ public class WebsocketServer {
                     // Get the tracks to base the quiz on
                     List<Track> tracks = service.getPlaylistSongs(playlistId);
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
-                    List<String> similarTrackIds = new ArrayList<>();
-                    for(Track track : similarTracks)
-                        similarTrackIds.add(track.getId());
+	                List<Question> questions = new ArrayList<>();
+                    for(int i = 0; i < similarTracks.size(); i++) {
+						questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
+                    }
 
                     // Create quiz
-                    Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), similarTrackIds);
+	                Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
+
                     db.getQuizCatalogue().create(quiz);
                     
-                    // TODO invite users to quiz
+                    sessionHandler.sendToSessions(quiz, gson.toJson(quiz));
                     
                     // Send back the resulting quiz
                     String jsonQuiz = gson.toJson(quiz);
@@ -190,7 +192,7 @@ public class WebsocketServer {
                     break;
                 default:
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).build();
-                    sessionHandler.sendToAllConnectedSessions(response);
+                    sessionHandler.sendToAllConnectedSessions(response.toString());
                     break;
             }
         } catch (IOException e) {
