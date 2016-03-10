@@ -73,7 +73,7 @@
             <h5>Choose playlist</h5>
 
             <md-radio-group ng-model="playlistSelected" id="playlists">
-                <md-radio-button ng-repeat="playlist in playlists" ng-value="playlist.id" class="md-primary">{{playlist.name}}</md-radio-button>
+                <md-radio-button ng-repeat="playlist in playlists" ng-value="playlist" class="md-primary">{{playlist.name}}</md-radio-button>
             </md-radio-group>
 
         </md-input-container>
