@@ -145,7 +145,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             // callback(isCorrect)
-            answerQuestion: function(answerId, questionId, quizId, callback){
+            answerQuestion: function(quizId, questionId, answerId, callback){
                 var data = {
                     answerId: answerId,
                     questionId: questionId,
@@ -154,7 +154,27 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('answerQuestion', data).then(callback);
             },
             
-            // action: userJoined, invitedTo, newQuestion
+            // callback(users)
+            getUsersInQuiz: function(quizId, callback){
+                var data = {
+                    quizId: quizId
+                };
+                invoke('getUsersInQuiz', data).then(callback);
+            },
+            
+            // callback(success)
+            joinQuiz: function(quizId, callback) {
+                var data = {
+                    quizId: quizId
+                };
+                invoke('joinQuiz', data).then(callback);
+            },
+            
+            /* action: 
+             *      userJoined      --> callback(newUser)
+             *      invitedTo       --> callback(quiz)
+             *      newQuestion     --> callback(question)
+             */
             listenTo: function(action, callback){
                 console.log("listenTo(" + action + ")");
                 if (!Array.isArray(listenCallbacks[action]))
