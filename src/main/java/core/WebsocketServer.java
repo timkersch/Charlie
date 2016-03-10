@@ -208,19 +208,19 @@ public class WebsocketServer {
                     String name = data.getString("name");
                     String playlistId = data.getString("playlist");
                     int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
-	                boolean generate = Boolean.parseBoolean(data.getString("generated"));
+                    boolean generate = data.getBoolean("generated");
 
-	                List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
-	                List<Track> quizTracks;
+                    List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
+                    List<Track> quizTracks;
 
-	                if (generate) {
-		                quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
-	                } else {
-		                Collections.shuffle(playlistTracks);
-		                quizTracks = playlistTracks.subList(0, nbrOfSongs);
-	                }
+                    if (generate) {
+                            quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
+                    } else {
+                            Collections.shuffle(playlistTracks);
+                            quizTracks = playlistTracks.subList(0, nbrOfSongs);
+                    }
 
-	                List<Question> questions = new ArrayList<>();
+                    List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < quizTracks.size(); i++) {
                         questions.add(new Question(quizTracks.get(i), service.getQuizOptions(quizTracks.get(i))));
                     }

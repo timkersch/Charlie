@@ -345,7 +345,8 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.submit = function() {
             console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
             
-            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+            // TODO generate quiz
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, true, function(quiz){
                $location.path('/lobby'); 
             });
             
