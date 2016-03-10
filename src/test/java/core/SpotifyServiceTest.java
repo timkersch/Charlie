@@ -28,7 +28,7 @@ public class SpotifyServiceTest {
 
 	@Test
 	public void testGetAuthorizeURL() throws Exception {
-		System.out.println(s.getAuthorizeURL());
+
 	}
 
 	@Test

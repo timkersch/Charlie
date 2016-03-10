@@ -11,14 +11,14 @@
 
 </style>
 <md-content class="autoScroll" ng-cloak>
-    <md-toolbar md-scroll-shrink id="lobby" class="md-warn">
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">person</md-icon>Profile</span></div>
     </md-toolbar>
     <md-list>
         <md-list-item class="md-2-line">
             <md-icon aria-label="Username" class="material-icons">portrait</md-icon>
             <div class="md-list-item-text" ng-class="{'md-offset': $index == 2 }">
-                <h3> {{ user.id }} </h3>
+                <h3> {{ user.name }} </h3>
                 <p>User ID</p>
             </div>
         </md-list-item>

@@ -30,6 +30,14 @@ public class SessionHandler {
             users.add(session.getUserIdentity());
         return users;
     }
+    
+    public UserIdentity findUserByName(String name){
+        for (UserSession session : sessions){
+            if (session.getUserIdentity().getUser().getName().equals(name))
+                return session.getUserIdentity();
+        }
+        return null;
+    }
 
     public UserSession getUserSession(String sessionId) {
         for (UserSession session : sessions) {
@@ -59,8 +67,8 @@ public class SessionHandler {
 
     public void sendToSessions(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
-        for (Long user: quiz.getPlayerIds()){
-            this.sendToSession(this.getUserSessionById(user), response);
+        for (UserIdentity user: quiz.getPlayers()){
+            this.sendToSession(this.getUserSessionById(user.getId()), response);
         }
     }
     

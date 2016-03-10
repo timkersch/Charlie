@@ -6,8 +6,8 @@ var charlieController = angular.module('charlieController', [
     'ngMaterial'
 ]);
 
-charlieController.controller('mainController', ['$scope', '$location', '$routeParams', 'charlieProxy', '$mdSidenav',
-    function($scope, $location, $routeParams, charlieProxy, $mdSidenav) {
+charlieController.controller('mainController', ['$scope', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function($scope, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = {};
         $scope.url = "";
 
@@ -51,6 +51,30 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
                 });
             }
         });
+        
+        var showActionToast = function(quiz) {
+            var toast = $mdToast.simple()
+            .textContent('You are invited to ' + quiz.name)
+            .action('ACCEPT')
+            .highlightAction(true);
+    
+            $mdToast.show(toast).then(function(response) {
+                if ( response == 'ok' ) {
+                    alert('You accepted the '+ quiz.name + ' invite.');
+                    charlieProxy.joinQuiz(quiz.uuid, function(success) {
+                       if (success) {
+                           alert('Successfully joined the quiz!');
+                       } else {
+                           alert('Something went wrong! :(');
+                       }
+                    });
+                }
+            });
+        };
+        
+        charlieProxy.listenTo("invitedTo", function(quiz) {
+            showActionToast(quiz);
+        });
 
         $scope.login = function (){
             console.log("login");
@@ -67,36 +91,29 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
-charlieController.controller('lobbyController', ['$scope', '$location', '$routeParams', 'charlieProxy',
-    function($scope, $location,  $routeParams, charlieProxy){
+charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
+    function($scope, $location, charlieProxy){
         console.log("LobbyController!");
         $scope.status = '  ';
 
         /*var quizname = charlieProxy.getQuizname();*/
+        //TODO add name
         $scope.quizname = "Simpas Quiz";
-        var users = [{
-            name: "Simon"
-        },{
-            name: "Erik"
-        },{
-            name: "Joakim"
-        },{
-            name: "Tim"
-            }];
-        $scope.users = users;
-
-        $scope.$on("user-joined", function(data) {
-            $scope.users = [];
-            $scope.users.push(data);
+    
+        $scope.users = [];
+        charlieProxy.listenTo("userJoined", function(user){
+            $scope.users.push(user.name);
         });
+            
 
         $scope.startQuiz = function(){
             $location.path('/question');
         }
+        
     }]);
 
-charlieController.controller('signupController', [ '$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('signupController', [ '$scope', 'charlieProxy',
+    function($scope, charlieProxy) {
         console.log("Init");
 
         $scope.publish = function () {
@@ -114,8 +131,8 @@ charlieController.controller('signupController', [ '$scope', '$routeParams', 'ch
         };
     }]);
 
-charlieController.controller('homeController', [ '$scope', '$location', '$routeParams', 'charlieProxy',
-    function($scope, $location, $routeParams, charlieProxy) {
+charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy',
+    function($scope, $location, charlieProxy) {
         console.log("Init");
 
       $scope.changeView = function(view){
@@ -124,18 +141,25 @@ charlieController.controller('homeController', [ '$scope', '$location', '$routeP
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$location','$routeParams', '$interval', 'charlieProxy',
-    function($scope, $location, $routeParams, $interval, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy', '$document',
+    function($scope, $location, $interval, charlieProxy, $document) {
         console.log("Inside questionController");
-        $scope.determinateValue = 20;
+        $scope.determinateValue = 30;
         var incrementer = 0;
+        $scope.currentTrack = "mp3test";
         
         var quiz = charlieProxy.getQuiz();
-        quiz.nextQuestion(function(data){
-           $scope.currentTrack = data.track_url; 
+        var audioElement = $document[0].createElement('audio');
+        charlieProxy.nextQuestion(1, function(data){
+            console.log("TRACK: " + data);
+            audioElement.src = data.track_url + ".mp3";
+            audioElement.play();   
+            //$scope.$apply(function(){
+            $scope.currentTrack = data.track_url; 
+            console.log($scope.currentTrack);
+            //});
         });
         
-        console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
@@ -269,8 +293,8 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
 
     }]);
 
-charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('scoreboardController', [ '$scope', 'charlieProxy',
+    function($scope, charlieProxy) {
         console.log("Inside scoreboardController");
 
 
@@ -314,8 +338,8 @@ charlieController.controller('scoreboardController', [ '$scope', '$routeParams',
 
     }]);
 
-charlieController.controller('profileController', [ '$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('profileController', [ '$scope', 'charlieProxy',
+    function($scope, charlieProxy) {
         console.log("Inside profileController");
 
         charlieProxy.getUser(function(user){
@@ -325,8 +349,8 @@ charlieController.controller('profileController', [ '$scope', '$routeParams', 'c
 
     }]);
 
-charlieController.controller('createController', ['$scope', '$location', '$routeParams', 'charlieProxy',
-    function($scope, $location, $routeParams, charlieProxy) {
+charlieController.controller('createController', ['$scope', '$location', 'charlieProxy',
+    function($scope, $location, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
@@ -351,7 +375,7 @@ charlieController.controller('createController', ['$scope', '$location', '$route
         $scope.submit = function() {
             console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
             
-            charlieProxy.createQuiz($scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
                $location.path('/lobby'); 
             });
             

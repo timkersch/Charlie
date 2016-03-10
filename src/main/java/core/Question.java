@@ -1,6 +1,7 @@
 package core;
 
 import com.google.appengine.repackaged.com.google.common.base.Flag;
+import com.wrapper.spotify.models.Track;
 import persistence.AbstractEntity;
 
 import javax.persistence.ElementCollection;
@@ -18,15 +19,15 @@ import java.util.Map;
  */
 
 public class Question extends AbstractEntity {
-	private String trackId;
+	private Track track;
 	private final Map<String, Boolean> artistsIds = new HashMap<String, Boolean>();
 
 	public Question() {
             super();
 	}
 
-	public Question(String trackId, Map<String, Boolean> artistsIds) {
-            this.trackId = trackId;
+	public Question(Track track, Map<String, Boolean> artistsIds) {
+            this.track = track;
             this.artistsIds.putAll(artistsIds);
 	}
 
@@ -34,8 +35,8 @@ public class Question extends AbstractEntity {
             return this.artistsIds;
 	}
 
-	public String getTrackId() {
-            return this.trackId;
+	public Track getTrackId() {
+            return this.track;
 	}
 
 }
