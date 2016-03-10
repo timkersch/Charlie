@@ -253,37 +253,20 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
     function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
-
-
         var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
-        $scope.scoreData = [
-    {
-        value: 5,
-        userName: "simon",
-        color: color[0],
-        /*highlight: "#8ef0aa"*/
-    },
-    {
-        value: 4,
-        userName: "erik",
-        color: color[1],
-        /*highlight: "#ffff66"*/
-    },
-    {
-        value: 3,
-        userName: "tim",
-        color: color[2],
-        /*highlight: "#66ffff"*/
-    },
-    {
-        value: 3,
-        userName: "tim",
-        color: color[3],
-        /*highlight: "#ff5b4d"*/
-    }
-];
-
-
+        var dataArray = [];
+        charlieProxy.listenTo("gameover", function(users){
+           for(var i = 0; i < users.length; i++){
+               var data = {
+                   value : users[i].points,
+                   userName: users[i].name,
+                   color: color[i]
+               };
+               dataArray.push(data);
+           }
+        });
+        $scope.scoreData = dataArray;
+    
         var ctx = document.getElementById("scoreboardChart").getContext("2d");
         var sChart = new Chart(ctx).Doughnut();
         
@@ -295,6 +278,10 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
             console.log("Changing view to: " + view);
             $location.path(view); // path not hash
         };
+        
+        $scope.savePlaylist = function(){
+            charlieProxy.savePlaylist();
+        }
         
 
 

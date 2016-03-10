@@ -1,6 +1,8 @@
 package core;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by jcber on 2016-03-04.
@@ -14,6 +16,7 @@ public class Quiz {
     private final List<Question> questions = new ArrayList<>();
     private int currentQuestion;
     private UserIdentity owner;
+    private int ownerPoints;
 
     public Quiz(){
         this.uuid = UUID.randomUUID().toString();
@@ -26,6 +29,7 @@ public class Quiz {
         this.unjoinedPlayers.addAll(players);
         this.questions.addAll(questions);
         this.currentQuestion = -1;
+        this.ownerPoints = 0;
     }
 
     public List<UserIdentity> getUnjoinedPlayers() {
@@ -37,12 +41,14 @@ public class Quiz {
     }
     
     public Map<UserIdentity, Integer> getResults() {
-        return joinedPlayers;
+        Map<UserIdentity, Integer> results = new HashMap<>(joinedPlayers);
+        results.put(owner, ownerPoints);
+        return results;
     }
     
     public boolean joinPlayer(UserIdentity user) {
         if (unjoinedPlayers.remove(user)) {
-            joinedPlayers.put(user, 0);
+            joinedPlayers.putIfAbsent(user, 0);
             return true;
         }
         return false;
@@ -68,8 +74,12 @@ public class Quiz {
     
     public boolean answerQuestion(UserIdentity user, String artistName) {
         if (this.getCurrentQuestion().answer(artistName)) {
-            int currentPoints = joinedPlayers.getOrDefault(user, 0);
-            joinedPlayers.replace(user, currentPoints+1);
+            if (user.equals(owner)){
+                ownerPoints++;
+            } else {
+                int currentPoints = joinedPlayers.getOrDefault(user, 0);
+                joinedPlayers.replace(user, currentPoints+1);
+            }
             return true;
         }
         return false;
