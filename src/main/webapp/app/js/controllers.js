@@ -273,6 +273,32 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
+        var data = [
+    {
+        value: 5,
+        color:"#F7464A",
+        highlight: "#FF5A5E"
+    },
+    {
+        value: 4,
+        color: "#46BFBD",
+        highlight: "#5AD3D1"
+    },
+    {
+        value: 3,
+        color: "#FDB45C",
+        highlight: "#FFC870"
+    }
+];
+
+
+        var ctx = document.getElementById("scoreboardChart").getContext("2d");
+        var sChart = new Chart(ctx).Doughnut(data);
+        sChart.addData({
+            value: 10,
+            color: "#B48EAD",
+            highlight: "#C69CBE"
+        });
 
 
     }]);
