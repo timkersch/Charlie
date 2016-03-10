@@ -149,7 +149,9 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             
             // Play song
             audioElement.src = data.track_url + ".mp3";
-            audioElement.play();   
+            audioElement.play();
+            
+            $scope.possibleArtists = data.artists;  
             
         });
         
