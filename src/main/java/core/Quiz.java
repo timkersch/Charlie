@@ -17,8 +17,8 @@ public class Quiz extends AbstractEntity {
     @ElementCollection
     private final List<Long> playerIds = new ArrayList<>();
 
-	@ElementCollection
-	private final List<Question> questions = new ArrayList<>();
+    //@ElementCollection
+    private final List<Question> questions = new ArrayList<>();
 
     private Long ownerId;
 
@@ -30,7 +30,7 @@ public class Quiz extends AbstractEntity {
         this();
         this.ownerId = ownerId;
         this.playerIds.addAll(playerIds);
-	    this.questions.addAll(questions);
+        this.questions.addAll(questions);
     }
 
     public List<Long> getPlayerIds() {
@@ -42,7 +42,7 @@ public class Quiz extends AbstractEntity {
     }
 
 	public List<Question> getQuestion() {
-		return this.questions;
+            return this.questions;
 	}
 
 }
