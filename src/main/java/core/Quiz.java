@@ -52,4 +52,8 @@ public class Quiz extends AbstractEntity {
         return questions.get(currentQuestion++);
     }
 
+    public String getName() {
+        return name;
+    }
+
 }

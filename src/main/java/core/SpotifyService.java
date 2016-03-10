@@ -4,7 +4,6 @@ import com.wrapper.spotify.Api;
 import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.io.IOException;
 
@@ -184,7 +183,7 @@ public class SpotifyService {
 	 * @param t the Track
 	 * @return a hashtable with artists as keys and boolans as values
 	 */
-	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+	public Hashtable<String, Boolean> getQuizOptions(Track t) {
 		List<SimpleArtist> artists = t.getArtists();
 		try {
 			List<Artist> relatedArtists = api.getArtistRelatedArtists(artists.get(0).getId()).build().get();
@@ -216,10 +215,10 @@ public class SpotifyService {
 	 * @param trackId the trackId
 	 * @return a hashtable with the artists as keys and booleans as values
 	 */
-	public Hashtable<String, Boolean> getArtistOptions(String trackId) {
+	public Hashtable<String, Boolean> getQuizOptions(String trackId) {
 		try {
 			api.getTrack(trackId);
-			return getArtistOptions(api.getTrack(trackId).build().get());
+			return getQuizOptions(api.getTrack(trackId).build().get());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
