@@ -78,12 +78,16 @@ public class SpotifyService {
 	public String refreshAccessToken(String refreshToken){
 		try {
 			api.setRefreshToken(refreshToken);
-			String newAccessToken = api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
-			return newAccessToken;
+			return api.refreshAccessToken().refreshToken(refreshToken).build().get().getAccessToken();
 		} catch (IOException | WebApiException ex) {
 			Logger.getLogger(SpotifyService.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return null;
+	}
+
+	public void setTokens(String access, String refresh){
+		api.setRefreshToken(refresh);
+		api.setAccessToken(access);
 	}
 
 	/**
@@ -141,15 +145,21 @@ public class SpotifyService {
 	}
 
 
+	/**
+	 * Method that creates and populates a playlist
+	 * @param trackids tracks to populate the list with
+	 * @param name the name of the playlist
+	 */
 	public void createAndPopulatePlaylist(List<String> trackids, String name) {
-		Playlist p = this.createQuizPlaylist(name);
+		Playlist p = this.createPlaylist(name);
+		this.addTracksToPlayList(trackids, p.getId());
 	}
 
 	/**
 	 * Method that creates a playlist and returns it
 	 * @return a new Playlist
 	 */
-	public Playlist createQuizPlaylist(String name) {
+	public Playlist createPlaylist(String name) {
 		try {
 			PlaylistCreationRequest request = api.createPlaylist(api.getMe().build().get().getId(), name)
 					.publicAccess(false)
@@ -251,16 +261,30 @@ public class SpotifyService {
 		return chosenTracks;
 	}
 
-
+	/**
+	 * Helper method that generates a random number within a range
+	 * @param min the minimum number in the range (inclusive)
+	 * @param max the maximum number in the range (inclusive)
+	 * @return a ranom integer
+	 */
 	private int randomInt(int min, int max) {
 		Random random = new Random();
 		return random.nextInt(max - min + 1) + min;
 	}
 
+	/** Return the url to a preview of a track
+	 * @param t the track
+	 * @return a String with the url
+	 */
 	public String getTrackUrl(Track t) {
 		return t.getPreviewUrl();
 	}
 
+	/**
+	 * Return the url to a preview of a track
+	 * @param trackId the trackId
+	 * @return a String with the url
+	 */
 	public String getTrackUrl(String trackId) {
 		try {
 			Track t = api.getTrack(trackId).build().get();
@@ -269,23 +293,5 @@ public class SpotifyService {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	public void setTokens(String access, String refresh){
-            api.setRefreshToken(refresh);
-            api.setAccessToken(access);
-	}
-
-	public List<SimplePlaylist> getPlaylists(String displayname){
-		final UserPlaylistsRequest request = api.getPlaylistsForUser(displayname).build();
-
-		try {
-			final Page<SimplePlaylist> playlistsPage = request.get();
-
-			return playlistsPage.getItems();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new ArrayList<>();
 	}
 }
