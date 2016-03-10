@@ -162,10 +162,12 @@ public class WebsocketServer {
                     break;
                 case "answerQuestion":
                     String artist = data.getString("artistName");
+                    System.out.println("Answer: " + artist);
                     boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
                     
-                    
-                    // TODO
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", right).build();
+                    System.out.println("Response: " + response);
+                    session.getBasicRemote().sendText(response.toString());
                     break;
                 case "joinQuiz":
                     String quizId = data.getString("quizId");
@@ -187,20 +189,28 @@ public class WebsocketServer {
                     userSession.setCurrentQuiz(null);
                     break;
                 case "nextQuestion":
+                    if (userSession.getCurrentQuiz().getOwner().getId() != userSession.getUserIdentity().getId())
+                        return;
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
                     
                     // TODO Send wrong anser for last question.
                     //sessionHandler.sendToQuizMemebrs(userSession.getCurrentQuiz(), "answer", false);
                     
-                    // Send them back as json
-                    String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                    String artistsAsJson = gson.toJson(nextQuestion.getArtists());
-                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson).build();
-                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
-                    System.out.println("Response: " + response);
-                    session.getBasicRemote().sendText(response.toString());
-                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", trackData.toString());
+                    if (nextQuestion == null) {
+                        // Quiz is over
+                        Quiz over = userSession.getCurrentQuiz();
+                        sessionHandler.sendToQuizMemebrs(over, "gameOver", gson.toJson(over.getJoinedPlayers()));
+                    } else {
+                        // Send them back as json
+                        String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
+                        String artistsAsJson = gson.toJson(nextQuestion.getArtists());
+                        JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson).build();
+                        response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
+                        System.out.println("Response: " + response);
+                        session.getBasicRemote().sendText(response.toString());
+                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", trackData.toString());
+                    }
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
@@ -208,7 +218,7 @@ public class WebsocketServer {
                     String name = data.getString("name");
                     String playlistId = data.getString("playlist");
                     int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
-                    boolean generate = true;/*data.getBoolean("generated")*/;
+                    boolean generate = data.getBoolean("generated");
 
                     List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
                     List<Track> quizTracks;
