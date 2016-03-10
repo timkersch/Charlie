@@ -192,7 +192,7 @@ public class WebsocketServer {
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
 	                List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < similarTracks.size(); i++) {
-                        questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
+                        questions.add(new Question(similarTracks.get(i), service.getArtistOptions(similarTracks.get(i))));
                     }
                     
                     // Get users
