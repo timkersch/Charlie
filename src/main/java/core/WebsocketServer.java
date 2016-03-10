@@ -183,7 +183,7 @@ public class WebsocketServer {
 
                     db.getQuizCatalogue().create(quiz);
                     
-                    // TODO invite users to quiz
+                    sessionHandler.sendToSessions(quiz, gson.toJson(quiz));
                     
                     // Send back the resulting quiz
                     String jsonQuiz = gson.toJson(quiz);
@@ -192,7 +192,7 @@ public class WebsocketServer {
                     break;
                 default:
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).build();
-                    sessionHandler.sendToAllConnectedSessions(response);
+                    sessionHandler.sendToAllConnectedSessions(response.toString());
                     break;
             }
         } catch (IOException e) {
