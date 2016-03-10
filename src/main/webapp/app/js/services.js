@@ -13,18 +13,30 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         };
         var isReady = false;
         var callbacks = {};
+        var listenCallbacks = {};
         var user = {};
+        var currentQuiz = {};
 
         socket.onmessage = function(event){
             console.log(event);
-            var data = angular.fromJson(event.data);
-            if (angular.isDefined(callbacks[data.request_id])) {
-                var callback = callbacks[data.request_id];
-                delete callbacks[data.request_id];
-                callback.resolve(data);
+            var response = angular.fromJson(event.data);
+            if (angular.isDefined(callbacks[response.request_id])) {
+                var callback = callbacks[response.request_id];
+                delete callbacks[response.request_id];
+                callback.resolve(response);
             } else {
-                console.log("Broadcasting: %o", event.action);
-                $rootScope.$broadcast(event.action, data);
+                console.log("broadcastEvent(%o)", response.action);
+                var action = response.action;
+                var data = response.data;
+                try {
+                    data = JSON.parse(data);
+                } catch(error) {}
+                if (Array.isArray(listenCallbacks[action])) {
+                    for (var i = 0; i < listenCallbacks[action].length; i++) {
+                        listenCallbacks[action][i](data);
+                    }
+                }
+                //$rootScope.$broadcast(event.action, data);
             }
         };
 
@@ -50,7 +62,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
         socket.onopen = function (event) {
             isReady = true;
-            console.log("Service ready");
+            console.log("Service ready: " + event);
 
             if (sessionStorage.user){
                 // User in storage
@@ -96,7 +108,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     playlist: playlistId,
                     nbrOfSongs: nbrOfSongs
                 };
-                invoke("createQuiz", data).then(callback);
+                invoke("createQuiz", data).then(function(quiz){
+                    currentQuiz = quiz;
+                    callback(currentQuiz);
+                });
             },
 
             // callback(user)
@@ -127,6 +142,44 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             // callback(lists)
             getPlaylists: function(callback){
                 invoke("getPlaylists").then(callback);
+            },
+            
+            // callback(isCorrect)
+            answerQuestion: function(quizId, questionId, answerId, callback){
+                var data = {
+                    answerId: answerId,
+                    questionId: questionId,
+                    quizId: quizId
+                };
+                invoke('answerQuestion', data).then(callback);
+            },
+            
+            // callback(users)
+            getUsersInQuiz: function(quizId, callback){
+                var data = {
+                    quizId: quizId
+                };
+                invoke('getUsersInQuiz', data).then(callback);
+            },
+            
+            // callback(success)
+            joinQuiz: function(quizId, callback) {
+                var data = {
+                    quizId: quizId
+                };
+                invoke('joinQuiz', data).then(callback);
+            },
+            
+            /* action: 
+             *      userJoined      --> callback(newUser)
+             *      invitedTo       --> callback(quiz)
+             *      newQuestion     --> callback(question)
+             */
+            listenTo: function(action, callback){
+                console.log("listenTo(" + action + ")");
+                if (!Array.isArray(listenCallbacks[action]))
+                    listenCallbacks[action] = [];
+                listenCallbacks[action].push(callback);
             }
         };
     }]);

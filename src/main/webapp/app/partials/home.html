@@ -1,19 +1,51 @@
-<div>
-	<h1>Lobby</h1>
+<style>
+    	md-content {
+		margin: -1em;
+	}
 
-	<md-button ng-click="getPlaylists()">Show Playlists</md-button>
-	<md-button ng-click="getUsers()">Show Users</md-button>
-	<a href="/#/question">Question View</a>
-	<h1>Playlists</h1>
-	<md-list>
-		<md-list-item class="ng-scope" layout="row" layout-align="start center" ng-repeat="playlist in playlists">
-			<div class="inset ng-binding">{{playlist.name}}</div>
-		</md-list-item>
-	</md-list>
-	<h1>Users</h1>
-	<md-list>
-		<md-list-item class="ng-scope" layout="row" layout-align="start center" ng-repeat="user in users">
-			<div class="inset ng-binding">{{user.name}}</div>
-		</md-list-item>
-	</md-list>
-</div>
+	span md-icon {
+		margin-top: -0.12em;
+		margin-right: 0.5em;
+	}
+        
+        article {
+            margin: 1em;
+        }
+        
+        h4 {
+            text-align: right;
+        }
+        
+        div .end {
+            width: 100%;
+        }
+
+        div .end .md-button {
+            min-width: 100%;
+            min-height: 3em;
+            padding: 0;
+            margin: 0;
+            position: fixed;
+            bottom: 0px;
+            background: #1A237E !important;
+        }
+        
+</style>
+<md-content ng-cloak>
+	<md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+		<div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">home</md-icon>Home</span></div>
+	</md-toolbar>
+    <article>
+        <h3>Hi,</h3>
+        <p>
+        Welcome to SpotHoot! This a music quiz based on Spotify. Where you can
+        create a quiz generated from your playlists and invite your friends in 
+        just about a minute. 
+        Say goodbye to hours of searching for the right music for the 
+        right event. Just generate a quiz from your preferences and go!
+        </p>
+        </article>
+    <div class="end">
+        <md-button class="md-accent md-raised" ng-click="changeView('/create')">Start</md-button>
+    <div>
+</md-content>
