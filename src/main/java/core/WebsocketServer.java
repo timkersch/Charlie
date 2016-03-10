@@ -180,9 +180,9 @@ public class WebsocketServer {
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
-                    Long[] userIds = (Long[]) jsonMessage.getJsonArray("users").toArray();
-                    String playlistId = jsonMessage.getString("playlist");
-                    int nbrOfSongs = jsonMessage.getInt("nbrOfSongs");
+                    String[] usernames = (String[]) data.getJsonArray("users").toArray();
+                    String playlistId = data.getString("playlist");
+                    int nbrOfSongs = data.getInt("nbrOfSongs");
 
                     // Get the tracks to base the quiz on
                     List<Track> tracks = service.getPlaylistSongs(playlistId);
@@ -191,10 +191,15 @@ public class WebsocketServer {
                     for(int i = 0; i < similarTracks.size(); i++) {
                         questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
                     }
+                    
+                    // Get users
+                    List<UserIdentity> players = new ArrayList<>();
+                    for (String name : usernames) {
+                        players.add(sessionHandler.findUserByName(name));
+                    }
 
                     // Create quiz
-                    Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
-
+                    Quiz quiz = new Quiz(userSession.getUserIdentity(), players, questions);
                     userSession.setCurrentQuiz(quiz);
                     
                     // Send back the resulting quiz

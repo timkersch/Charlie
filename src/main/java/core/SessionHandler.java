@@ -30,6 +30,14 @@ public class SessionHandler {
             users.add(session.getUserIdentity());
         return users;
     }
+    
+    public UserIdentity findUserByName(String name){
+        for (UserSession session : sessions){
+            if (session.getUserIdentity().getUser().getName().equals(name))
+                return session.getUserIdentity();
+        }
+        return null;
+    }
 
     public UserSession getUserSession(String sessionId) {
         for (UserSession session : sessions) {
