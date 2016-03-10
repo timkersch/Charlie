@@ -28,15 +28,12 @@ public class SpotifyService {
 
 	public String getAuthorizeURL() {
 		List<String> scopes = new ArrayList<>();
-		scopes.add("user-read-private");
-		scopes.add("user-read-email");
+		scopes.add("playlist-read-private");
 		scopes.add("playlist-modify-private");
 		scopes.add("playlist-modify-public");
-		scopes.add("user-library-read");
+		scopes.add("user-read-email");
 		scopes.add("user-read-private");
 		scopes.add("user-read-birthdate");
-		scopes.add("user-library-modify");
-		scopes.add("playlist-read-collaborative");
 
 		/* Set a state. This is used to prevent cross site request forgeries. */
 		String state = "someState";
@@ -110,7 +107,7 @@ public class SpotifyService {
 			return playlistsPage.getItems();
 
 		} catch (Exception e) {
-			System.out.println("Something went wrong!" + e.getMessage());
+			System.out.println("Something went wrong in getUsersPlaylists!" + e.getMessage());
 			return null;
 		}
 	}
@@ -122,6 +119,7 @@ public class SpotifyService {
 	 */
 	public List<Track> getPlaylistSongs(String playlistId) {
 		try {
+			System.out.println(playlistId);
 			PlaylistTracksRequest request = api.getPlaylistTracks(api.getMe().build().get().getId(), playlistId).build();
 
 			List<PlaylistTrack> playlistTracks = request.get().getItems();
@@ -133,7 +131,7 @@ public class SpotifyService {
 			return tracks;
 
 		} catch (Exception e) {
-			System.out.println("Something went wrong!" + e.getMessage());
+			System.out.println("Something went wrong in getPlaylistSongs!" + e.getMessage());
 			return null;
 		}
 	}
@@ -148,7 +146,7 @@ public class SpotifyService {
 			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, tracks).build();
 			request.get();
 		} catch (Exception e) {
-			System.out.println("Something went wrong!" + e.getMessage());
+			System.out.println("Something went wrong in addTracksToPlayList!" + e.getMessage());
 		}
 	}
 
@@ -180,7 +178,7 @@ public class SpotifyService {
 
 			return playlist;
 		} catch (Exception e) {
-			System.out.println("Something went wrong!" + e.getMessage());
+			System.out.println("Something went wrong in createPlaylist!" + e.getMessage());
 			return null;
 		}
 	}
