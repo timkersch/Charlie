@@ -27,8 +27,16 @@ public class SpotifyService {
 
 
 	public String getAuthorizeURL() {
-		/* Set the necessary scopes that the application will need from the user */
-		List<String> scopes = new ArrayList<>(); //Arrays.asList("user-read-private", "user-read-email");
+		List<String> scopes = new ArrayList<>();
+		scopes.add("user-read-private");
+		scopes.add("user-read-email");
+		scopes.add("playlist-modify-private");
+		scopes.add("playlist-modify-public");
+		scopes.add("user-library-read");
+		scopes.add("user-read-private");
+		scopes.add("user-read-birthdate");
+		scopes.add("user-library-modify");
+		scopes.add("playlist-read-collaborative");
 
 		/* Set a state. This is used to prevent cross site request forgeries. */
 		String state = "someState";
@@ -99,7 +107,6 @@ public class SpotifyService {
 		try {
 			UserPlaylistsRequest request = api.getPlaylistsForUser(api.getMe().build().get().getId()).build();
 			Page<SimplePlaylist> playlistsPage = request.get();
-
 			return playlistsPage.getItems();
 
 		} catch (Exception e) {
