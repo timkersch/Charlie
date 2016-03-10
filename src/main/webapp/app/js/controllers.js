@@ -142,9 +142,17 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         var incrementer = 0;
+        
+        var quiz = charlieProxy.getQuiz();
+        quiz.nextQuestion(function(data){
+           $scope.currentTrack = data.track_url; 
+        });
+        
+        console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
+        
 
         var hasIndex = '';
         var hasAnswerd = false;
@@ -277,6 +285,35 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
+        $scope.scoreData = [
+    {
+        value: 5,
+        userName: "simon",
+        color: "#F7464A",
+        highlight: "#FF5A5E"
+    },
+    {
+        value: 4,
+        userName: "erik",
+        color: "#46BFBD",
+        highlight: "#5AD3D1"
+    },
+    {
+        value: 3,
+        userName: "tim",
+        color: "#FDB45C",
+        highlight: "#FFC870"
+    }
+];
+
+
+        var ctx = document.getElementById("scoreboardChart").getContext("2d");
+        var sChart = new Chart(ctx).Doughnut();
+        
+        for(var i = 0; i < $scope.scoreData.length; i++){
+            sChart.addData($scope.scoreData[i]);
+        };
+        
 
 
     }]);
@@ -292,8 +329,8 @@ charlieController.controller('profileController', [ '$scope', '$routeParams', 'c
 
     }]);
 
-charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('createController', ['$scope', '$location', '$routeParams', 'charlieProxy',
+    function($scope, $location, $routeParams, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
@@ -316,7 +353,12 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
         }
 
         $scope.submit = function() {
-            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected)
+            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
+            
+            charlieProxy.createQuiz($scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+               $location.path('/lobby'); 
+            });
+            
         };
 
     }]);

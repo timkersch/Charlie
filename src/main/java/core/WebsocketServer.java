@@ -29,7 +29,7 @@ public class WebsocketServer {
 
     private final SpotifyService service = new SpotifyService();
     
-    private Logger logger;
+    private static final Logger logger = Logger.getLogger(WebsocketServer.class.getName());
 
     @Inject
     private SessionHandler sessionHandler;
@@ -164,6 +164,20 @@ public class WebsocketServer {
                 case "answer":
                     // TODO
                     break;
+                case "nextQuestion":
+                    Question question = userSession.getCurrentQuiz().getCurrentQuestion();
+                    Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
+                    
+                    // TODO Send wrong anser for last question.
+                    
+                    // Send them back as json
+                    String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
+                    String nextQuestionAsJson = gson.toJson(nextQuestion);
+                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestionAsJson).build();
+                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
+                    session.getBasicRemote().sendText(response.toString());
+                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestionAsJson);
+                    break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
                     Long[] userIds = (Long[]) jsonMessage.getJsonArray("users").toArray();
@@ -175,24 +189,22 @@ public class WebsocketServer {
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
 	                List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < similarTracks.size(); i++) {
-						questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
+                        questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
                     }
 
                     // Create quiz
-	                Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
+                    Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
 
-                    db.getQuizCatalogue().create(quiz);
-                    
-                    sessionHandler.sendToSessions(quiz, gson.toJson(quiz));
+                    userSession.setCurrentQuiz(quiz);
                     
                     // Send back the resulting quiz
                     String jsonQuiz = gson.toJson(quiz);
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", jsonQuiz).build();
                     session.getBasicRemote().sendText(response.toString());
+                    sessionHandler.sendToSessions(quiz, "invitedTo", jsonQuiz);
                     break;
                 default:
-                    response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).build();
-                    sessionHandler.sendToAllConnectedSessions(response.toString());
+                    sessionHandler.sendToAllConnectedSessions("noRequest", "error");
                     break;
             }
         } catch (IOException e) {
