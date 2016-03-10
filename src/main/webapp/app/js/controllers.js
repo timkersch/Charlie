@@ -6,8 +6,8 @@ var charlieController = angular.module('charlieController', [
     'ngMaterial'
 ]);
 
-charlieController.controller('mainController', ['$scope', '$location', '$routeParams', 'charlieProxy', '$mdSidenav',
-    function($scope, $location, $routeParams, charlieProxy, $mdSidenav) {
+charlieController.controller('mainController', ['$scope', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function($scope, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = {};
         $scope.url = "";
 
@@ -51,6 +51,30 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
                 });
             }
         });
+        
+        charlieProxy.listenTo("invitedTo", function(quiz) {
+            showActionToast(quiz);
+        });
+        
+        var showActionToast = function(quiz) {
+            var toast = $mdToast.simple()
+            .textContent('You are invited to ' + quiz.name)
+            .action('ACCEPT')
+            .highlightAction(true);
+    
+            $mdToast.show(toast).then(function(response) {
+                if ( response == 'ok' ) {
+                    alert('You accepted the '+ quiz.name + ' invite.');
+                    charlieProxy.joinQuiz(quiz.id, function(success) {
+                       if (success) {
+                           alert('Successfully joined the quiz!');
+                       } else {
+                           alert('Something went wrong! :(');
+                       }
+                    });
+                }
+            });
+        };
 
         $scope.login = function (){
             console.log("login");
@@ -67,8 +91,8 @@ charlieController.controller('mainController', ['$scope', '$location', '$routePa
         };
     }]);
 
-charlieController.controller('lobbyController', ['$scope', '$location', '$mdToast', '$routeParams', 'charlieProxy',
-    function($scope, $location, $mdToast, $routeParams, charlieProxy){
+charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
+    function($scope, $location, charlieProxy){
         console.log("LobbyController!");
         $scope.status = '  ';
 
@@ -86,18 +110,6 @@ charlieController.controller('lobbyController', ['$scope', '$location', '$mdToas
             $location.path('/question');
         }
         
-        $scope.showActionToast = function() {
-            var toast = $mdToast.simple()
-            .textContent('You are invited to a quiz')
-            .action('ACCEPT')
-            .highlightAction(true)
-            $mdToast.show(toast).then(function(response) {
-                console.log("The toast: " + toast); 
-                if ( response == 'ok' ) {
-                    alert('You accepted the \'ACCEPT\' invite.');
-                }
-            });
-        };
     }]);
 
 charlieController.controller('signupController', [ '$scope', 'charlieProxy',
