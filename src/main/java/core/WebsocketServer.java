@@ -195,11 +195,12 @@ public class WebsocketServer {
                     
                     // Send them back as json
                     String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestion.toJsonObject()).build();
+                    String artistsAsJson = gson.toJson(nextQuestion.getArtists());
+                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson).build();
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
                     System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response.toString());
-                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestion.toJsonObject().toString());
+                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", trackData.toString());
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
@@ -236,7 +237,7 @@ public class WebsocketServer {
                     break;
 	            case "savePlaylist":
 		            String name1 = userSession.getCurrentQuiz().getName();
-		            List<Question> question1 = userSession.getCurrentQuiz().getQuestion();
+		            List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
 		            List<String> trackids = new ArrayList<>(question1.size());
 		            for (Question q : question1) {
 			            trackids.add(q.getTrackId().getId());

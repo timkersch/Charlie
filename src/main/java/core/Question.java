@@ -10,7 +10,9 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.json.JsonObject;
 import javax.json.spi.JsonProvider;
@@ -48,9 +50,7 @@ public class Question extends AbstractEntity {
             return artistsIds.get(artistName);
         }
 
-        public JsonObject toJsonObject(){
-            Gson gson = new Gson();
-            JsonObject obj = PROVIDER.createObjectBuilder().add("track", gson.toJson(track)).add("artists", gson.toJson(artistsIds.keySet().toArray())).build();
-            return obj;
+        public List<String> getArtists(){
+            return new ArrayList<>(artistsIds.keySet());
         }
 }

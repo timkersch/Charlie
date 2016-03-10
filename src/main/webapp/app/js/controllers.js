@@ -150,25 +150,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var quiz = charlieProxy.getQuiz();
         var audioElement = $document[0].createElement('audio');
         charlieProxy.nextQuestion(1, function(data){
-            console.log("TRACK: " + data);
-            console.log("----------ShowArtists--------: ");
-            console.log(data);
-            console.log(data.question);
-            console.log(JSON.stringify(data));
+            console.log("DATA: " + JSON.stringify(data));
             
-            console.log("Artistids");
-            console.log(data.question.artistIds);
-            /*
-            console.log(data.question.artists[1].name);
-            console.log(data.question.artists[2].name);
-            console.log(data.question.artists[3].name);
-            */
+            // Play song
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();   
-            //$scope.$apply(function(){
-            $scope.currentTrack = data.track_url; 
-            console.log($scope.currentTrack);
-            //});
+            
         });
         
         var questionNumber = 0;
