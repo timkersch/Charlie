@@ -245,11 +245,13 @@ public class WebsocketServer {
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
+
                     JsonArray usernames = data.getAsJsonArray("users");
                     String name = data.getAsJsonPrimitive("name").getAsString(); //getString("name");
                     String playlistId = data.getAsJsonPrimitive("playlist").getAsString();//data.getString("playlist");
                     int nbrOfSongs = data.getAsJsonPrimitive("nbrOfSongs").getAsInt(); //Integer.parseInt(data.getString("nbrOfSongs"));
                     boolean generate = data.getAsJsonPrimitive("generated").getAsBoolean(); //data.getBoolean("generated");
+
 
                     List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
                     List<Track> quizTracks;
