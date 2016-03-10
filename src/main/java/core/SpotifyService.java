@@ -4,6 +4,8 @@ import com.wrapper.spotify.Api;
 import com.wrapper.spotify.exceptions.WebApiException;
 import com.wrapper.spotify.methods.*;
 import com.wrapper.spotify.models.*;
+import sun.java2d.pipe.SpanShapeRenderer;
+
 import java.io.IOException;
 
 import java.util.*;
@@ -184,13 +186,24 @@ public class SpotifyService {
 	 */
 	public Hashtable<String, Boolean> getArtistOptions(Track t) {
 		List<SimpleArtist> artists = t.getArtists();
-		RelatedArtistsRequest request = api.getArtistRelatedArtists(artists.get(0).getId()).build();
 		try {
+			List<Artist> relatedArtists = api.getArtistRelatedArtists(artists.get(0).getId()).build().get();
 			Hashtable<String, Boolean> ht = new Hashtable<>();
-			ht.put(t.getArtists().get(0).getName(), true);
+
+			//StringBuilder sb = new StringBuilder();
+			//for (int i = 0; i < artists.size() - 1; i++) {
+			//	sb.append(artists.get(i).getName());
+			//	sb.append(" and ");
+			//}
+			//sb.append(artists.get(artists.size()-1).getName());
+			//ht.put(sb.toString(), true);
+
+			ht.put(artists.get(0).getName(), true);
+
 			for (int i = 0; i < 3; i++) {
-				ht.put(artists.get(i).getName(), false);
+				ht.put(relatedArtists.get(i).getName(), false);
 			}
+
 			return ht;
 		} catch (Exception e) {
 			e.printStackTrace();
