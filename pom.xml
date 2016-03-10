@@ -5,8 +5,8 @@
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <groupId>com.edit.charlie</groupId>
-    <artifactId>charlie</artifactId>
+    <groupId>com.edit.spothoot</groupId>
+    <artifactId>SpotHoot</artifactId>
 
     <properties>
         <app.id>charlie-1239</app.id>
