@@ -174,6 +174,7 @@ public class WebsocketServer {
                     String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
                     System.out.println("Answer: " + artist);
                     boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
+                    log("After answer: " + userSession.getCurrentQuiz().getResults());
 
                     response = createResponse(requestId, action, right);
                     System.out.println("Response: " + response);
@@ -212,16 +213,17 @@ public class WebsocketServer {
                         // Quiz is over
                         Quiz over = userSession.getCurrentQuiz();
                         Map<UserIdentity, Integer> results = over.getResults();
-                        JsonObject object = new JsonObject();
+                        log("GameOver: " + results);
                         JsonArray array = new JsonArray();
                         for (UserIdentity identity : results.keySet()) {
                             JsonObject o = GSON.toJsonTree(identity).getAsJsonObject();
                             o.addProperty("points", results.get(identity));
                             array.add(o);
                         }
-                        String arrayString = array.getAsJsonObject().getAsString();
+                        String arrayString = GSON.toJson(array);
                         
                         sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
+                        log("GameOver: " + arrayString);
                         
                         response = createResponse(requestId, action, "");
                         session.getBasicRemote().sendText(response);
@@ -275,6 +277,7 @@ public class WebsocketServer {
                     // Create quiz
                     Quiz quiz = new Quiz(name, userSession.getUserIdentity(), players, questions);
                     userSession.setCurrentQuiz(quiz);
+                    db.getQuizCatalogue().addQuiz(quiz);
 
                     // Send back the resulting quiz
                     String jsonQuiz = GSON.toJson(quiz);

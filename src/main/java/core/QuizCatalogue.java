@@ -16,7 +16,7 @@ public class QuizCatalogue {
 
     private List<Quiz> quizes = new ArrayList<>();
     
-    private void addQuiz(Quiz quiz){
+    public void addQuiz(Quiz quiz){
         quizes.add(quiz);
     }
     
