@@ -172,29 +172,39 @@ public class WebsocketServer {
                     
                     // Send them back as json
                     String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
+                    System.out.println("Nexttrack: " + nextTrack);
                     String nextQuestionAsJson = gson.toJson(nextQuestion);
                     JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestionAsJson).build();
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
+                    System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response.toString());
                     sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestionAsJson);
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
-                    Long[] userIds = (Long[]) jsonMessage.getJsonArray("users").toArray();
-                    String playlistId = jsonMessage.getString("playlist");
-                    int nbrOfSongs = jsonMessage.getInt("nbrOfSongs");
+                    JsonArray usernames = data.getJsonArray("users");
+                    String name = data.getString("name");
+                    String playlistId = data.getString("playlist");
+                    int nbrOfSongs = Integer.parseInt(data.getString("nbrOfSongs"));
 
                     // Get the tracks to base the quiz on
                     List<Track> tracks = service.getPlaylistSongs(playlistId);
                     List<Track> similarTracks = service.getSimilarTracks(tracks, nbrOfSongs);
 	                List<Question> questions = new ArrayList<>();
                     for(int i = 0; i < similarTracks.size(); i++) {
-                        questions.add(new Question(similarTracks.get(i).getId(), service.getArtistOptions(similarTracks.get(i))));
+                        questions.add(new Question(similarTracks.get(i), service.getArtistOptions(similarTracks.get(i))));
+                    }
+                    
+                    // Get users
+                    List<UserIdentity> players = new ArrayList<>();
+                    for (JsonValue username : usernames) {
+                        UserIdentity userToAdd = sessionHandler.findUserByName(username.toString());
+                        if (userToAdd != null)
+                            players.add(userToAdd);
                     }
 
                     // Create quiz
-                    Quiz quiz = new Quiz(userSession.getUserIdentity().getId(), Arrays.asList(userIds), questions);
-
+                    Quiz quiz = new Quiz(name, userSession.getUserIdentity(), players, questions);
                     userSession.setCurrentQuiz(quiz);
                     
                     // Send back the resulting quiz

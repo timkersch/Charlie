@@ -141,18 +141,25 @@ charlieController.controller('homeController', [ '$scope', '$location', 'charlie
         };
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy',
-    function($scope, $location, $interval, charlieProxy) {
+charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy', '$document',
+    function($scope, $location, $interval, charlieProxy, $document) {
         console.log("Inside questionController");
-        $scope.determinateValue = 20;
+        $scope.determinateValue = 30;
         var incrementer = 0;
+        $scope.currentTrack = "mp3test";
         
         var quiz = charlieProxy.getQuiz();
-        quiz.nextQuestion(function(data){
-           $scope.currentTrack = data.track_url; 
+        var audioElement = $document[0].createElement('audio');
+        charlieProxy.nextQuestion(1, function(data){
+            console.log("TRACK: " + data);
+            audioElement.src = data.track_url + ".mp3";
+            audioElement.play();   
+            //$scope.$apply(function(){
+            $scope.currentTrack = data.track_url; 
+            console.log($scope.currentTrack);
+            //});
         });
         
-        console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
         $scope.activated = true;
@@ -359,7 +366,7 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.submit = function() {
             console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
             
-            charlieProxy.createQuiz($scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
                $location.path('/lobby'); 
             });
             

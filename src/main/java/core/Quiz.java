@@ -13,29 +13,31 @@ import java.util.*;
  */
 
 public class Quiz extends AbstractEntity {
-    private final List<Long> playerIds = new ArrayList<>();
+    private String name;
+    private final List<UserIdentity> players = new ArrayList<>();
     private final List<Question> questions = new ArrayList<>();
     private int currentQuestion;
-    private Long ownerId;
+    private UserIdentity owner;
 
     public Quiz(){
         super();
     }
 
-    public Quiz(Long ownerId, List<Long> playerIds, List<Question> questions){
+    public Quiz(String name, UserIdentity owner, List<UserIdentity> players, List<Question> questions){
         this();
-        this.ownerId = ownerId;
-        this.playerIds.addAll(playerIds);
+        this.name = name;
+        this.owner = owner;
+        this.players.addAll(players);
         this.questions.addAll(questions);
         this.currentQuestion = 0;
     }
 
-    public List<Long> getPlayerIds() {
-        return playerIds;
+    public List<UserIdentity> getPlayers() {
+        return players;
     }
 
-    public Long getOwnerId() {
-        return ownerId;
+    public UserIdentity getOwner() {
+        return owner;
     }
 
     public List<Question> getQuestion() {
