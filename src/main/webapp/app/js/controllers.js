@@ -129,7 +129,12 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
         console.log("Inside questionController");
         $scope.determinateValue = 20;
         var incrementer = 0;
-        $scope.currentTrack = charlieProxy.nextQuestion().track_url;
+        
+        var quiz = charlieProxy.getQuiz();
+        quiz.nextQuestion(function(data){
+           $scope.currentTrack = data.track_url; 
+        });
+        
         console.log("What's the next song?" + charlieProxy.nextQuestion().trackurl);
         var questionNumber = 0;
         var answer = "";
@@ -311,8 +316,8 @@ charlieController.controller('profileController', [ '$scope', '$routeParams', 'c
 
     }]);
 
-charlieController.controller('createController', ['$scope', '$routeParams', 'charlieProxy',
-    function($scope, $routeParams, charlieProxy) {
+charlieController.controller('createController', ['$scope', '$location', '$routeParams', 'charlieProxy',
+    function($scope, $location, $routeParams, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
@@ -335,7 +340,12 @@ charlieController.controller('createController', ['$scope', '$routeParams', 'cha
         }
 
         $scope.submit = function() {
-            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected)
+            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected);
+            
+            charlieProxy.createQuiz($scope.tags, $scope.playlistSelected, $scope.nbrOfQuestions, function(quiz){
+               $location.path('/lobby'); 
+            });
+            
         };
 
     }]);
