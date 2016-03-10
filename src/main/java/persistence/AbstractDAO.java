@@ -78,8 +78,7 @@ public abstract class AbstractDAO<T, K> implements IDAO<T, K> {
     @Override
     public int count() {
         EntityManager em = getEntityManager();
-        Long n = em.createQuery("select count(t) from " + clazz.getSimpleName() + " t", Long.class)
-                .getSingleResult();
+        Long n = em.createQuery("select count(t) from " + clazz.getSimpleName() + " t", Long.class).getSingleResult();
         return n.intValue();
     }
 
