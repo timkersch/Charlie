@@ -161,8 +161,9 @@ public class WebsocketServer {
                 case "logout":
                     sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;
-                case "answer":
-                    String artist = data.getString("artist");
+                case "answerQuestion":
+                    String artist = data.getString("artistName");
+                    boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
                     
                     
                     // TODO
@@ -195,13 +196,11 @@ public class WebsocketServer {
                     
                     // Send them back as json
                     String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                    System.out.println("Nexttrack: " + nextTrack);
-                    String nextQuestionAsJson = gson.toJson(nextQuestion);
-                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestionAsJson).build();
+                    JsonObject trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("question", nextQuestion.toJsonObject()).build();
                     response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", trackData).build();
                     System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response.toString());
-                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestionAsJson);
+                    sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", nextQuestion.toJsonObject().toString());
                     break;
                 case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.

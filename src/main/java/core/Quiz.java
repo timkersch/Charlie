@@ -9,7 +9,7 @@ import java.util.*;
 public class Quiz {
     private String uuid;
     private String name;
-    private final List<UserIdentity> joinedPlayers = new ArrayList<>();
+    private final Map<UserIdentity, Integer> joinedPlayers = new HashMap<>();
     private final List<UserIdentity> unjoinedPlayers = new ArrayList<>();
     private final List<Question> questions = new ArrayList<>();
     private int currentQuestion;
@@ -33,19 +33,19 @@ public class Quiz {
     }
     
     public List<UserIdentity> getJoinedPlayers() {
-        return joinedPlayers;
+        return new ArrayList<>(joinedPlayers.keySet());
     }
     
     public boolean joinPlayer(UserIdentity user) {
         if (unjoinedPlayers.remove(user)) {
-            joinedPlayers.add(user);
+            joinedPlayers.put(user, 0);
             return true;
         }
         return false;
     }
     
     public boolean leavePlayer(UserIdentity user) {
-        return joinedPlayers.remove(user);
+        return joinedPlayers.remove(user) > 0;
     }
 
     public UserIdentity getOwner() {
@@ -58,6 +58,14 @@ public class Quiz {
     
     public Question getCurrentQuestion(){
         return questions.get(currentQuestion);
+    }
+    
+    public boolean answerQuestion(UserIdentity user, String artistName) {
+        if (this.getCurrentQuestion().answer(artistName)) {
+            joinedPlayers.put(user, joinedPlayers.get(user));
+            return true;
+        }
+        return false;
     }
     
     public Question getNextQuestion(){

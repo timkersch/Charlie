@@ -23,7 +23,6 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
 
         var init = function(){
             if (charlieProxy.isLoggedIn()) {
-                console.log("Not logged in");
                 charlieProxy.getUser(function(user){
                    $scope.user = user;
                 });
