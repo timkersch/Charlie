@@ -272,6 +272,7 @@ charlieController.controller('questionController', [ '$scope', '$location','$rou
 charlieController.controller('scoreboardController', [ '$scope', '$routeParams', 'charlieProxy',
     function($scope, $routeParams, charlieProxy) {
         console.log("Inside scoreboardController");
+        var color = ["#F7464A","#46BFBD","#FDB45C" ];
         $scope.scoreData = [
     {
         value: 5,
