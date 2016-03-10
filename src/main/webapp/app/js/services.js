@@ -67,7 +67,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         };
 
         socket.onopen = function (event) {
-
             if (sessionStorage.user){
                 console.log("Reading user from storage");
                 // User in storage
@@ -76,12 +75,15 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     id: user.id
                 };
                 invoke("setUser", data).then(function(success){
-                    if (!success) 
+                    if (!success) {
                         sessionStorage.user = "";
-                    else{
-                        
+                        setReady();
+                    }else{
+                        invoke("getQuiz").then(function(quiz){
+                            currentQuiz = quiz;
+                            setReady();
+                        });
                     }
-                    setReady();
                 });
             } else {
                 setReady();
@@ -169,6 +171,13 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('getQuestion').then(callback);
             },
             
+            isQuizStarted: function(){
+                if (currentQuiz)
+                    return currentQuiz.currentQuestion > -1;
+                else
+                    return false;
+            },
+            
             // callback(users)
             getUsersInQuiz: function(quizId, callback){
                 var data = {
@@ -204,7 +213,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 if (currentQuiz)
                     callback(currentQuiz);
                 else
-                    invoke("getQuiz", callback);
+                    invoke("getQuiz").then(callback);
             },
             
             /* action: 
