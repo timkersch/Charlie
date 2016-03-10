@@ -195,6 +195,8 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response.toString());
                     sessionHandler.sendToSessions(quiz, "invitedTo", jsonQuiz);
                     break;
+	            case "nextQuestion":
+		            break;
                 default:
                     sessionHandler.sendToAllConnectedSessions("noRequest", "error");
                     break;
