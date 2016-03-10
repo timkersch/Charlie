@@ -64,7 +64,7 @@
 		<md-grid-tile ng-repeat="artist in possibleArtists" class="{{setColor($index)}}" id={{retriveCursor()}}
 					  ng-click="selectedAnswer(sug, $index)" md-disable="true" ng-disabled="isDisabled($index)">
 			<md-button id="{{$index}}" md-disable="true" ng-disabled="isDisabled($index)" md-class="md-primary"
-					   ng-click="selectedAnswer(sug, $index)">{{artist.artist}}</md-button>
+					   ng-click="selectedAnswer(artist, $index)">{{artist.artist}}</md-button>
 		</md-grid-tile>
 	</md-grid-list>
 	<!--
