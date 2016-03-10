@@ -104,6 +104,7 @@ public class SpotifyService {
 		try {
 			UserPlaylistsRequest request = api.getPlaylistsForUser(api.getMe().build().get().getId()).build();
 			Page<SimplePlaylist> playlistsPage = request.get();
+
 			return playlistsPage.getItems();
 
 		} catch (Exception e) {
@@ -117,17 +118,14 @@ public class SpotifyService {
 	 * @param playlistId a playlist id
 	 * @return List of Track in the playlist
 	 */
-	public List<Track> getPlaylistSongs(String playlistId) {
+	public List<Track> getPlaylistSongs(String playlistId, String ownerId) {
 		try {
-			System.out.println(playlistId);
-			PlaylistTracksRequest request = api.getPlaylistTracks(api.getMe().build().get().getId(), playlistId).build();
-
+			PlaylistTracksRequest request = api.getPlaylistTracks(ownerId, playlistId).build();
 			List<PlaylistTrack> playlistTracks = request.get().getItems();
 			List<Track> tracks = new ArrayList<>(playlistTracks.size());
 			for (PlaylistTrack pt : playlistTracks) {
 				tracks.add(pt.getTrack());
 			}
-
 			return tracks;
 
 		} catch (Exception e) {

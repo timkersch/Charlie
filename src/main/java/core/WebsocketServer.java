@@ -279,9 +279,9 @@ public class WebsocketServer {
                     String playlistId = data.getAsJsonPrimitive("playlist").getAsString();//data.getString("playlist");
                     int nbrOfSongs = data.getAsJsonPrimitive("nbrOfSongs").getAsInt(); //Integer.parseInt(data.getString("nbrOfSongs"));
                     boolean generate = data.getAsJsonPrimitive("generated").getAsBoolean(); //data.getBoolean("generated");
+					String ownerId = data.getAsJsonPrimitive("owner").getAsString();
 
-
-                    List<Track> playlistTracks = service.getPlaylistSongs(playlistId);
+                    List<Track> playlistTracks = service.getPlaylistSongs(playlistId, ownerId);
                     List<Track> quizTracks;
 
                     if (generate) {
