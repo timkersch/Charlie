@@ -36,6 +36,10 @@ public class Quiz {
         return new ArrayList<>(joinedPlayers.keySet());
     }
     
+    public Map<UserIdentity, Integer> getResults() {
+        return joinedPlayers;
+    }
+    
     public boolean joinPlayer(UserIdentity user) {
         if (unjoinedPlayers.remove(user)) {
             joinedPlayers.put(user, 0);
@@ -57,7 +61,7 @@ public class Quiz {
     }
     
     public Question getCurrentQuestion(){
-        if (currentQuestion < 0)
+        if (currentQuestion < 0 || currentQuestion >= questions.size())
             return null;
         return questions.get(currentQuestion);
     }
@@ -72,7 +76,7 @@ public class Quiz {
     }
     
     public Question getNextQuestion(){
-        if (questions.size() == currentQuestion)
+        if (questions.size() == currentQuestion + 1)
             return null;
         return questions.get(++currentQuestion);
     }

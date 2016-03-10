@@ -146,12 +146,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         
         var quiz = charlieProxy.getQuiz();
         var audioElement = $document[0].createElement('audio');
-        charlieProxy.nextQuestion(1, function(data){
+        charlieProxy.nextQuestion(function(data){
             // Play song
             audioElement.src = data.track_url + ".mp3";
             audioElement.play();
             
-            $scope.possibleArtists = JSON.parse(data.artists);
+            $scope.possibleArtists = data.artists;
         });
         
         var questionNumber = 0;
@@ -222,12 +222,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         $interval(function(){
             $scope.determinateValue--;
             if($scope.determinateValue === -1){
-                charlieProxy.nextQuestion(1, function(data){
+                charlieProxy.nextQuestion(function(data){
                     // Play song
                     audioElement.src = data.track_url + ".mp3";
                     audioElement.play();
 
-                    $scope.possibleArtists = JSON.parse(data.artists);
+                    $scope.possibleArtists = data.artists;
                 });
                 
                 $scope.determinateValue = 20;

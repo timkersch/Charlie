@@ -171,11 +171,8 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
 
             // callback(data[track_url, question])
-            nextQuestion: function(quizId, callback) {
-                var data = {
-                    quizId: quizId
-                };
-                invoke('nextQuestion', data).then(callback);
+            nextQuestion: function(callback) {
+                invoke('nextQuestion').then(callback);
             },
 
             savePlaylist: function() {
@@ -190,6 +187,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
              *      userJoined      --> callback(newUser)
              *      invitedTo       --> callback(quiz)
              *      newQuestion     --> callback(question)
+             *      gameOver        --> callback(players)
              */
             listenTo: function(action, callback){
                 console.log("listenTo(" + action + ")");
