@@ -152,9 +152,9 @@ md-list {
 
 /* Cont Style */
 
-.partials-cont {
+/*.partials-cont {
     margin: 1em;
-}
+}*/
 
 /* TOAST */
 md-toast {
@@ -174,4 +174,8 @@ md-toast {
     max-height: 100px;
     height: 100px;
     z-index: 100;
+}
+
+md-content {
+    overflow:visible;
 }
