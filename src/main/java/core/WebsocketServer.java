@@ -87,7 +87,11 @@ public class WebsocketServer {
             UserIdentity user;
 
             log(action + " - DATA: " + data);
+
+	        // TODO really needs some refactoring!!!
+	        // TODO something is wrong here after the backend-model remake with "Player"
             switch(action) {
+
                 case "getLoginURL":
                     // Retrieve login URL from spotify service
                     String url = service.getAuthorizeURL();
@@ -96,6 +100,7 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, url);
                     session.getBasicRemote().sendText(response);
                     break;
+
                 case "login":
                     // Extract spotify code
                     String code = data.getAsJsonPrimitive("code").getAsString(); //.getString("code");
@@ -117,8 +122,9 @@ public class WebsocketServer {
 
                     // Send back result
                     System.out.println("User: " + userAsString);
-                    session.getBasicRemote().sendText(response.toString());
+                    session.getBasicRemote().sendText(response);
                     break;
+
                 case "setUser":
                     // Extract user id
                     Long id = data.getAsJsonPrimitive("id").getAsLong(); //getJsonNumber("id").longValue();
@@ -129,7 +135,7 @@ public class WebsocketServer {
                     if (user == null) {
                         user = UserIdentity.createDummyUser();
                         success = false;
-                    }else{
+                    } else {
                         String newAccessToken = service.refreshAccessToken(user.getRefreshToken());
                         user.setAccessToken(newAccessToken);
                         service.setTokens(user.getAccessToken(), user.getRefreshToken());
@@ -143,7 +149,8 @@ public class WebsocketServer {
                     System.out.println("Success: " + success);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "getPlaylists":
+
+	            case "getPlaylists":
                     // Get users playlist from spotfiy service
                     List<SimplePlaylist> lists = service.getUsersPlaylists();
 
@@ -154,7 +161,8 @@ public class WebsocketServer {
                     System.out.println("Playlists: " + playlists);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "getCurrentQuestion":
+
+	            case "getCurrentQuestion":
                     Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
                     // Send them back as json
                     String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
@@ -167,7 +175,8 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, objAsString);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "isQuizStarted":
+
+	            case "isQuizStarted":
                     // Retrieve online users from session handler
                     boolean started = userSession.getCurrentQuiz().getCurrentQuestion() != null;
 
@@ -175,7 +184,8 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, started);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "getUsers":
+
+	            case "getUsers":
                     // Retrieve online users from session handler
                     List<UserIdentity> onlineUsers = sessionHandler.getUsers();
 
@@ -191,7 +201,8 @@ public class WebsocketServer {
                     log("Users: " + usersString);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "getUsersInQuiz":
+
+	            case "getUsersInQuiz":
                     // Retrieve online users from session handler
                     List<UserIdentity> usersInQuiz = userSession.getCurrentQuiz().getJoinedPlayers();
                     usersInQuiz.add(userSession.getCurrentQuiz().getOwner());
@@ -207,10 +218,12 @@ public class WebsocketServer {
                     log("Users: " + usersInQuizString);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "logout":
+
+	            case "logout":
                     sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;
-                case "answerQuestion":
+
+	            case "answerQuestion":
                     String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
                     System.out.println("Answer: " + artist);
                     boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
@@ -220,7 +233,8 @@ public class WebsocketServer {
                     System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "joinQuiz":
+
+	            case "joinQuiz":
                     String quizId = data.getAsJsonPrimitive("quizId").getAsString(); //.getString("quizId");
                     Quiz quizToJoin = db.getQuizCatalogue().findQuiz(quizId);
                     boolean joinSuccess = false;
@@ -237,11 +251,13 @@ public class WebsocketServer {
                     System.out.println("Response: " + response);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "leaveQuiz":
+
+	            case "leaveQuiz":
                     userSession.getCurrentQuiz().leavePlayer(userSession.getUserIdentity());
                     userSession.setCurrentQuiz(null);
                     break;
-                case "nextQuestion":
+
+	            case "nextQuestion":
                     if (userSession.getCurrentQuiz().getOwner().getId() != userSession.getUserIdentity().getId())
                         return;
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();
@@ -272,6 +288,7 @@ public class WebsocketServer {
                         
                         response = createResponse(requestId, action, "");
                         session.getBasicRemote().sendText(response);
+
                     } else {
                         // Send them back as json
                         String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
@@ -288,7 +305,8 @@ public class WebsocketServer {
                         session.getBasicRemote().sendText(response);
                     }
                     break;
-                case "getUserResults":
+
+	            case "getUserResults":
                     Quiz q = userSession.getCurrentQuiz();
 
                     int points = q.getUserPoints(userSession.getUserIdentity());
@@ -303,7 +321,8 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, arrayString);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "createQuiz":
+
+	            case "createQuiz":
                     // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
 
                     JsonArray usernames = data.getAsJsonArray("users");
@@ -349,7 +368,8 @@ public class WebsocketServer {
                     session.getBasicRemote().sendText(response);
                     sessionHandler.sendToSessions(players, "invitedTo", jsonQuiz);
                     break;
-                case "savePlaylist":
+
+	            case "savePlaylist":
                     String name1 = userSession.getCurrentQuiz().getName();
                     List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
                     List<String> trackids = new ArrayList<>(question1.size());
@@ -360,17 +380,21 @@ public class WebsocketServer {
 
 	                service.createAndPopulatePlaylist(trackids, name1);
                     break;
-                case "getQuiz":
+
+	            case "getQuiz":
                     // Send back the resulting quiz
                     String quizAsJson = GSON.toJson(userSession.getCurrentQuiz());
                     response = createResponse(requestId, action, quizAsJson);
                     session.getBasicRemote().sendText(response);
                     break;
-                default:
+
+	            default:
                     sessionHandler.sendToAllConnectedSessions("noRequest", "error");
                     break;
             }
+
             log("Response: " + response);
+
         }catch(IOException exception) {
             exception.printStackTrace();
             LOGGER.log(Level.WARNING, exception.toString());

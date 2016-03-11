@@ -29,18 +29,31 @@ public class Quiz {
         this.currentQuestion = -1;
     }
 
+	/**
+	 * Returns a list of users that are invited to the quiz but have not joined
+	 * @return a list of UserIdentity
+	 */
     public List<UserIdentity> getUnjoinedPlayers() {
         return invitedUsers;
     }
-    
-    public List<UserIdentity> getJoinedPlayers() {
+
+	/**
+	 * Returns a list of UserIdentitys that are the joined players of the quiz
+	 * @return a list of UserIdentity
+	 */
+	public List<UserIdentity> getJoinedPlayers() {
 	    List<UserIdentity> userIdentities = new ArrayList<UserIdentity>();
         for (Player p : players) {
 	        userIdentities.add(p.getUserIdentity());
         }
 	    return userIdentities;
     }
-    
+
+	/**
+	 * Adds a user to a quiz
+	 * @param user the user to be added
+	 * @return true if user was invited i.e can be added, otherwise false
+	 */
     public boolean joinPlayer(UserIdentity user) {
         if (invitedUsers.remove(user)) {
             players.add(new Player(user, false));
@@ -48,7 +61,12 @@ public class Quiz {
         }
         return false;
     }
-    
+
+	/**
+	 * Removes a player from this quiz
+	 * @param user the user to be removed
+	 * @return true if user was in the quiz, otherwise false
+	 */
     public boolean leavePlayer(UserIdentity user) {
 	    Iterator<Player> it = players.iterator();
 	    while(it.hasNext()) {
@@ -60,6 +78,10 @@ public class Quiz {
 	    return false;
     }
 
+	/**
+	 * Returns the UserIdentity of the ower of this quiz
+	 * @return a UserIdentity
+	 */
     public UserIdentity getOwner() {
         for (Player p : players) {
 	        if (p.isOwner()) {
@@ -69,6 +91,11 @@ public class Quiz {
 	    return null;
     }
 
+	/**
+	 * Returns a Map of Questions and answers that a particular user has made
+	 * @param id the UserIdentity to be considered
+	 * @return a Map of questions and answers if user has answered questions, otherwise null
+	 */
 	public Map<Question, String> getUserResults(UserIdentity id) {
 		for(Player p : players) {
 			if (p.getUserIdentity().equals(id)) {
@@ -78,6 +105,11 @@ public class Quiz {
 		return null;
 	}
 
+	/**
+	 * Returns the points number of points in this quiz for a User
+	 * @param id the UserIdentity
+	 * @return an integer that is the number of points collected
+	 */
 	public int getUserPoints(UserIdentity id) {
 		for(Player p : players) {
 			if (p.getUserIdentity().equals(id)) {
@@ -87,20 +119,38 @@ public class Quiz {
 		return 0;
 	}
 
+	/**
+	 * Returns all players which contains all results
+	 * @return a List of Players
+	 */
 	public List<Player> getAllResults() {
 		return this.players;
 	}
 
+	/**
+	 * Returns a list of questions associated to this quiz
+	 * @return a List of Questions
+	 */
     public List<Question> getQuestions() {
         return this.questions;
     }
-    
-    public Question getCurrentQuestion(){
+
+	/**
+	 * Returns the current questions of this quiz
+	 * @return a Questions
+	 */
+	public Question getCurrentQuestion(){
         if (currentQuestion < 0 || currentQuestion >= questions.size())
             return null;
         return questions.get(currentQuestion);
     }
-    
+
+	/**
+	 * A method for answering questions.
+	 * @param user the UserIdentity that answered
+	 * @param artistName the answer they made
+	 * @return true if the answer was correct, false otherwise
+	 */
     public boolean answerQuestion(UserIdentity user, String artistName) {
 	    for (Player p : players) {
 		    if (p.getUserIdentity().equals(user)) {
@@ -109,17 +159,29 @@ public class Quiz {
 	    }
 	    return false;
     }
-    
-    public Question getNextQuestion(){
+
+	/**
+	 * Returns the next questions of this quiz
+	 * @return a Question or null if no more questions
+	 */
+	public Question getNextQuestion(){
         if (questions.size() == currentQuestion + 1)
             return null;
         return questions.get(++currentQuestion);
     }
-    
-    public String getUUID(){
+
+	/**
+	 * Returns the uuid of this quiz
+	 * @return a String
+	 */
+	public String getUUID(){
         return uuid;
     }
 
+	/**
+	 * Returns the name of this quiz
+	 * @return a String
+	 */
     public String getName() {
         return name;
     }
