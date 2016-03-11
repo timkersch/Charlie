@@ -29,6 +29,7 @@ public class SpotifyService {
 	public String getAuthorizeURL() {
 		List<String> scopes = new ArrayList<>();
 		scopes.add("playlist-read-private");
+		scopes.add("playlist-read-collaborative");
 		scopes.add("playlist-modify-private");
 		scopes.add("playlist-modify-public");
 		scopes.add("user-read-email");
