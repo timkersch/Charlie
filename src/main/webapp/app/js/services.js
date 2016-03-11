@@ -16,6 +16,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var listenCallbacks = {};
         var user = {};
         var currentQuiz;
+        var currentQuestion;
 
         socket.onmessage = function(event){
             console.log(event);
@@ -35,6 +36,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     for (var i = 0; i < listenCallbacks[action].length; i++) {
                         listenCallbacks[action][i](data);
                     }
+                }
+                if (action === "newQuestion") {
+                    currentQuestion = data;
                 }
                 //$rootScope.$broadcast(event.action, data);
             }
@@ -166,16 +170,20 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('answerQuestion', data).then(callback);
             },
             
-            // callback(artists)
+            // callback(question)
             getQuestion: function(callback) {
-                invoke('getQuestion').then(callback);
+                invoke('getQuestion').then(function(question){
+                    currentQuestion = question;
+                    callback(question);
+                });
             },
             
-            isQuizStarted: function(){
-                if (currentQuiz)
-                    return currentQuiz.currentQuestion > -1;
-                else
-                    return false;
+            isOwner: function() {
+                return currentQuiz.owner.user.name === user.name;
+            },
+            
+            isQuizStarted: function(callback){
+                invoke("isQuizStarted").then(callback);
             },
             
             // callback(users)
@@ -191,9 +199,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 invoke('joinQuiz', data).then(callback);
             },
 
-            // callback(data[track_url, question])
+            // callback(question)
             nextQuestion: function(callback) {
-                invoke('nextQuestion').then(callback);
+                invoke('nextQuestion').then(function(question){
+                    currentQuestion = question;
+                    callback(question);
+                });
             },
 
             savePlaylist: function() {
@@ -213,11 +224,16 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     invoke("getQuiz").then(callback);
             },
             
+            setQuiz: function(quiz) {
+                currentQuiz = quiz;
+            },
+            
             /* action: 
              *      userJoined      --> callback(newUser)
              *      invitedTo       --> callback(quiz)
              *      newQuestion     --> callback(question)
              *      gameOver        --> callback(players)
+             *      quizStart       --> callback()
              */
             listenTo: function(action, callback){
                 console.log("listenTo(" + action + ")");

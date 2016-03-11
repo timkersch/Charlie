@@ -53,18 +53,19 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
         
         var showActionToast = function(quiz) {
             var toast = $mdToast.simple()
-            .textContent('You are invited to ' + quiz.name)
-            .action('ACCEPT')
-            .highlightAction(true);
+                .textContent('You are invited to ' + quiz.name)
+                .action('ACCEPT')
+                .highlightAction(true)
+                .hideDelay(10 * 1000);
     
             $mdToast.show(toast).then(function(response) {
                 if ( response == 'ok' ) {
-                    alert('You accepted the '+ quiz.name + ' invite.');
                     charlieProxy.joinQuiz(quiz.uuid, function(success) {
                        if (success) {
-                           alert('Successfully joined the quiz!');
+                           charlieProxy.setQuiz(quiz);
+                           $location.path('/lobby');
                        } else {
-                           alert('Something went wrong! :(');
+                           alert('Something went wrong joining the quiz!');
                        }
                     });
                 }
@@ -99,11 +100,11 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         $scope.users = [];
         
         var init = function(){
-            charlieProxy.getUsersInQuiz(function(users){
-                $scope.users = users;
-            });
             charlieProxy.getQuiz(function(quiz){
                 $scope.quizname = quiz.name;
+                charlieProxy.getUsersInQuiz(function(users){
+                    $scope.users = users;
+                });
             });
         };
         
@@ -116,13 +117,23 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         }
         
         charlieProxy.listenTo("userJoined", function(user){
-            $scope.users.push(user.name);
+            console.log(user);
+            $scope.$apply(function(){
+                $scope.users.push(user);
+            });
         });
-            
-
+        
         $scope.startQuiz = function(){
             $location.path('/question');
         };
+            
+        charlieProxy.listenTo("quizStart", function(){
+            console.log("Now started!!");
+            $scope.$apply(function(){
+                $location.path('/question');
+            });
+        });
+
         
     }]);
 
@@ -169,9 +180,9 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         };
         
         var init = function(){
-            if(charlieProxy.isQuizStarted()){
+            if (!charlieProxy.isOwner()){
                 charlieProxy.getQuestion(function(data){
-                    play(data.track_url);
+                    //play(data.track_url);
                     $scope.possibleArtists = data.artists;
                 });
             }else{
@@ -192,6 +203,10 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         
         charlieProxy.listenTo("gameOver", function(users){
            $location.path("/scoreboard"); 
+        });
+        
+        charlieProxy.listenTo("newQuestion", function(question){
+           $scope.possibleArtists = question.artists;
         });
         
         $scope.isDisabled = function(index){
@@ -233,10 +248,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var intervalPromise = $interval(function(){
             $scope.determinateValue--;
             if($scope.determinateValue === -1){
-                charlieProxy.nextQuestion(function(data){
-                    play(data.track_url);
-                    $scope.possibleArtists = data.artists;
-                });
+                if (charlieProxy.isOwner()) {
+                    charlieProxy.nextQuestion(function(data){
+                        play(data.track_url);
+                        $scope.possibleArtists = data.artists;
+                    });
+                }
                 
                 $scope.determinateValue = 20;
                 hasAnswered = false;

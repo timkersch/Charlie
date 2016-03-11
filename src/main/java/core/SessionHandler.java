@@ -71,6 +71,13 @@ public class SessionHandler {
         }
     }
     
+    public void sendToSessions(List<UserIdentity> users, String action, String data){
+        JsonObject response = createJson(action, data);
+        for (UserIdentity user: users){
+            this.sendToSession(this.getUserSessionById(user.getId()), response);
+        }
+    }
+    
     public void sendToQuizMemebrs(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
         for (UserIdentity user: quiz.getJoinedPlayers()){
