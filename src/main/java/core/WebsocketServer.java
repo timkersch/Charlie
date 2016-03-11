@@ -165,6 +165,14 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, objAsString);
                     session.getBasicRemote().sendText(response);
                     break;
+                case "isQuizStarted":
+                    // Retrieve online users from session handler
+                    boolean started = userSession.getCurrentQuiz().getCurrentQuestion() != null;
+
+                    // Send them back as json
+                    response = createResponse(requestId, action, started);
+                    session.getBasicRemote().sendText(response);
+                    break;
                 case "getUsers":
                     // Retrieve online users from session handler
                     List<UserIdentity> onlineUsers = sessionHandler.getUsers();
@@ -217,6 +225,7 @@ public class WebsocketServer {
 
                     if (quizToJoin != null) {
                         userSession.setCurrentQuiz(quizToJoin);
+                        quizToJoin.joinPlayer(userSession.getUserIdentity());
                         sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", userSession.getUserIdentity().toJsonElement().toString());
                         joinSuccess = true;
                     }
@@ -224,7 +233,7 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, joinSuccess);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", joinSuccess).build();
                     System.out.println("Response: " + response);
-                    session.getBasicRemote().sendText(response.toString());
+                    session.getBasicRemote().sendText(response);
                     break;
                 case "leaveQuiz":
                     userSession.getCurrentQuiz().leavePlayer(userSession.getUserIdentity());
@@ -237,7 +246,10 @@ public class WebsocketServer {
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
 
                     // TODO Send wrong anser for last question.
-                    
+                    if (question == null) {
+                        // Quiz started
+                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "quizStart", "");
+                    }
 
                     if (nextQuestion == null) {
                         // Quiz is over
@@ -331,7 +343,7 @@ public class WebsocketServer {
                     response = createResponse(requestId, action, jsonQuiz);
                     //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", jsonQuiz).build();
                     session.getBasicRemote().sendText(response);
-                    sessionHandler.sendToSessions(quiz, "invitedTo", jsonQuiz);
+                    sessionHandler.sendToSessions(players, "invitedTo", jsonQuiz);
                     break;
                 case "savePlaylist":
                     String name1 = userSession.getCurrentQuiz().getName();
