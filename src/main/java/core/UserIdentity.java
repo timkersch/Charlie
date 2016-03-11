@@ -14,7 +14,9 @@ import javax.persistence.*;
 @Entity
 public class UserIdentity extends AbstractEntity{
     private User user;
+    @Column(length=512)
     private String accessToken;
+    @Column(length=512)
     private String refreshToken;
 
     public UserIdentity() {

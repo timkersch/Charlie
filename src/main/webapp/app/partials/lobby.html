@@ -42,8 +42,8 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>{{quizname}}</span></div>
     </md-toolbar>
 
-    <md-list>
-        <md-list-item ng-repeat="user in users">
+    <md-list layout="column" layout-align="center center">
+        <md-list-item ng-repeat="user in users" style="font-size:1.8em;margin-top:10px;">
             {{user.name}}
         </md-list-item>
     </md-list>

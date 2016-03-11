@@ -179,11 +179,8 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             // callback(users)
-            getUsersInQuiz: function(quizId, callback){
-                var data = {
-                    quizId: quizId
-                };
-                invoke('getUsersInQuiz', data).then(callback);
+            getUsersInQuiz: function(callback){
+                invoke('getUsersInQuiz').then(callback);
             },
             
             // callback(success)

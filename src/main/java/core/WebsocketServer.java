@@ -181,6 +181,22 @@ public class WebsocketServer {
                     log("Users: " + usersString);
                     session.getBasicRemote().sendText(response);
                     break;
+                case "getUsersInQuiz":
+                    // Retrieve online users from session handler
+                    List<UserIdentity> usersInQuiz = userSession.getCurrentQuiz().getJoinedPlayers();
+                    usersInQuiz.add(userSession.getCurrentQuiz().getOwner());
+
+                    // Create user json
+                    List<JsonElement> usersInQuizAsJson = new ArrayList<>();
+                    for(UserIdentity userIdentity : usersInQuiz)
+                        usersInQuizAsJson.add(userIdentity.toJsonElement());
+
+                    // Send them back as json
+                    String usersInQuizString = GSON.toJson(usersInQuizAsJson);
+                    response = createResponse(requestId, action, usersInQuizString);
+                    log("Users: " + usersInQuizString);
+                    session.getBasicRemote().sendText(response);
+                    break;
                 case "logout":
                     sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
                     break;

@@ -95,12 +95,26 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
     function($scope, $location, charlieProxy){
         console.log("LobbyController!");
         $scope.status = '  ';
-
-        /*var quizname = charlieProxy.getQuizname();*/
-        //TODO add name
         $scope.quizname = "Simpas Quiz";
-    
         $scope.users = [];
+        
+        var init = function(){
+            charlieProxy.getUsersInQuiz(function(users){
+                $scope.users = users;
+            });
+            charlieProxy.getQuiz(function(quiz){
+                $scope.quizname = quiz.name;
+            });
+        };
+        
+        if (charlieProxy.isReady()){
+            init();
+        }else{
+            $scope.$on('service-ready', function(event, args) {
+                init();
+            });
+        }
+        
         charlieProxy.listenTo("userJoined", function(user){
             $scope.users.push(user.name);
         });
@@ -108,7 +122,7 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
 
         $scope.startQuiz = function(){
             $location.path('/question');
-        }
+        };
         
     }]);
 
@@ -216,7 +230,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             $scope.selected = data.artist;
         };
 
-        $interval(function(){
+        var intervalPromise = $interval(function(){
             $scope.determinateValue--;
             if($scope.determinateValue === -1){
                 charlieProxy.nextQuestion(function(data){
@@ -229,7 +243,10 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                 hasIndex = '';
             }
         }, 1000, 0, true);
-
+        
+        $scope.$on('$destroy', function() {
+            $interval.cancel(intervalPromise);
+        });
     }]);
 
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
