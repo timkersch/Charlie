@@ -34,9 +34,7 @@ public class SpotifyService {
 		scopes.add("playlist-modify-public");
 		scopes.add("user-read-email");
 		scopes.add("user-read-private");
-		scopes.add("user-read-birthdate");
 
-		/* Set a state. This is used to prevent cross site request forgeries. */
 		String state = "someState";
 
 		return api.createAuthorizeURL(scopes, state);
@@ -242,9 +240,9 @@ public class SpotifyService {
 					Track track;
 					do {
 						Artist a = relart.get(randomInt(0,relart.size()-1));
-						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), "SE").build().get();
+						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), api.getMe().build().get().getCountry()).build().get();
 						track = popularTracks.get(randomInt(0, popularTracks.size()-1));
-					} while(chosenTracks.contains(track));
+					} while(chosenTracks.contains(track) && track.getPreviewUrl().equals("null"));
 					chosenTracks.add(track);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -259,7 +257,7 @@ public class SpotifyService {
 						do {
 							SimpleTrack st = strack.get(randomInt(0, strack.size()-1));
 							tt = api.getTrack(st.getId()).build().get();
-						} while(chosenTracks.contains(tt));
+						} while(chosenTracks.contains(tt) && tt.getPreviewUrl().equals("null"));
 						chosenTracks.add(tt);
 					} catch (Exception e) {
 						e.printStackTrace();
