@@ -17,6 +17,11 @@
 	md-grid-tile:focus {
 		outline: none;
 	}
+        
+        md-grid-tile[disabled] {
+            background-color:#eee;
+            color:#888;
+        }
 
 	#selected:hover {
 		cursor: default;
@@ -59,8 +64,9 @@
 			md-gutter="0" md-gutter-gt-sm="0">
 		<md-grid-tile ng-repeat="artist in possibleArtists" class="{{setColor($index)}}" id={{retriveCursor()}}
 					  ng-click="selectedAnswer(artist, $index)" md-disable="true" ng-disabled="isDisabled($index)">
-			<md-button id="{{$index}}" md-disable="true" ng-disabled="isDisabled($index)" md-class="md-primary"
-					   ng-click="selectedAnswer(artist, $index)">{{artist}}</md-button>
+                    {{artist}}
+			<!--<md-button id="{{$index}}" md-disable="true" ng-disabled="isDisabled($index)" md-class="md-primary"
+					   ng-click="selectedAnswer(artist, $index)">{{artist}}</md-button>-->
 		</md-grid-tile>
 	</md-grid-list>
     

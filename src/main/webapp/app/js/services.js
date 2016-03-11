@@ -16,7 +16,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var listenCallbacks = {};
         var user = {};
         var currentQuiz;
-        var currentQuestion;
 
         socket.onmessage = function(event){
             console.log(event);
@@ -26,7 +25,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 delete callbacks[response.request_id];
                 callback.resolve(response);
             } else {
-                console.log("broadcastEvent(%o)", response.action);
+                console.log("ListenEvent(%o)", response.action);
                 var action = response.action;
                 var data = response.data;
                 try {
@@ -37,10 +36,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                         listenCallbacks[action][i](data);
                     }
                 }
-                if (action === "newQuestion") {
-                    currentQuestion = data;
-                }
-                //$rootScope.$broadcast(event.action, data);
             }
         };
 
@@ -72,7 +67,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
         socket.onopen = function (event) {
             if (sessionStorage.user){
-                console.log("Reading user from storage");
                 // User in storage
                 user = angular.fromJson(sessionStorage.user);
                 var data = {
@@ -97,8 +91,21 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
         return {
 
+            /**
+             * Service
+             */
+            
             isReady: function(){
                 return isReady;
+            },
+            
+            /**
+             * User
+             */
+
+            // callback(url)
+            getLoginUrl: function(callback) {
+                invoke("getLoginURL").then(callback);
             },
 
             isLoggedIn: function(){
@@ -116,6 +123,30 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 });
             },
 
+            logout: function(){
+                sessionStorage.user = "";
+                user = {};
+                invoke("logout");
+            },
+
+            // callback(user)
+            getUser: function(callback){
+                if (this.isLoggedIn())
+                    // No user in storage
+                    callback(user);
+                else
+                    callback({});
+            },
+
+            // callback(users)
+            getUsers: function(callback){
+                invoke("getUsers").then(callback);
+            },
+            
+            /**
+             * Quiz
+             */
+
             // callback(quiz)
             createQuiz: function(name, userIds, playlistId, playlistOwner, nbrOfSongs, generated, callback){
                 var data = {
@@ -132,31 +163,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 });
             },
 
-            // callback(user)
-            getUser: function(callback){
-                if (this.isLoggedIn())
-                    // No user in storage
-                    callback(user);
-                else
-                    callback({});
-            },
-
-            // callback(url)
-            getLoginUrl: function(callback) {
-                invoke("getLoginURL").then(callback);
-            },
-
-            logout: function(){
-                sessionStorage.user = "";
-                user = {};
-                invoke("logout");
-            },
-
-            // callback(users)
-            getUsers: function(callback){
-                invoke("getUsers").then(callback);
-            },
-
             // callback(lists)
             getPlaylists: function(callback){
                 invoke("getPlaylists").then(callback);
@@ -171,17 +177,15 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             // callback(question)
-            getQuestion: function(callback) {
-                invoke('getQuestion').then(function(question){
-                    currentQuestion = question;
-                    callback(question);
-                });
+            getCurrentQuestion: function(callback) {
+                invoke('getCurrentQuestion').then(callback);
             },
             
-            isOwner: function() {
+            isQuizOwner: function() {
                 return currentQuiz.owner.user.name === user.name;
             },
             
+            // callback(started)
             isQuizStarted: function(callback){
                 invoke("isQuizStarted").then(callback);
             },
@@ -192,19 +196,20 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             // callback(success)
-            joinQuiz: function(quizId, callback) {
+            joinQuiz: function(quiz, callback) {
                 var data = {
-                    quizId: quizId
+                    quizId: quiz.uuid
                 };
-                invoke('joinQuiz', data).then(callback);
+                invoke('joinQuiz', data).then(function(success){
+                    if (success)
+                        currentQuiz = quiz;
+                    callback(success);
+                });
             },
 
             // callback(question)
             nextQuestion: function(callback) {
-                invoke('nextQuestion').then(function(question){
-                    currentQuestion = question;
-                    callback(question);
-                });
+                invoke('nextQuestion').then(callback);
             },
 
             savePlaylist: function() {
@@ -221,11 +226,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 if (currentQuiz)
                     callback(currentQuiz);
                 else
-                    invoke("getQuiz").then(callback);
-            },
-            
-            setQuiz: function(quiz) {
-                currentQuiz = quiz;
+                    invoke("getQuiz").then(function(quiz){
+                        currentQuiz = quiz;
+                        callback(quiz);
+                    });
             },
             
             /* action: 

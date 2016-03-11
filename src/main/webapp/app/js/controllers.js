@@ -60,9 +60,8 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
     
             $mdToast.show(toast).then(function(response) {
                 if ( response == 'ok' ) {
-                    charlieProxy.joinQuiz(quiz.uuid, function(success) {
+                    charlieProxy.joinQuiz(quiz, function(success) {
                        if (success) {
-                           charlieProxy.setQuiz(quiz);
                            $location.path('/lobby');
                        } else {
                            alert('Something went wrong joining the quiz!');
@@ -137,27 +136,8 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         
     }]);
 
-charlieController.controller('signupController', [ '$scope', 'charlieProxy',
-    function($scope, charlieProxy) {
-        console.log("Init");
-
-        $scope.publish = function () {
-            console.log("Publish");
-        };
-
-        $scope.create = function (){
-            console.log("create");
-
-        };
-
-        $scope.register = function (){
-            console.log("register");
-
-        };
-    }]);
-
-charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy',
-    function($scope, $location, charlieProxy) {
+charlieController.controller('homeController', [ '$scope', '$location',
+    function($scope, $location) {
         $scope.changeView = function(data){
             $location.path(data);
         }
@@ -174,22 +154,29 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var hasAnswered = false;
         
         var play = function(url) {
+            // Stop previous
+            audioElement.pause();
+            audioElement.currentTime = 0;
             // Play song
             audioElement.src = url + ".mp3";
             audioElement.play();
         };
         
+        var nextQuestion = function(){
+            charlieProxy.nextQuestion(function(data){
+                play(data.track_url);
+                $scope.possibleArtists = data.artists;
+            });  
+        };
+        
         var init = function(){
-            if (!charlieProxy.isOwner()){
-                charlieProxy.getQuestion(function(data){
+            if (!charlieProxy.isQuizOwner()){
+                charlieProxy.getCurrentQuestion(function(data){
                     //play(data.track_url);
                     $scope.possibleArtists = data.artists;
                 });
             }else{
-                charlieProxy.nextQuestion(function(data){
-                    play(data.track_url);
-                    $scope.possibleArtists = data.artists;
-                });
+                nextQuestion();
             }
         };
         
@@ -206,7 +193,10 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         });
         
         charlieProxy.listenTo("newQuestion", function(question){
-           $scope.possibleArtists = question.artists;
+            $scope.possibleArtists = question.artists;
+            $scope.determinateValue = 20;
+            hasAnswered = false;
+            hasIndex = '';
         });
         
         $scope.isDisabled = function(index){
@@ -237,22 +227,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
           }
         };
 
-        $scope.isSelected = function(data){
-            return $scope.selected === data;
-        };
-
-        $scope.setAnswer2 = function(data){
-            $scope.selected = data.artist;
-        };
-
         var intervalPromise = $interval(function(){
             $scope.determinateValue--;
             if($scope.determinateValue === -1){
-                if (charlieProxy.isOwner()) {
-                    charlieProxy.nextQuestion(function(data){
-                        play(data.track_url);
-                        $scope.possibleArtists = data.artists;
-                    });
+                // Question over
+                if (charlieProxy.isQuizOwner()) {
+                    nextQuestion();
                 }
                 
                 $scope.determinateValue = 20;
@@ -297,7 +277,6 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
 
         // Initialize when service is ready
         if (charlieProxy.isReady()){
-            console.log("Ready now?")
             init();
         }else{
             $scope.$on('service-ready', function(event, args) {
@@ -306,7 +285,6 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         }
     
         $scope.changeView = function(view){
-            console.log("Changing view to: " + view);
             $location.path(view); // path not hash
         };
         
@@ -314,11 +292,8 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
             charlieProxy.savePlaylist();
             $scope.isDisabled = true;
             $scope.playlistText = "Playlist added";
-            
         }
         
-
-
     }]);
 
 charlieController.controller('profileController', [ '$scope', 'charlieProxy',
@@ -356,9 +331,6 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         }
 
         $scope.submit = function() {
-            console.log("Submitting..." + " " + $scope.name + " " + $scope.nbrOfQuestions + " " + $scope.tags + " " + $scope.playlistSelected + "  toggleSwitch: " + $scope.toggleSwitch);
-            
-            // TODO generate quiz
             charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected.id, $scope.playlistSelected.owner.id, $scope.nbrOfQuestions, $scope.toggleSwitch, function(quiz){
                $location.path('/lobby'); 
             });

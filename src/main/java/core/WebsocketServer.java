@@ -152,7 +152,7 @@ public class WebsocketServer {
                     System.out.println("Playlists: " + playlists);
                     session.getBasicRemote().sendText(response);
                     break;
-                case "getQuestion":
+                case "getCurrentQuestion":
                     Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
                     // Send them back as json
                     String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
