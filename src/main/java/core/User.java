@@ -1,9 +1,8 @@
 package core;
 
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-
-import javax.persistence.Embeddable;
 
 /**
  * Created by jcber on 2016-03-03.

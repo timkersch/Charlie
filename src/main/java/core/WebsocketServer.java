@@ -13,7 +13,9 @@ import javax.persistence.PersistenceContext;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -212,7 +214,7 @@ public class WebsocketServer {
                     String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
                     System.out.println("Answer: " + artist);
                     boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
-                    log("After answer: " + userSession.getCurrentQuiz().getResults());
+                    log("After answer: " + userSession.getCurrentQuiz().getUserResults(userSession.getUserIdentity()));
 
                     response = createResponse(requestId, action, right);
                     System.out.println("Response: " + response);
@@ -245,24 +247,25 @@ public class WebsocketServer {
                     Question question = userSession.getCurrentQuiz().getCurrentQuestion();
                     Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
 
-                    // TODO Send wrong anser for last question.
-                    if (question == null) {
-                        // Quiz started
-                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "quizStart", "");
-                    }
+	                if (question == null) {
+		                // Quiz started
+		                sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "quizStart", "");
+	                }
 
                     if (nextQuestion == null) {
                         // Quiz is over
                         Quiz over = userSession.getCurrentQuiz();
-                        Map<UserIdentity, Integer> results = over.getResults();
+	                    List<Player> results = over.getAllResults();
                         log("GameOver: " + results);
                         JsonArray array = new JsonArray();
-                        for (UserIdentity identity : results.keySet()) {
-                            JsonObject o = identity.toJsonElement().getAsJsonObject();
-                            o.addProperty("points", results.get(identity));
+
+	                    for (Player p: results) {
+		                    JsonObject o = p.getUserIdentity().toJsonElement().getAsJsonObject();
+		                    o.addProperty("points", p.getScore());
                             array.add(o);
                         }
-                        String arrayString = GSON.toJson(array);
+
+	                    String arrayString = GSON.toJson(array);
                         
                         sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
                         log("GameOver: " + arrayString);
@@ -285,15 +288,16 @@ public class WebsocketServer {
                         session.getBasicRemote().sendText(response);
                     }
                     break;
-                case "getResults":
-                    Quiz over = userSession.getCurrentQuiz();
-                    Map<UserIdentity, Integer> results = over.getResults();
+                case "getUserResults":
+                    Quiz q = userSession.getCurrentQuiz();
+
+                    int points = q.getUserPoints(userSession.getUserIdentity());
+
                     JsonArray array = new JsonArray();
-                    for (UserIdentity identity : results.keySet()) {
-                        JsonObject o = identity.toJsonElement().getAsJsonObject();
-                        o.addProperty("points", results.get(identity));
-                        array.add(o);
-                    }
+	                JsonObject o = userSession.getUserIdentity().toJsonElement().getAsJsonObject();
+	                o.addProperty("points", points);
+	                array.add(o);
+
                     String arrayString = GSON.toJson(array);
                     
                     response = createResponse(requestId, action, arrayString);
@@ -350,8 +354,8 @@ public class WebsocketServer {
                     List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
                     List<String> trackids = new ArrayList<>(question1.size());
 
-	                for (Question q : question1) {
-                        trackids.add(q.getTrackId().getId());
+	                for (Question que : question1) {
+                        trackids.add(que.getTrackId().getId());
                     }
 
 	                service.createAndPopulatePlaylist(trackids, name1);

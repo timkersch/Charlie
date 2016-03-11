@@ -69,13 +69,26 @@ public class Quiz {
 	    return null;
     }
 
-	public Map<Question, String> getResults(UserIdentity id) {
+	public Map<Question, String> getUserResults(UserIdentity id) {
 		for(Player p : players) {
 			if (p.getUserIdentity().equals(id)) {
 				return p.getAnswers();
 			}
 		}
 		return null;
+	}
+
+	public int getUserPoints(UserIdentity id) {
+		for(Player p : players) {
+			if (p.getUserIdentity().equals(id)) {
+				return p.getScore();
+			}
+		}
+		return 0;
+	}
+
+	public List<Player> getAllResults() {
+		return this.players;
 	}
 
     public List<Question> getQuestions() {
@@ -88,12 +101,13 @@ public class Quiz {
         return questions.get(currentQuestion);
     }
     
-    public void answerQuestion(UserIdentity user, String artistName) {
+    public boolean answerQuestion(UserIdentity user, String artistName) {
 	    for (Player p : players) {
 		    if (p.getUserIdentity().equals(user)) {
-			    p.setAnswer(this.getCurrentQuestion(), artistName);
+			    return p.setAnswer(this.getCurrentQuestion(), artistName);
 		    }
 	    }
+	    return false;
     }
     
     public Question getNextQuestion(){

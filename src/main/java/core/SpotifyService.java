@@ -2,12 +2,17 @@ package core;
 
 import com.wrapper.spotify.Api;
 import com.wrapper.spotify.exceptions.WebApiException;
-import com.wrapper.spotify.methods.*;
+import com.wrapper.spotify.methods.AddTrackToPlaylistRequest;
+import com.wrapper.spotify.methods.PlaylistCreationRequest;
+import com.wrapper.spotify.methods.PlaylistTracksRequest;
+import com.wrapper.spotify.methods.UserPlaylistsRequest;
 import com.wrapper.spotify.models.*;
 
 import java.io.IOException;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

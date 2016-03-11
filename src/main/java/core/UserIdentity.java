@@ -2,10 +2,11 @@ package core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import java.util.Objects;
 import persistence.AbstractEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import java.util.Objects;
 
 /**
  * Created by jcber on 2016-03-03.

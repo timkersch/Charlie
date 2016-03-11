@@ -1,7 +1,5 @@
 package core;
 
-import com.google.appengine.repackaged.com.google.common.base.Flag;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,19 +20,17 @@ public class Player {
 		this.isOwner = isOwner;
 	}
 
-	public void setAnswer(Question q, String answer) {
+	public boolean setAnswer(Question q, String answer) {
 		answers.put(q, answer);
 		if (q.getArtistsIds().get(answer)) {
 			score++;
+			return true;
 		}
+		return false;
 	}
 
 	public boolean isOwner() {
 		return this.isOwner;
-	}
-
-	public void setScore(int score) {
-		this.score = score;
 	}
 
 	public Map<Question, String> getAnswers() {
@@ -52,6 +48,10 @@ public class Player {
 
 	public UserIdentity getUserIdentity() {
 		return this.userIdentity;
+	}
+
+	private void setScore(int score) {
+		this.score = score;
 	}
 
 }

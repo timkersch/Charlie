@@ -1,11 +1,12 @@
 package core;
 
 import com.wrapper.spotify.models.Track;
+
+import javax.json.spi.JsonProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.json.spi.JsonProvider;
 
 /**
  * Created by: Tim Kerschbaumer

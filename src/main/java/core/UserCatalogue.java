@@ -1,11 +1,11 @@
 package core;
 
-import java.util.List;
 import persistence.AbstractDAO;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * Created by jcber on 2016-03-07.

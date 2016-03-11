@@ -4,11 +4,14 @@ package core; /**
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
+import javax.json.spi.JsonProvider;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.spi.JsonProvider;
 
 @ApplicationScoped
 public class SessionHandler {
