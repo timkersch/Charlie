@@ -249,10 +249,11 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
     function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
-        var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
+        var color = ["#8ef0aa","#ffff66"," #66ffff", "#ff5b4d" ];
         var dataArray = [];
         $scope.isDisabled = false;
-        $scope.playlistText = "Save playlist to Spotify"
+        $scope.playlistText = "Save playlist to Spotify";
+        
         
         var ctx = document.getElementById("scoreboardChart").getContext("2d");
         var sChart = new Chart(ctx).Doughnut();
