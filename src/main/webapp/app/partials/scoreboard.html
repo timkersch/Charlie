@@ -45,10 +45,10 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
     <center>
-        <div class="chart">
+        <div flex class="chart">
             <canvas id="scoreboardChart" width="200" height="200"></canvas>
-            <br>
         </div>
+        <br>
         <md-list>
             <md-list-item ng-repeat="person in scoreData">
                 <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}}">person</md-icon>
