@@ -306,6 +306,7 @@ public class WebsocketServer {
 
                     // Create quiz
                     Quiz quiz = new Quiz(name, userSession.getUserIdentity(), players, questions);
+                    db.getQuizCatalogue().removeUserFromQuizes(userSession.getUserIdentity());
                     userSession.setCurrentQuiz(quiz);
                     db.getQuizCatalogue().addQuiz(quiz);
 
@@ -320,10 +321,12 @@ public class WebsocketServer {
                     String name1 = userSession.getCurrentQuiz().getName();
                     List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
                     List<String> trackids = new ArrayList<>(question1.size());
-                    for (Question q : question1) {
+
+	                for (Question q : question1) {
                         trackids.add(q.getTrackId().getId());
                     }
-                    service.createAndPopulatePlaylist(trackids, name1);
+
+	                service.createAndPopulatePlaylist(trackids, name1);
                     break;
                 case "getQuiz":
                     // Send back the resulting quiz

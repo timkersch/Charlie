@@ -29,6 +29,7 @@ public class SpotifyService {
 	public String getAuthorizeURL() {
 		List<String> scopes = new ArrayList<>();
 		scopes.add("playlist-read-private");
+		scopes.add("playlist-read-collaborative");
 		scopes.add("playlist-modify-private");
 		scopes.add("playlist-modify-public");
 		scopes.add("user-read-email");
@@ -141,7 +142,11 @@ public class SpotifyService {
 	 */
 	public void addTracksToPlayList(List<String> tracks, String playlistId) {
 		try {
-			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, tracks).build();
+			List<String> trackUris = new ArrayList<>(tracks.size());
+			for (String track : tracks) {
+				trackUris.add(api.getTrack(track).build().get().getUri());
+			}
+			AddTrackToPlaylistRequest request = api.addTracksToPlaylist(api.getMe().build().get().getId(), playlistId, trackUris).build();
 			request.get();
 		} catch (Exception e) {
 			System.out.println("Something went wrong in addTracksToPlayList!" + e.getMessage());
