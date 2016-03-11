@@ -106,7 +106,7 @@ public class User implements Serializable {
 	    sb.append("email:");
 	    sb.append(this.email);
 	    sb.append("\n");
-	    sb.append("href");
+	    sb.append("href:");
 	    sb.append(this.href);
 	    sb.append("\n");
 	    sb.append("country:");
