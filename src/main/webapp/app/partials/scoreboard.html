@@ -84,7 +84,7 @@
             </md-list-item>
 	</md-list>
 </md-content>
-<div><md-button ng-click="savePlaylist()" class="md-primary md-raised">Save songs to playlist</md-button></div>
+<div><md-button ng-click="savePlaylist()" ng-disabled="isDisabled" class="md-primary md-raised">{{playlistText}}</md-button></div>
 <div class="end">
     <md-button ng-click="changeView('/')" class="md-primary md-raised">GO TO HOME</md-button>
     
