@@ -1,8 +1,6 @@
 package core;
 
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by jcber on 2016-03-04.
@@ -11,12 +9,12 @@ import java.util.logging.Logger;
 public class Quiz {
     private String uuid;
     private String name;
-    private final Map<UserIdentity, Integer> joinedPlayers = new HashMap<>();
-    private final List<UserIdentity> unjoinedPlayers = new ArrayList<>();
-    private final List<Question> questions = new ArrayList<>();
-    private int currentQuestion;
-    private UserIdentity owner;
-    private int ownerPoints;
+
+    private final List<Player> players = new ArrayList<>();
+    private final List<UserIdentity> invitedUsers = new ArrayList<>();
+	private final List<Question> questions = new ArrayList<>();
+
+	private int currentQuestion;
 
     public Quiz(){
         this.uuid = UUID.randomUUID().toString();
@@ -25,42 +23,60 @@ public class Quiz {
     public Quiz(String name, UserIdentity owner, List<UserIdentity> players, List<Question> questions){
         this();
         this.name = name;
-        this.owner = owner;
-        this.unjoinedPlayers.addAll(players);
+	    this.players.add(new Player(owner, true));
+        this.invitedUsers.addAll(players);
         this.questions.addAll(questions);
         this.currentQuestion = -1;
-        this.ownerPoints = 0;
     }
 
     public List<UserIdentity> getUnjoinedPlayers() {
-        return unjoinedPlayers;
+        return invitedUsers;
     }
     
     public List<UserIdentity> getJoinedPlayers() {
-        return new ArrayList<>(joinedPlayers.keySet());
-    }
-    
-    public Map<UserIdentity, Integer> getResults() {
-        Map<UserIdentity, Integer> results = new HashMap<>(joinedPlayers);
-        results.put(owner, ownerPoints);
-        return results;
+	    List<UserIdentity> userIdentities = new ArrayList<UserIdentity>();
+        for (Player p : players) {
+	        userIdentities.add(p.getUserIdentity());
+        }
+	    return userIdentities;
     }
     
     public boolean joinPlayer(UserIdentity user) {
-        if (unjoinedPlayers.remove(user)) {
-            joinedPlayers.putIfAbsent(user, 0);
+        if (invitedUsers.remove(user)) {
+            players.add(new Player(user, false));
             return true;
         }
         return false;
     }
     
     public boolean leavePlayer(UserIdentity user) {
-        return joinedPlayers.remove(user) > 0;
+	    Iterator<Player> it = players.iterator();
+	    while(it.hasNext()) {
+		    if (it.next().getUserIdentity().equals(user)) {
+			    it.remove();
+			    return true;
+		    }
+	    }
+	    return false;
     }
 
     public UserIdentity getOwner() {
-        return owner;
+        for (Player p : players) {
+	        if (p.isOwner()) {
+		        return p.getUserIdentity();
+	        }
+        }
+	    return null;
     }
+
+	public Map<Question, String> getResults(UserIdentity id) {
+		for(Player p : players) {
+			if (p.getUserIdentity().equals(id)) {
+				return p.getAnswers();
+			}
+		}
+		return null;
+	}
 
     public List<Question> getQuestions() {
         return this.questions;
@@ -72,17 +88,12 @@ public class Quiz {
         return questions.get(currentQuestion);
     }
     
-    public boolean answerQuestion(UserIdentity user, String artistName) {
-        if (this.getCurrentQuestion().answer(artistName)) {
-            if (user.equals(owner)){
-                ownerPoints++;
-            } else {
-                int currentPoints = joinedPlayers.getOrDefault(user, 0);
-                joinedPlayers.replace(user, currentPoints+1);
-            }
-            return true;
-        }
-        return false;
+    public void answerQuestion(UserIdentity user, String artistName) {
+	    for (Player p : players) {
+		    if (p.getUserIdentity().equals(user)) {
+			    p.setAnswer(this.getCurrentQuestion(), artistName);
+		    }
+	    }
     }
     
     public Question getNextQuestion(){
