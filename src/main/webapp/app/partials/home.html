@@ -3,6 +3,12 @@
             margin: -1em;
 	}
         
+        #music_video{
+            margin-top: 1em;
+            margin-left: 2em;
+            font-size: 144pt;
+        }
+        
         span {
             margin-left: 7px;
         }
@@ -39,16 +45,12 @@
 	<md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
 		<div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">home</md-icon>Home</span></div>
 	</md-toolbar>
-    <article>
-        <h3>Hi,</h3>
-        <p>
-        Welcome to SpotHoot! This a music quiz based on Spotify. Where you can
-        create a quiz generated from your playlists and invite your friends in 
-        just about a minute. 
-        Say goodbye to hours of searching for the right music for the 
-        right event. Just generate a quiz from your preferences and go!
-        </p>
-        </article>
+    <div flex>
+        <md-icon aria-label="Menu" class="material-icons" id="music_video">music_video</md-icon>
+        <h4>
+        ERIK LÖS DET HÄR! We LOVE Music and hopefully we will guide you through a music adventure!
+        </h4>
+    </div>    
     <div class="end">
         <md-button class="md-accent md-raised" ng-click="changeView('/create')">Start</md-button>
     <div>

@@ -254,6 +254,8 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         console.log("Inside scoreboardController");
         var color = ["#B9F6CA","#FFFF8D","#84FFFF", "#FF8A80" ];
         var dataArray = [];
+        $scope.isDisabled = false;
+        $scope.playlistText = "Save playlist to Spotify"
         
         var ctx = document.getElementById("scoreboardChart").getContext("2d");
         var sChart = new Chart(ctx).Doughnut();
@@ -293,6 +295,9 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         
         $scope.savePlaylist = function(){
             charlieProxy.savePlaylist();
+            $scope.isDisabled = true;
+            $scope.playlistText = "Playlist added";
+            
         }
         
 

@@ -46,11 +46,6 @@ public class UserIdentity extends AbstractEntity{
         return user;
     }
 
-    @Override
-    public String toString(){
-        return "User[" + super.toString() + ", accessToken: " + accessToken + ", refreshToken: " + refreshToken + "]";
-    }
-
     public static UserIdentity createDummyUser(){
         UserIdentity dummy = new UserIdentity();
         dummy.user = new User();
@@ -71,6 +66,11 @@ public class UserIdentity extends AbstractEntity{
         hash = 47 * hash + Objects.hashCode(this.user);
         return hash;
     }
+
+	@Override
+	public String toString() {
+		return user.toString() + "\n" + "accessToken:" + this.accessToken + "\n" + "refreshToken" + this.refreshToken;
+	}
 
     @Override
     public boolean equals(Object obj) {
