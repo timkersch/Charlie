@@ -1,18 +1,15 @@
 package core;
 
-import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonTypeInfo;
-import com.wrapper.spotify.models.Artist;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by: Tim Kerschbaumer

@@ -1,9 +1,9 @@
 package core;
 
+import javax.websocket.Session;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.websocket.Session;
 
 /**
  * Created by jcber on 2016-03-03.
