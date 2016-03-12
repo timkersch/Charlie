@@ -10,10 +10,12 @@ import org.junit.Test;
  * Time: 17:38
  */
 public class QuizCatalogueTest {
+
+	QuizCatalogue q;
 	
 	@Before
 	public void setUp() throws Exception {
-
+		q = new QuizCatalogue();
 	}
 
 	@Test

@@ -161,10 +161,8 @@ public class SpotifyService {
 		try {
 			UserPlaylistsRequest request = api.getPlaylistsForUser(userId).build();
 			Page<SimplePlaylist> pl = request.get();
+			// TODO this limit is not set??
 			pl.setLimit(50);
-			System.out.println("LIST TOTAL: " + pl.getTotal());
-			System.out.println("LIST NOW: " + pl.getItems().size());
-			System.out.println("LIMIT: " + pl.getLimit());
 			return pl.getItems();
 		} catch (Exception e) {
 			System.out.println("Something went wrong in getUsersPlaylists!" + e.getMessage());
@@ -305,18 +303,20 @@ public class SpotifyService {
 	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks, String countryCode) {
 		List<Track> chosenTracks = new ArrayList<>(noTracks);
 		for(int i = 0; i < noTracks; i++) {
-			int randTrack = randomInt(0, tracks.size()-1);
+			int randTrack = randomInt(0, tracks.size() - 1);
 			int rand = randomInt(0, 1);
 			Track t = tracks.get(randTrack);
 			if (rand == 0) {
 				try {
 					List<Artist> relart = api.getArtistRelatedArtists(t.getArtists().get(0).getId()).build().get();
-					Track track;
+					Track track = null;
 					do {
-						Artist a = relart.get(randomInt(0,relart.size()-1));
-						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), countryCode).build().get();
-						track = popularTracks.get(randomInt(0, popularTracks.size()-1));
-					} while(chosenTracks.contains(track) && track.getPreviewUrl().equals("null"));
+						if (!relart.isEmpty()){
+							Artist a = relart.get(randomInt(0, relart.size() - 1));
+							List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), countryCode).build().get();
+							track = popularTracks.get(randomInt(0, popularTracks.size() - 1));
+						}
+					} while(relart.isEmpty() || chosenTracks.contains(track) || track.getPreviewUrl().equals("null"));
 					chosenTracks.add(track);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -331,7 +331,7 @@ public class SpotifyService {
 						do {
 							SimpleTrack st = strack.get(randomInt(0, strack.size()-1));
 							tt = api.getTrack(st.getId()).build().get();
-						} while(chosenTracks.contains(tt) && tt.getPreviewUrl().equals("null"));
+						} while(chosenTracks.contains(tt) || tt.getPreviewUrl().equals("null"));
 						chosenTracks.add(tt);
 					} catch (Exception e) {
 						e.printStackTrace();
