@@ -137,10 +137,12 @@ public class SpotifyService {
 	public List<SimplePlaylist> getUsersPlaylists(String userId) {
 		try {
 			UserPlaylistsRequest request = api.getPlaylistsForUser(userId).build();
-			Page<SimplePlaylist> playlistsPage = request.get();
-
-			return playlistsPage.getItems();
-
+			Page<SimplePlaylist> pl = request.get();
+			pl.setLimit(50);
+			System.out.println("LIST TOTAL: " + pl.getTotal());
+			System.out.println("LIST NOW: " + pl.getItems().size());
+			System.out.println("LIMIT: " + pl.getLimit());
+			return pl.getItems();
 		} catch (Exception e) {
 			System.out.println("Something went wrong in getUsersPlaylists!" + e.getMessage());
 			return null;
@@ -274,9 +276,10 @@ public class SpotifyService {
 	 * Method that returns a list of similar tracks based on the tracks specified
 	 * @param tracks the tracks to find similar tracks from
 	 * @param noTracks how many tracks to return
+	 * @param countryCode the country to look for popular tracks in
 	 * @return a list of tracks similar to the tracks given as parameter.
 	 */
-	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
+	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks, String countryCode) {
 		List<Track> chosenTracks = new ArrayList<>(noTracks);
 		for(int i = 0; i < noTracks; i++) {
 			int randTrack = randomInt(0, tracks.size()-1);
@@ -288,7 +291,7 @@ public class SpotifyService {
 					Track track;
 					do {
 						Artist a = relart.get(randomInt(0,relart.size()-1));
-						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), api.getMe().build().get().getCountry()).build().get();
+						List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), countryCode).build().get();
 						track = popularTracks.get(randomInt(0, popularTracks.size()-1));
 					} while(chosenTracks.contains(track) && track.getPreviewUrl().equals("null"));
 					chosenTracks.add(track);
@@ -319,6 +322,21 @@ public class SpotifyService {
 	}
 
 	/**
+	 * Method that returns a list of similar tracks based on the tracks specified
+	 * @param tracks the tracks to find similar tracks from
+	 * @param noTracks how many tracks to return
+	 * @return a list of tracks similar to the tracks given as parameter.
+	 */
+	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks) {
+		try {
+			return getSimilarTracks(tracks, noTracks, api.getMe().build().get().getCountry());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
 	 * Returns the primary artist of a track
 	 * @param trackId the track
 	 * @return a SimpleArtist
@@ -338,7 +356,7 @@ public class SpotifyService {
 	 * @param max the maximum number in the range (inclusive)
 	 * @return a ranom integer
 	 */
-	private int randomInt(int min, int max) {
+	protected int randomInt(int min, int max) {
 		Random random = new Random();
 		return random.nextInt(max - min + 1) + min;
 	}
