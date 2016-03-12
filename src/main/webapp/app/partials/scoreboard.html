@@ -11,32 +11,9 @@
     #player4{
         color: #B48EAD;
     }
-
-    span {
-        margin-left: 7px;
-    }
-
-    span md-icon {
-        margin-top: -0.12em;
-        margin-right: 0.5em;
-    }
     
     div .chart {
         margin: 1.5em 0 1.2em 0;
-    }
-    
-    div .end {
-        width: 100%;
-        position: fixed;
-        bottom: 0px;
-    }
-
-    div .end .md-button {
-        min-width: 100%;
-        min-height: 4em;
-        padding: 0;
-        margin: 0;
-        background: #1A237E !important;
     }
 </style>
 
@@ -45,12 +22,11 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
     <center>
-        <div flex class="chart">
-            <canvas id="scoreboardChart" width="200" height="200"></canvas>
-        </div>
+        <!--<canvas id="scoreboardChart" width="400" height="400"></canvas>-->
+        <canvas id="doughnut" class="chart chart-doughnut" chart-data="chart.values" chart-labels="chart.labels" chart-colours="chart.colors"></canvas> 
         <br>
         <md-list>
-            <md-list-item ng-repeat="person in scoreData">
+            <md-list-item ng-repeat="person in scores">
                 <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}}">person</md-icon>
                 <p style="font-weight: 900; color:{{person.color}}">{{person.userName}}</p>
                 <p>{{person.value}} {{person.value == 1 ? "point" : "points"}}</p>

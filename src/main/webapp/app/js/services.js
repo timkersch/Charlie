@@ -182,7 +182,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             isQuizOwner: function() {
-                return currentQuiz.owner.user.name === user.name;
+                return currentQuiz.owner.name === user.name;
             },
             
             // callback(started)

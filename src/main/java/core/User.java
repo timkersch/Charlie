@@ -26,7 +26,7 @@ public class User implements Serializable {
         this();
         this.displayName = spotifyUser.getDisplayName();
         this.email = spotifyUser.getEmail();
-        this.href = spotifyUser.getHref();
+        this.href = spotifyUser.getExternalUrls().get("spotify");
         this.name = spotifyUser.getId();
         this.country = spotifyUser.getCountry();
         this.uri = spotifyUser.getUri();

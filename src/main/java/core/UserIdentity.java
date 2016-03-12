@@ -2,6 +2,7 @@ package core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import persistence.AbstractEntity;
 
 import javax.persistence.Column;
@@ -20,6 +21,8 @@ public class UserIdentity extends AbstractEntity{
     @Column(length=512)
     private String refreshToken;
 
+    private static final Gson GSON = new Gson();
+    
     public UserIdentity() {
         super();
     }
@@ -54,11 +57,10 @@ public class UserIdentity extends AbstractEntity{
         return dummy;
     }
     
-    public JsonElement toJsonElement(){
-        Gson gson = new Gson();
-        JsonElement element = gson.toJsonTree(this.getUser());
-        element.getAsJsonObject().addProperty("id", this.getId());;
-        return element;
+    public JsonObject toJson(){
+        JsonObject obj = GSON.toJsonTree(this.getUser()).getAsJsonObject();
+        obj.addProperty("id", this.getId());;
+        return obj;
     }
 
     @Override
@@ -68,10 +70,10 @@ public class UserIdentity extends AbstractEntity{
         return hash;
     }
 
-	@Override
-	public String toString() {
-		return user.toString() + "\n" + "accessToken:" + this.accessToken + "\n" + "refreshToken" + this.refreshToken;
-	}
+    @Override
+    public String toString() {
+        return user.toString() + "\n" + "accessToken:" + this.accessToken + "\n" + "refreshToken" + this.refreshToken;
+    }
 
     @Override
     public boolean equals(Object obj) {
