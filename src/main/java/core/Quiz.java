@@ -1,5 +1,6 @@
 package core;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -47,7 +48,7 @@ public class Quiz {
      * @return a list of UserIdentity
      */
     public List<UserIdentity> getJoinedPlayers() {
-        List<UserIdentity> userIdentities = new ArrayList<UserIdentity>();
+        List<UserIdentity> userIdentities = new ArrayList<>();
         for (Player p : players) {
             userIdentities.add(p.getUserIdentity());
         }
@@ -220,12 +221,16 @@ public class Quiz {
         return name;
     }
     
-    public JsonElement toJsonElement(){
+    public JsonElement toJson(){
         JsonObject obj = new JsonObject();
         obj.addProperty("name", name);
         obj.addProperty("uuid", uuid);
         obj.addProperty("currentQuestion", currentQuestion);
         obj.add("owner", getOwner().toJson());
+        JsonArray array = new JsonArray();
+        for (Question q : questions)
+            array.add(q.toJson());
+        obj.add("questions", array);
         return obj;
     }
 

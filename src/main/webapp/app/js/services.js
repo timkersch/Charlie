@@ -171,7 +171,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             // callback(isCorrect)
             answerQuestion: function(artistName, callback){
                 var data = {
-                    artistName: artistName,
+                    artistName: artistName
                 };
                 invoke('answerQuestion', data).then(callback);
             },
@@ -233,11 +233,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             },
             
             /* action: 
-             *      userJoined      --> callback(newUser)
-             *      invitedTo       --> callback(quiz)
-             *      newQuestion     --> callback(question)
-             *      gameOver        --> callback(players)
-             *      quizStart       --> callback()
+             *      userJoined          --> callback(newUser)
+             *      invitedTo           --> callback(quiz)
+             *      newQuestion         --> callback(question)
+             *      gameOver            --> callback(players)
+             *      quizStart           --> callback()
+             *      userPointsUpdate   --> callback(user)
              */
             listenTo: function(action, callback){
                 console.log("listenTo(" + action + ")");

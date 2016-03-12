@@ -34,7 +34,7 @@ public class WebsocketServer {
 
     private final SpotifyService service = new SpotifyService();
 
-    private static final Gson GSON = new Gson();
+    public static final Gson GSON = new Gson();
     private static final Logger LOGGER = Logger.getLogger(WebsocketServer.class.getName());
 
     @OnOpen
@@ -164,7 +164,17 @@ public class WebsocketServer {
         List<SimplePlaylist> lists = service.getUsersPlaylists();
 
         // Send them back as json
-        String playlists = GSON.toJson(lists);
+        JsonArray array = new JsonArray();
+        for (SimplePlaylist playlist : lists) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("id", playlist.getId());
+            obj.addProperty("name", playlist.getName());
+            obj.addProperty("owner", playlist.getOwner().getId());
+            obj.addProperty("url", playlist.getExternalUrls().get("spotify"));
+            obj.addProperty("nbrOfTracks", playlist.getTracks().getTotal());
+            array.add(obj);
+        }
+        String playlists = GSON.toJson(array);
         String response = createResponse(requestId, action, playlists);
         System.out.println("Playlists: " + playlists);
         userSession.send(response);
@@ -172,12 +182,14 @@ public class WebsocketServer {
     
     private void getCurrentQuestion(int requestId, String action, JsonObject data, UserSession userSession) {
         Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
+        Player player = userSession.getCurrentQuiz().getPlayer(userSession.getUserIdentity());
         // Send them back as json
         String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
-        JsonElement artistsJson = GSON.toJsonTree(currentQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
+        JsonElement artistsJson = GSON.toJsonTree(currentQuestion.getArtists());
         JsonObject object = new JsonObject();
         object.addProperty("track_url", trackUrl);
         object.add("artists", artistsJson);
+        object.addProperty("answered", player.hasAnswered(currentQuestion));
         String objAsString = object.toString();
 
         String response = createResponse(requestId, action, objAsString);
@@ -250,7 +262,7 @@ public class WebsocketServer {
         // Send back the resulting quiz
         String quizAsJson = "";
         if (session.getCurrentQuiz() != null)
-            quizAsJson = GSON.toJson(session.getCurrentQuiz().toJsonElement());
+            quizAsJson = GSON.toJson(session.getCurrentQuiz().toJson());
 
         String response = createResponse(requestId, action, quizAsJson);
         session.send(response);
@@ -308,7 +320,7 @@ public class WebsocketServer {
         db.getQuizCatalogue().addQuiz(quiz);
 
         // Send back the resulting quiz
-        String jsonQuiz = GSON.toJson(quiz.toJsonElement());
+        String jsonQuiz = GSON.toJson(quiz.toJson());
         String response = createResponse(requestId, action, jsonQuiz);
         session.send(response);
         sessionHandler.sendToSessions(players, "invitedTo", jsonQuiz);
@@ -349,7 +361,7 @@ public class WebsocketServer {
 
             String arrayString = GSON.toJson(array);
 
-            sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
+            sessionHandler.sendToQuizMembers(over, "gameOver", arrayString);
             log("GameOver: " + arrayString);
 
             String response = createResponse(requestId, action, "");
@@ -385,23 +397,24 @@ public class WebsocketServer {
         if (quizToJoin != null) {
             session.setCurrentQuiz(quizToJoin);
             quizToJoin.joinPlayer(session.getUserIdentity());
-            sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", session.getUserIdentity().toJson().toString());
+            sessionHandler.sendToQuizMembers(quizToJoin, "userJoined", session.getUserIdentity().toJson().toString());
             joinSuccess = true;
         }
 
         String response = createResponse(requestId, action, joinSuccess);
-        System.out.println("Response: " + response);
+        log("Response: " + response);
         session.send(response);
     }
     
     private void answerQuestion(int requestId, String action, JsonObject data, UserSession userSession) {
-        String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
-        System.out.println("Answer: " + artist);
+        Quiz quiz = userSession.getCurrentQuiz();
+        String artist = data.getAsJsonPrimitive("artistName").getAsString();
         boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
-        log("After answer: " + userSession.getCurrentQuiz().getUserResults(userSession.getUserIdentity()));
 
         String response = createResponse(requestId, action, right);
-        System.out.println("Response: " + response);
+        String player = GSON.toJson(quiz.getPlayer(userSession.getUserIdentity()).toJson());
+        sessionHandler.sendToQuizMembers(quiz, "userPointsUpdate", player);
+        log("Response: " + response);
         userSession.send(response);
     }
 

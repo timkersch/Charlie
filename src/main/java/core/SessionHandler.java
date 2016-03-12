@@ -81,12 +81,11 @@ public class SessionHandler {
         }
     }
     
-    public void sendToQuizMemebrs(Quiz quiz, String action, String data){
+    public void sendToQuizMembers(Quiz quiz, String action, String data){
         JsonObject response = createJson(action, data);
         for (UserIdentity user: quiz.getJoinedPlayers()){
             this.sendToSession(this.getUserSessionById(user.getId()), response);
         }
-        this.sendToSession(this.getUserSessionById(quiz.getOwner().getId()), response);
     }
     
     public void sendToUser(UserIdentity user, String action, String data) {

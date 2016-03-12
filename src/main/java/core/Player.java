@@ -34,10 +34,12 @@ public class Player {
      * @return true if the answer was correct, otherwise false
      */
     public boolean setAnswer(Question q, String answer) {
-        answers.put(q, answer);
-        if (q.getArtistsIds().getOrDefault(answer, false)) {
-            score++;
-            return true;
+        if (!hasAnswered(q)) {
+            answers.put(q, answer);
+            if (q.getArtistsIds().getOrDefault(answer, false)) {
+                score++;
+                return true;
+            }
         }
         return false;
     }
@@ -70,6 +72,15 @@ public class Player {
     public boolean getAnswerCorrect(Question q) {
         String answer = this.answers.get(q);
         return q.getArtistsIds().get(answer);
+    }
+    
+    /**
+     * Returns whether or not the question has been answered by this player
+     * @param q the question
+     * @return a boolean
+     */
+    public boolean hasAnswered(Question q) {
+        return this.answers.containsKey(q);
     }
 
     /**

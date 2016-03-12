@@ -1,17 +1,4 @@
 <style>
-    #player1{
-        color: #F7464A;
-    }
-    #player2{
-        color: #46BFBD;
-    }
-    #player3{
-        color: #FDB45C;
-    }
-    #player4{
-        color: #B48EAD;
-    }
-    
     div .chart {
         margin: 1.5em 0 1.2em 0;
     }
@@ -22,16 +9,16 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
     <center>
-        <!--<canvas id="scoreboardChart" width="400" height="400"></canvas>-->
         <canvas id="doughnut" class="chart chart-doughnut" chart-data="chart.values" chart-labels="chart.labels" chart-colours="chart.colors"></canvas> 
         <br>
         <md-list>
-            <md-list-item ng-repeat="person in scores">
+            <md-list-item ng-repeat="person in scores | orderBy:'-value'">
                 <md-icon aria-label="Menu" class="material-icons" style="color:{{person.color}}">person</md-icon>
                 <p style="font-weight: 900; color:{{person.color}}">{{person.userName}}</p>
                 <p>{{person.value}} {{person.value == 1 ? "point" : "points"}}</p>
             </md-list-item>
         </md-list>
+        <br><br>
         <md-button ng-click="savePlaylist()" ng-disabled="isDisabled" class="md-primary md-raised">{{playlistText}}</md-button>
     </center>
     <div class="end">

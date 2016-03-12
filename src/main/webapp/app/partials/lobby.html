@@ -30,7 +30,7 @@
             {{user.name}}
         </md-list-item>
     </md-list>
-    <div class="end">
+    <div class="end" ng-show="isOwner">
         <md-button class="md-primary md-raised" ng-click="startQuiz()">START QUIZ</md-button>
     </div>
 </md-content>
