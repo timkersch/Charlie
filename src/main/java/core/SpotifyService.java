@@ -131,18 +131,31 @@ public class SpotifyService {
 	}
 
 	/**
-	 * Method that gathers and returns all playlists of the logged in user.
+	 * Method that gathers and returns all playlists of a specified user
 	 * @return a list of SimplePlaylist
 	 */
-	public List<SimplePlaylist> getUsersPlaylists() {
+	public List<SimplePlaylist> getUsersPlaylists(String userId) {
 		try {
-			UserPlaylistsRequest request = api.getPlaylistsForUser(api.getMe().build().get().getId()).build();
+			UserPlaylistsRequest request = api.getPlaylistsForUser(userId).build();
 			Page<SimplePlaylist> playlistsPage = request.get();
 
 			return playlistsPage.getItems();
 
 		} catch (Exception e) {
 			System.out.println("Something went wrong in getUsersPlaylists!" + e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * Method that gathers and returns all playlists of the logged in user.
+	 * @return a list of SimplePlaylist
+	 */
+	public List<SimplePlaylist> getUsersPlaylists() {
+		try {
+			return getUsersPlaylists(api.getMe().build().get().getId());
+		} catch (Exception e) {
+			System.out.println("Something went wring in getUsersPlaylists!" + e.getMessage());
 			return null;
 		}
 	}
@@ -303,6 +316,20 @@ public class SpotifyService {
 			}
 		}
 		return chosenTracks;
+	}
+
+	/**
+	 * Returns the primary artist of a track
+	 * @param trackId the track
+	 * @return a SimpleArtist
+	 */
+	public SimpleArtist getTracksArtist(String trackId) {
+		try {
+			return api.getTrack(trackId).build().get().getArtists().get(0);
+		} catch (Exception e) {
+			System.out.println("Something went wrong in getTracksArtist" + e);
+			return null;
+		}
 	}
 
 	/**

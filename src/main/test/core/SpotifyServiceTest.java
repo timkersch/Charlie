@@ -1,11 +1,15 @@
 package core;
 
+import com.wrapper.spotify.models.Artist;
+import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -17,9 +21,10 @@ import static org.junit.Assert.*;
  */
 public class SpotifyServiceTest {
 	SpotifyService s = new SpotifyService();
-	String playlistId = "7uqylp6NzurXY8TeLuJAwp";
+	String user = "tiimiz";
 	String[] songs = {"57ay2J7PoNPKUGIncs3lHi", "4ycUbcT3euZ3ICarb23fQF", "0SVZV4iQ9Qi5mEpijs63v1",
 			"0VwMJ5cpmKirULOuW321Zc", "1eq1wUnLVLg4pdEfx9kajC"};
+	String[] playlists = {"7uqylp6NzurXY8TeLuJAwp", "4lgfWQz3pRy2oMVyKslxop", "4oYskMonMrG2veyspteerz"};
 
 	@Before
 	public void setUp() throws Exception {
@@ -27,48 +32,36 @@ public class SpotifyServiceTest {
 	}
 
 	@Test
-	public void testGetUser() throws Exception {
-
-	}
-
-	@Test
 	public void testGetUsersPlaylists() throws Exception {
-		s.getUsersPlaylists();
-		System.out.println("gotit");
+		List<SimplePlaylist> sp = s.getUsersPlaylists(user);
+		assertTrue(sp.size() == playlists.length);
+		for (int i = 0; i < sp.size(); i++) {
+			assertTrue(sp.get(i).getId().equals(playlists[i]));
+		}
 	}
 
 	@Test
 	public void testGetPlaylistSongs() throws Exception {
-		List<Track> t = s.getPlaylistSongs(playlistId, "tiimiz");
-		assertTrue(t.size() == 5);
+		List<Track> t = s.getPlaylistSongs(playlists[0], user);
+		assertTrue(t.size() == songs.length);
 		for (int i = 0; i < t.size(); i++) {
 			assertTrue(t.get(i).getId().equals(songs[i]));
 		}
 	}
 
 	@Test
-	public void testAddTracksToPlayList() throws Exception {
-
-	}
-
-	@Test
-	public void testCreateAndPopulatePlaylist() throws Exception {
-
-	}
-
-	@Test
-	public void testCreatePlaylist() throws Exception {
-
-	}
-
-	@Test
 	public void testGetArtistOptions() throws Exception {
-
-	}
-
-	@Test
-	public void testGetArtistOptions1() throws Exception {
-
+		for (int i = 0; i < songs.length; i++) {
+			Hashtable<String, Boolean> artists = s.getArtistOptions(songs[i]);
+			String[] arts = artists.keySet().toArray(new String[artists.keySet().size()]);
+			for (int j = 0; j < arts.length; j++) {
+				if(arts[j].equals(s.getTracksArtist(songs[i]).getName())) {
+					assertTrue(artists.get(arts[j]));
+				} else {
+					assertTrue(!artists.get(arts[j]));
+				}
+			}
+		}
 	}
 
 	@Test
@@ -78,11 +71,6 @@ public class SpotifyServiceTest {
 
 	@Test
 	public void testGetTrackUrl() throws Exception {
-
-	}
-
-	@Test
-	public void testGetTrackUrl1() throws Exception {
 
 	}
 }
