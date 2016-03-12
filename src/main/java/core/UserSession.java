@@ -7,6 +7,9 @@ import java.util.logging.Logger;
 
 /**
  * Created by jcber on 2016-03-03.
+ * A UserSession is to represent the connection between a user and its
+ * session. The session is used to communicate with the client the user is
+ * using. 
  */
 public class UserSession {
     private UserIdentity user;

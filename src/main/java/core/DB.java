@@ -6,18 +6,18 @@ import javax.inject.Named;
 
 /**
  * Created by jcber on 2016-03-07.
+ * This class gives access to the classes saved in the database and
+ * in-memory saved data.
  */
 
 @Named
 @ApplicationScoped
 public class DB {
 
-    //@EJB
-    //private TestCatalogue testCatalogue;
     @EJB
     private UserCatalogue userCatalogue;
     
-    private static QuizCatalogue quizCatalogue = new QuizCatalogue();
+    private static final QuizCatalogue quizCatalogue = new QuizCatalogue();
 
     public UserCatalogue getUserCatalogue() {
         return userCatalogue;
@@ -26,9 +26,5 @@ public class DB {
     public QuizCatalogue getQuizCatalogue() {
         return quizCatalogue;
     }
-
-    /*public TestCatalogue getTestCatalogue() {
-        return testCatalogue;
-    }*/
 
 }

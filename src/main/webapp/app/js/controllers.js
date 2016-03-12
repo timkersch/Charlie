@@ -165,8 +165,10 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         
         var nextQuestion = function(){
             charlieProxy.nextQuestion(function(data){
-                play(data.track_url);
-                $scope.possibleArtists = data.artists;
+                if (data.track_url) {
+                    play(data.track_url);
+                    $scope.possibleArtists = data.artists;
+                }
             });  
         };
         
@@ -174,7 +176,8 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             if (!charlieProxy.isQuizOwner()){
                 charlieProxy.getCurrentQuestion(function(data){
                     //play(data.track_url);
-                    $scope.possibleArtists = data.artists;
+                    if (data.artists)
+                        $scope.possibleArtists = data.artists;
                 });
             }else{
                 nextQuestion();

@@ -30,7 +30,7 @@ public class User implements Serializable {
         this.name = spotifyUser.getId();
         this.country = spotifyUser.getCountry();
         this.uri = spotifyUser.getUri();
-        if(spotifyUser.getImages().size() != 0) {
+        if(!spotifyUser.getImages().isEmpty()) {
             this.imgUrl = spotifyUser.getImages().get(0).getUrl();
         } else {
             this.imgUrl = "";
@@ -89,35 +89,35 @@ public class User implements Serializable {
         return uri;
     }
 
-	public String getImgUrl() {
-		return imgUrl;
-	}
+    public String getImgUrl() {
+            return imgUrl;
+    }
 
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-	    sb.append("displayname:");
-	    sb.append(this.displayName);
-	    sb.append("\n");
-	    sb.append("name:");
-	    sb.append(this.name);
-	    sb.append("\n");
-	    sb.append("email:");
-	    sb.append(this.email);
-	    sb.append("\n");
-	    sb.append("href:");
-	    sb.append(this.href);
-	    sb.append("\n");
-	    sb.append("country:");
-	    sb.append(this.country);
-	    sb.append("\n");
-	    sb.append("uri:");
-	    sb.append(this.uri);
-	    sb.append("\n");
-	    sb.append("imgUrl:");
-	    sb.append(this.imgUrl);
-	    sb.append("\n");
-	    return sb.toString();
+        sb.append("displayname:");
+        sb.append(this.displayName);
+        sb.append("\n");
+        sb.append("name:");
+        sb.append(this.name);
+        sb.append("\n");
+        sb.append("email:");
+        sb.append(this.email);
+        sb.append("\n");
+        sb.append("href:");
+        sb.append(this.href);
+        sb.append("\n");
+        sb.append("country:");
+        sb.append(this.country);
+        sb.append("\n");
+        sb.append("uri:");
+        sb.append(this.uri);
+        sb.append("\n");
+        sb.append("imgUrl:");
+        sb.append(this.imgUrl);
+        sb.append("\n");
+        return sb.toString();
     }
 
     @Override

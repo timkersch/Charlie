@@ -36,6 +36,10 @@ public class UserIdentity extends AbstractEntity{
     public void setAccessToken(String token) {
         this.accessToken = token;
     }
+    
+    public void setRefreshToken(String token) {
+        this.refreshToken = token;
+    }
 
     public String getRefreshToken() {
         return refreshToken;
@@ -49,6 +53,10 @@ public class UserIdentity extends AbstractEntity{
         return user;
     }
 
+    /**
+     * Create a dummy user to be used as a placeholder.
+     * @return the user
+     */
     public static UserIdentity createDummyUser(){
         UserIdentity dummy = new UserIdentity();
         dummy.user = new User();

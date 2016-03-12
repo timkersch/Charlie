@@ -1,4 +1,3 @@
-
 package persistence;
 
 import java.io.Serializable;
@@ -6,15 +5,6 @@ import javax.persistence.*;
 
 /**
  * Base class for all entities, defines id, equal etc
- *   
- * The below implementations can be disputed
- * - Using surrogate or natural keys?
- * - No id before saved to database, problems with equals (storing in Sets)
- * - See https://community.jboss.org/wiki/EqualsAndHashCode
- * 
-                  *** Nothing to do here ***
-
- * @author hajo
  */
 
 @MappedSuperclass
@@ -25,9 +15,7 @@ public abstract class AbstractEntity implements Serializable {
     @GeneratedValue(strategy  = GenerationType.AUTO)
     private Long id;
 
-    public AbstractEntity() {
-        //this.id = UUID.randomUUID().toString();
-    }
+    public AbstractEntity() { }
 
     public Long getId(){
         return id;
