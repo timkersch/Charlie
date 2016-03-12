@@ -34,6 +34,10 @@ public class SpotifyService {
 			.redirectURI(SpotifyCredentials.redirectURI)
 			.build();
 
+	/**
+	 * This method is only used for initialization when testing
+	 * DO NOT CALL THIS METHOD
+	 */
 	public void initTests() {
 		final ClientCredentialsGrantRequest reqTest = api.clientCredentialsGrant().build();
 		final SettableFuture<ClientCredentials> responseFuture = reqTest.getAsync();
@@ -61,6 +65,10 @@ public class SpotifyService {
 	}
 
 
+	/**
+	 * Returns an autorization URL needed to send to the user
+	 * @return a String that is the URL
+	 */
 	public String getAuthorizeURL() {
 		List<String> scopes = new ArrayList<>();
 		scopes.add("playlist-read-private");
@@ -75,6 +83,11 @@ public class SpotifyService {
 		return api.createAuthorizeURL(scopes, state);
 	}
 
+	/**
+	 * Returns a UserIdentity from a autorization code provided by the user
+	 * @param code the code that is recived from the autorization URL
+	 * @return a UserIdentity that is the signed-in user
+	 */
 	public UserIdentity getUser(String code) {
 		try {
 			System.out.println("Getting user");
@@ -115,6 +128,11 @@ public class SpotifyService {
 		return UserIdentity.createDummyUser();
 	}
 
+	/**
+	 * Returns and a new acesstoken from the refreshToken
+	 * @param refreshToken the refreshtoken needed to get a new accesstoken
+	 * @return a new accesstoken
+	 */
 	public String refreshAccessToken(String refreshToken){
 		try {
 			api.setRefreshToken(refreshToken);
@@ -125,6 +143,11 @@ public class SpotifyService {
 		return null;
 	}
 
+	/**
+	 * Method to set acess and refresh tokens
+	 * @param access the acesstoken
+	 * @param refresh the refreshtoken
+	 */
 	public void setTokens(String access, String refresh){
 		api.setRefreshToken(refresh);
 		api.setAccessToken(access);
