@@ -1,4 +1,4 @@
-package core;
+package web;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
+import core.*;
 import java.lang.reflect.Method;
 
 import javax.inject.Inject;
@@ -113,9 +114,13 @@ public class WebsocketServer {
 
         // Check if user already exists
         UserIdentity current = db.getUserCatalogue().getByName(user.getUser().getName());
-        if (current != null) //Already exists
+        if (current != null) {
+            // Already exists
+            current.setAccessToken(user.getAccessToken());
+            current.setRefreshToken(user.getRefreshToken());
+            db.getUserCatalogue().update(current);
             user = current;
-        else // New user 
+        } else // New user 
             db.getUserCatalogue().create(user);
         
         userSession.setUserIdentity(user);

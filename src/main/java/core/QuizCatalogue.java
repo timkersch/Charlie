@@ -5,11 +5,13 @@ import java.util.List;
 
 /**
  * Created by jcber on 2016-03-07.
+ * This will be a in-memory storage for quizes. 
+ * At this point quizes do not need to be stored in a database.
  */
 
 public class QuizCatalogue {
 
-    private List<Quiz> quizes = new ArrayList<>();
+    private final List<Quiz> quizes = new ArrayList<>();
     
     public void addQuiz(Quiz quiz){
         quizes.add(quiz);

@@ -1,6 +1,5 @@
 package persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -37,11 +36,6 @@ public abstract class AbstractDAO<T, K> implements IDAO<T, K> {
         getEntityManager().remove(t);
     }
 
-    /**
-     * Using out parameter
-     *
-     * @param t
-     */
     @Override
     public void update(T t) {
         getEntityManager().merge(t);
@@ -54,31 +48,13 @@ public abstract class AbstractDAO<T, K> implements IDAO<T, K> {
 
     @Override
     public List<T> findAll() {
-        return get(true, -1, -1);
-    }
-
-    @Override
-    public List<T> findRange(int first, int n) {
-        return get(false, first, n);
-    }
-
-    //@SuppressWarnings("")
-    private List<T> get(boolean all, int first, int n) {
-        EntityManager em = getEntityManager();
-        List<T> found = new ArrayList<>();
-        TypedQuery<T> q = em.createQuery("select t from " + clazz.getSimpleName() + " t", clazz);
-        if (!all) {
-            q.setFirstResult(first);
-            q.setMaxResults(n);
-        }
-        found.addAll(q.getResultList());
-        return found;
+        TypedQuery<T> q = getEntityManager().createQuery("select t from " + clazz.getSimpleName() + " t", clazz);
+        return q.getResultList();
     }
 
     @Override
     public int count() {
-        EntityManager em = getEntityManager();
-        Long n = em.createQuery("select count(t) from " + clazz.getSimpleName() + " t", Long.class).getSingleResult();
+        Long n = getEntityManager().createQuery("select count(t) from " + clazz.getSimpleName() + " t", Long.class).getSingleResult();
         return n.intValue();
     }
 
