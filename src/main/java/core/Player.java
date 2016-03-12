@@ -34,7 +34,7 @@ public class Player {
      */
     public boolean setAnswer(Question q, String answer) {
         answers.put(q, answer);
-        if (q.getArtistsIds().get(answer)) {
+        if (q.getArtistsIds().getOrDefault(answer, false)) {
             score++;
             return true;
         }

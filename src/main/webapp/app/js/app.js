@@ -1,6 +1,6 @@
 'use strict';
 
-	var charlieApp = angular.module('charlieApp', [
+	var charlieApp = angular.module("charlieApp", [
             'ngRoute',
             'ngMaterial',
             'ngMessages',
