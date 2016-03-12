@@ -351,6 +351,33 @@ public class SpotifyService {
 	}
 
 	/**
+	 * Method that returns a track form a trackId
+	 * @param trackId the trackid
+	 * @return a Track
+	 */
+	public Track getTrack(String trackId) {
+		try {
+			return api.getTrack(trackId).build().get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Method that returns a list of tracks from a collection of trackIds
+	 * @param trackIds the trackis
+	 * @return a List of tracks
+	 */
+	public List<Track> getTracks(String... trackIds) {
+		List<Track> tracks = new ArrayList<>();
+		for (String s : trackIds) {
+			tracks.add(getTrack(s));
+		}
+		return tracks;
+	}
+
+	/**
 	 * Helper method that generates a random number within a range
 	 * @param min the minimum number in the range (inclusive)
 	 * @param max the maximum number in the range (inclusive)

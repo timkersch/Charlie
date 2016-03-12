@@ -15,7 +15,7 @@ import java.util.*;
 public class Question {
 	private Track track;
 	private final Map<String, Boolean> artistNames = new HashMap<>();
-	private static final JsonProvider PROVIDER = JsonProvider.provider();
+	//private static final JsonProvider PROVIDER = JsonProvider.provider();
 
 	public Question() {
 		super();
