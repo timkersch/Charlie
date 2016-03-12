@@ -3,6 +3,7 @@
 var charlieController = angular.module('charlieController', [
     'ngRoute',
     'charlieService',
+    'chart.js',
     'ngMaterial'
 ]);
 
@@ -243,36 +244,40 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         
         $scope.$on('$destroy', function() {
             $interval.cancel(intervalPromise);
+            // Stop previous
+            audioElement.pause();
+            audioElement.currentTime = 0;
         });
     }]);
 
 charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
     function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
-        var color = ["#8ef0aa","#ffff66"," #66ffff", "#ff5b4d" ];
-        var dataArray = [];
+        $scope.scores = [];
+        $scope.chart = {
+            values: [],
+            labels: [],
+            colors: ["#8ef0aa","#ffff66"," #66ffff", "#ff5b4d"]
+        };
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
         
-        
-        var ctx = document.getElementById("scoreboardChart").getContext("2d");
-        var sChart = new Chart(ctx).Doughnut();
-        
         var init = function(){
             charlieProxy.getResults(function(users){
-                for(var i = 0; i < users.length; i++){
-                    var data = {
-                        value : users[i].points,
-                        userName: users[i].name,
-                        color: color[i]
-                    };
-                    dataArray.push(data);
+                if (users) {
+                    $scope.scores = [];
+                    $scope.chart.values = [];
+                    $scope.chart.labels = [];
+                    for(var i = 0; i < users.length; i++){
+                        $scope.scores.push({
+                            value : users[i].points,
+                            userName: users[i].name,
+                            color: $scope.chart.colors[i % 4]
+                        });
+                        $scope.chart.values.push(users[i].points);
+                        $scope.chart.labels.push(users[i].name);
+                    }
                 }
-                $scope.scoreData = dataArray;
-
-                for(var i = 0; i < $scope.scoreData.length; i++){
-                    sChart.addData($scope.scoreData[i]);
-                };
             });
         };
 
@@ -293,7 +298,7 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
             charlieProxy.savePlaylist();
             $scope.isDisabled = true;
             $scope.playlistText = "Playlist added";
-        }
+        };
         
     }]);
 

@@ -1,5 +1,8 @@
 package core;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.websocket.Session;
 
 /**
@@ -33,5 +36,13 @@ public class UserSession {
     
     public void setCurrentQuiz(Quiz quiz){
         this.currentQuiz = quiz;
+    }
+    
+    public void send(String text) {
+        try {
+            this.session.getBasicRemote().sendText(text);
+        } catch (IOException ex) {
+            Logger.getLogger(UserSession.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

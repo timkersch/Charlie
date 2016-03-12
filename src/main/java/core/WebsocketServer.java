@@ -6,13 +6,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
+import java.lang.reflect.Method;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,13 +26,13 @@ public class WebsocketServer {
     private DB db;
 
     @PersistenceContext(unitName = "db")
-    EntityManager em; 
+    EntityManager em;
 
     @Inject
     private SessionHandler sessionHandler;
-    
+
     private final SpotifyService service = new SpotifyService();
-    
+
     private static final Gson GSON = new Gson();
     private static final Logger LOGGER = Logger.getLogger(WebsocketServer.class.getName());
 
@@ -56,12 +56,12 @@ public class WebsocketServer {
         error.printStackTrace();
         LOGGER.log(Level.WARNING, error.toString());
     }
-    
-    private void log(String msg){
+
+    private void log(String msg) {
         LOGGER.log(Level.INFO, msg);
     }
-    
-    private String createResponse(int requestId, String action, Object data){
+
+    private String createResponse(int requestId, String action, Object data) {
         JsonResponse r = new JsonResponse();
         r.request_id = requestId;
         r.action = action;
@@ -71,334 +71,333 @@ public class WebsocketServer {
 
     @OnMessage
     public void handleMessage(String message, Session session) {
-        try{
-            JsonObject jsonMessage = GSON.fromJson(message, JsonObject.class);
+        // Read message
+        JsonObject jsonMessage = GSON.fromJson(message, JsonObject.class);
 
-            // Extract the action, requestId and data from the json message
-            JsonObject data = jsonMessage.getAsJsonObject("data");
-            String action = jsonMessage.get("action").getAsString();
-            int requestId = jsonMessage.getAsJsonPrimitive("request_id").getAsInt();
+        // Extract the action, requestId and data from the json message
+        JsonObject data = jsonMessage.getAsJsonObject("data");
+        String action = jsonMessage.get("action").getAsString();
+        int requestId = jsonMessage.getAsJsonPrimitive("request_id").getAsInt();
 
-            // Get the user session attached to this session
-            UserSession userSession = sessionHandler.getUserSession(session.getId());
+        // Get the user session attached to this session
+        UserSession userSession = sessionHandler.getUserSession(session.getId());
 
-            // Create objects needed by action
-            String response = "";
-            UserIdentity user;
+        log(action + " - Data: " + data);
+        
+        // Try to invoke the method of the action
+        try {
+            Method methodToCall = WebsocketServer.class.getDeclaredMethod(action, int.class, String.class, JsonObject.class, UserSession.class);
+            
+            methodToCall.invoke(this, requestId, action, data, userSession);
+        } catch (Exception ex) {
+            userSession.send(createResponse(requestId, action, ""));
+            Logger.getLogger(WebsocketServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void getLoginURL(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Retrieve login URL from spotify service
+        String url = service.getAuthorizeURL();
 
-            log(action + " - DATA: " + data);
+        // Send it back
+        String response = createResponse(requestId, action, url);
+        userSession.send(response);
+    }
+    
+    private void login(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Extract spotify code
+        String code = data.getAsJsonPrimitive("code").getAsString(); //.getString("code");
 
-	        // TODO really needs some refactoring!!!
-	        // TODO something is wrong here after the backend-model remake with "Player"
-            switch(action) {
+        // Get user from spotify
+        UserIdentity user = service.getUser(code);
 
-                case "getLoginURL":
-                    // Retrieve login URL from spotify service
-                    String url = service.getAuthorizeURL();
+        // Check if user already exists
+        UserIdentity current = db.getUserCatalogue().getByName(user.getUser().getName());
+        if (current != null) //Already exists
+            user = current;
+        else // New user 
+            db.getUserCatalogue().create(user);
+        
+        userSession.setUserIdentity(user);
 
-                    // Send it back
-                    response = createResponse(requestId, action, url);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        // Create user json
+        String userAsString = GSON.toJson(user.toJson());
+        String response = createResponse(requestId, action, userAsString);
 
-                case "login":
-                    // Extract spotify code
-                    String code = data.getAsJsonPrimitive("code").getAsString(); //.getString("code");
+        // Send back result
+        System.out.println("User: " + userAsString);
+        userSession.send(response);
+        
+    }
+    
+    private void setUser(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Extract user id
+        Long id = data.getAsJsonPrimitive("id").getAsLong();
 
-                    // Get user from spotify
-                    user = service.getUser(code);
+        // Check if user exists
+        boolean success = true;
+        UserIdentity user = db.getUserCatalogue().find(id);
+        if (user == null) {
+            user = UserIdentity.createDummyUser();
+            success = false;
+        } else {
+            String newAccessToken = service.refreshAccessToken(user.getRefreshToken());
+            user.setAccessToken(newAccessToken);
+            service.setTokens(user.getAccessToken(), user.getRefreshToken());
+            userSession.setCurrentQuiz(db.getQuizCatalogue().getQuiz(user));
+        }
+        userSession.setUserIdentity(user);
 
-                    // Check if user already exists
-                    UserIdentity current = db.getUserCatalogue().getByName(user.getUser().getName());
-                    if (current != null)    //Already exists
-                        user = current;
-                    else                    // New user 
-                        db.getUserCatalogue().create(user);
-                    userSession.setUserIdentity(user);
+        // Send response
+        String response = createResponse(requestId, action, success);
+        System.out.println("Success: " + success);
+        userSession.send(response);
+    }
+    
+    private void getPlaylists(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Get users playlist from spotfiy service
+        List<SimplePlaylist> lists = service.getUsersPlaylists();
 
-                    // Create user json
-                    String userAsString = GSON.toJson(user.toJsonElement());
-                    response = createResponse(requestId, action, userAsString);
+        // Send them back as json
+        String playlists = GSON.toJson(lists);
+        String response = createResponse(requestId, action, playlists);
+        System.out.println("Playlists: " + playlists);
+        userSession.send(response);
+    }
+    
+    private void getCurrentQuestion(int requestId, String action, JsonObject data, UserSession userSession) {
+        Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
+        // Send them back as json
+        String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
+        JsonElement artistsJson = GSON.toJsonTree(currentQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
+        JsonObject object = new JsonObject();
+        object.addProperty("track_url", trackUrl);
+        object.add("artists", artistsJson);
+        String objAsString = object.toString();
 
-                    // Send back result
-                    System.out.println("User: " + userAsString);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        String response = createResponse(requestId, action, objAsString);
+        userSession.send(response);
+    }
+    
+    private void isQuizStarted(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Retrieve online users from session handler
+        boolean started = userSession.getCurrentQuiz().getCurrentQuestion() != null;
 
-                case "setUser":
-                    // Extract user id
-                    Long id = data.getAsJsonPrimitive("id").getAsLong(); //getJsonNumber("id").longValue();
+        // Send them back as json
+        String response = createResponse(requestId, action, started);
+        userSession.send(response);
+    }
+    
+    private void getUsers(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Retrieve online users from session handler
+        List<UserIdentity> onlineUsers = sessionHandler.getUsers();
 
-                    // Check if user exists
-                    boolean success = true;
-                    user = db.getUserCatalogue().find(id);
-                    if (user == null) {
-                        user = UserIdentity.createDummyUser();
-                        success = false;
-                    } else {
-                        String newAccessToken = service.refreshAccessToken(user.getRefreshToken());
-                        user.setAccessToken(newAccessToken);
-                        service.setTokens(user.getAccessToken(), user.getRefreshToken());
-                        userSession.setCurrentQuiz(db.getQuizCatalogue().getQuiz(user));
-                    }
-                    userSession.setUserIdentity(user);
+        // Create user json
+        List<JsonElement> onlineUsersAsJson = new ArrayList<>();
+        for (UserIdentity userIdentity : onlineUsers) {
+            onlineUsersAsJson.add(userIdentity.toJson());
+        }
 
-                    // Send response
-                    response = createResponse(requestId, action, success);
-                    //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", success).build();
-                    System.out.println("Success: " + success);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        // Send them back as json
+        String usersString = GSON.toJson(onlineUsersAsJson);
+        String response = createResponse(requestId, action, usersString);
+        //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
+        log("Users: " + usersString);
+        userSession.send(response);
+    }
+    
+    private void getUsersInQuiz(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Retrieve online users from session handler
+        List<UserIdentity> usersInQuiz = userSession.getCurrentQuiz().getJoinedPlayers();
 
-	            case "getPlaylists":
-                    // Get users playlist from spotfiy service
-                    List<SimplePlaylist> lists = service.getUsersPlaylists();
+        // Create user json
+        List<JsonElement> usersInQuizAsJson = new ArrayList<>();
+        for (UserIdentity userIdentity : usersInQuiz) {
+            usersInQuizAsJson.add(userIdentity.toJson());
+        }
 
-                    // Send them back as json
-                    String playlists = GSON.toJson(lists);
-                    response = createResponse(requestId, action, playlists);
-                    //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", playlists).build();
-                    System.out.println("Playlists: " + playlists);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        // Send them back as json
+        String usersInQuizString = GSON.toJson(usersInQuizAsJson);
+        String response = createResponse(requestId, action, usersInQuizString);
+        log("Users: " + usersInQuizString);
+        userSession.send(response);
+    }
+    
+    private void logout(int requestId, String action, JsonObject data, UserSession userSession) {
+        userSession.setUserIdentity(UserIdentity.createDummyUser());
+    }
+    
+    private void getResults(int requestId, String action, JsonObject data, UserSession session) {
+        // Send back the resulting quiz
+        Quiz quiz = session.getCurrentQuiz();
+        List<Player> players = quiz.getAllResults();
+        JsonArray playersAsJson = new JsonArray();
+        for (Player p : players)
+            playersAsJson.add(p.toJson());
+        
+        String playersString = GSON.toJson(playersAsJson);
 
-	            case "getCurrentQuestion":
-                    Question currentQuestion = userSession.getCurrentQuiz().getCurrentQuestion();
-                    // Send them back as json
-                    String trackUrl = service.getTrackUrl(currentQuestion.getTrackId());
-                    JsonElement artistsJson = GSON.toJsonTree(currentQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
-                    JsonObject object = new JsonObject();
-                    object.addProperty("track_url", trackUrl);
-                    object.add("artists", artistsJson);
-                    String objAsString = object.toString();
+        String response = createResponse(requestId, action, playersString);
+        session.send(response);
+    }
+    
+    private void getQuiz(int requestId, String action, JsonObject data, UserSession session) {
+        // Send back the resulting quiz
+        String quizAsJson = "";
+        if (session.getCurrentQuiz() != null)
+            quizAsJson = GSON.toJson(session.getCurrentQuiz().toJsonElement());
 
-                    response = createResponse(requestId, action, objAsString);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        String response = createResponse(requestId, action, quizAsJson);
+        session.send(response);
+    }
+    
+    private void savePlaylist(int requestId, String action, JsonObject data, UserSession session) {
+        String name1 = session.getCurrentQuiz().getName();
+        List<Question> question1 = session.getCurrentQuiz().getQuestions();
+        List<String> trackids = new ArrayList<>(question1.size());
 
-	            case "isQuizStarted":
-                    // Retrieve online users from session handler
-                    boolean started = userSession.getCurrentQuiz().getCurrentQuestion() != null;
+        for (Question que : question1) {
+            trackids.add(que.getTrackId().getId());
+        }
 
-                    // Send them back as json
-                    response = createResponse(requestId, action, started);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        service.createAndPopulatePlaylist(trackids, name1);
+    }
+    
+    private void createQuiz(int requestId, String action, JsonObject data, UserSession session) {
+        // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
+        JsonArray usernames = data.getAsJsonArray("users");
+        String name = data.getAsJsonPrimitive("name").getAsString(); //getString("name");
+        String playlistId = data.getAsJsonPrimitive("playlist").getAsString();//data.getString("playlist");
+        int nbrOfSongs = data.getAsJsonPrimitive("nbrOfSongs").getAsInt(); //Integer.parseInt(data.getString("nbrOfSongs"));
+        boolean generate = data.getAsJsonPrimitive("generated").getAsBoolean(); //data.getBoolean("generated");
+        String ownerId = data.getAsJsonPrimitive("playlistOwner").getAsString();
 
-	            case "getUsers":
-                    // Retrieve online users from session handler
-                    List<UserIdentity> onlineUsers = sessionHandler.getUsers();
+        List<Track> playlistTracks = service.getPlaylistSongs(playlistId, ownerId);
+        List<Track> quizTracks;
 
-                    // Create user json
-                    List<JsonElement> onlineUsersAsJson = new ArrayList<>();
-                    for(UserIdentity userIdentity : onlineUsers)
-                        onlineUsersAsJson.add(userIdentity.toJsonElement());
+        if (generate) {
+            quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
+        } else {
+            Collections.shuffle(playlistTracks);
+            quizTracks = playlistTracks.subList(0, nbrOfSongs);
+        }
 
-                    // Send them back as json
-                    String usersString = GSON.toJson(onlineUsersAsJson);
-                    response = createResponse(requestId, action, usersString);
-                    //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", usersString).build();
-                    log("Users: " + usersString);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        List<Question> questions = new ArrayList<>();
+        for (int i = 0; i < quizTracks.size(); i++) {
+            questions.add(new Question(quizTracks.get(i), service.getArtistOptions(quizTracks.get(i))));
+        }
 
-	            case "getUsersInQuiz":
-                    // Retrieve online users from session handler
-                    List<UserIdentity> usersInQuiz = userSession.getCurrentQuiz().getJoinedPlayers();
-                    usersInQuiz.add(userSession.getCurrentQuiz().getOwner());
+        // Get users
+        List<UserIdentity> players = new ArrayList<>();
+        for (JsonElement username : usernames) {
+            UserIdentity userToAdd = sessionHandler.findUserByName(username.getAsString());
+            if (userToAdd != null) {
+                players.add(userToAdd);
+            }
+        }
 
-                    // Create user json
-                    List<JsonElement> usersInQuizAsJson = new ArrayList<>();
-                    for(UserIdentity userIdentity : usersInQuiz)
-                        usersInQuizAsJson.add(userIdentity.toJsonElement());
+        // Create quiz
+        Quiz quiz = new Quiz(name, session.getUserIdentity(), players, questions);
+        db.getQuizCatalogue().removeUserFromQuizes(session.getUserIdentity());
+        session.setCurrentQuiz(quiz);
+        db.getQuizCatalogue().addQuiz(quiz);
 
-                    // Send them back as json
-                    String usersInQuizString = GSON.toJson(usersInQuizAsJson);
-                    response = createResponse(requestId, action, usersInQuizString);
-                    log("Users: " + usersInQuizString);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        // Send back the resulting quiz
+        String jsonQuiz = GSON.toJson(quiz.toJsonElement());
+        String response = createResponse(requestId, action, jsonQuiz);
+        session.send(response);
+        sessionHandler.sendToSessions(players, "invitedTo", jsonQuiz);
+    }
+    
+    private void getUserResults(int requestId, String action, JsonObject data, UserSession session) {
+        Quiz q = session.getCurrentQuiz();
 
-	            case "logout":
-                    sessionHandler.getUserSession(session.getId()).setUserIdentity(UserIdentity.createDummyUser());
-                    break;
+        Player p = q.getPlayer(session.getUserIdentity());
 
-	            case "answerQuestion":
-                    String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
-                    System.out.println("Answer: " + artist);
-                    boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
-                    log("After answer: " + userSession.getCurrentQuiz().getUserResults(userSession.getUserIdentity()));
+        String arrayString = GSON.toJson(p.toJson());
 
-                    response = createResponse(requestId, action, right);
-                    System.out.println("Response: " + response);
-                    session.getBasicRemote().sendText(response);
-                    break;
+        String response = createResponse(requestId, action, arrayString);
+        session.send(response);
+    }
+    
+    private void nextQuestion(int requestId, String action, JsonObject data, UserSession session) {
+        if (session.getCurrentQuiz().getOwner().getId() != session.getUserIdentity().getId()) {
+            return;
+        }
+        Question question = session.getCurrentQuiz().getCurrentQuestion();
+        Question nextQuestion = session.getCurrentQuiz().getNextQuestion();
 
-	            case "joinQuiz":
-                    String quizId = data.getAsJsonPrimitive("quizId").getAsString(); //.getString("quizId");
-                    Quiz quizToJoin = db.getQuizCatalogue().findQuiz(quizId);
-                    boolean joinSuccess = false;
+        if (question == null) {
+            // Quiz started
+            sessionHandler.sendToSessions(session.getCurrentQuiz(), "quizStart", "");
+        }
 
-                    if (quizToJoin != null) {
-                        userSession.setCurrentQuiz(quizToJoin);
-                        quizToJoin.joinPlayer(userSession.getUserIdentity());
-                        sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", userSession.getUserIdentity().toJsonElement().toString());
-                        joinSuccess = true;
-                    }
-
-                    response = createResponse(requestId, action, joinSuccess);
-                    //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", joinSuccess).build();
-                    System.out.println("Response: " + response);
-                    session.getBasicRemote().sendText(response);
-                    break;
-
-	            case "leaveQuiz":
-                    userSession.getCurrentQuiz().leavePlayer(userSession.getUserIdentity());
-                    userSession.setCurrentQuiz(null);
-                    break;
-
-	            case "nextQuestion":
-                    if (userSession.getCurrentQuiz().getOwner().getId() != userSession.getUserIdentity().getId())
-                        return;
-                    Question question = userSession.getCurrentQuiz().getCurrentQuestion();
-                    Question nextQuestion = userSession.getCurrentQuiz().getNextQuestion();
-
-	                if (question == null) {
-		                // Quiz started
-		                sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "quizStart", "");
-	                }
-
-                    if (nextQuestion == null) {
-                        // Quiz is over
-                        Quiz over = userSession.getCurrentQuiz();
-	                    List<Player> results = over.getAllResults();
-                        log("GameOver: " + results);
-                        JsonArray array = new JsonArray();
-
-	                    for (Player p: results) {
-		                    JsonObject o = p.getUserIdentity().toJsonElement().getAsJsonObject();
-		                    o.addProperty("points", p.getScore());
-                            array.add(o);
-                        }
-
-	                    String arrayString = GSON.toJson(array);
-                        
-                        sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
-                        log("GameOver: " + arrayString);
-                        
-                        response = createResponse(requestId, action, "");
-                        session.getBasicRemote().sendText(response);
-
-                    } else {
-                        // Send them back as json
-                        String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
-                        JsonElement artistsAsJson = GSON.toJsonTree(nextQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
-                        JsonObject obj = new JsonObject();
-                        obj.addProperty("track_url", nextTrack);
-                        obj.add("artists", artistsAsJson);
-                        String objString = obj.toString();
-                        //JsonObjectBuilder trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson);
-                        
-                        sessionHandler.sendToSessions(userSession.getCurrentQuiz(), "newQuestion", objString);
-                        
-                        response = createResponse(requestId, action, objString);
-                        session.getBasicRemote().sendText(response);
-                    }
-                    break;
-
-	            case "getUserResults":
-                    Quiz q = userSession.getCurrentQuiz();
-
-                    int points = q.getUserPoints(userSession.getUserIdentity());
-
-                    JsonArray array = new JsonArray();
-	                JsonObject o = userSession.getUserIdentity().toJsonElement().getAsJsonObject();
-	                o.addProperty("points", points);
-	                array.add(o);
-
-                    String arrayString = GSON.toJson(array);
-                    
-                    response = createResponse(requestId, action, arrayString);
-                    session.getBasicRemote().sendText(response);
-                    break;
-
-	            case "createQuiz":
-                    // Extract users to invite, what playlist to base quiz on and number of questions in quiz.
-
-                    JsonArray usernames = data.getAsJsonArray("users");
-                    String name = data.getAsJsonPrimitive("name").getAsString(); //getString("name");
-                    String playlistId = data.getAsJsonPrimitive("playlist").getAsString();//data.getString("playlist");
-                    int nbrOfSongs = data.getAsJsonPrimitive("nbrOfSongs").getAsInt(); //Integer.parseInt(data.getString("nbrOfSongs"));
-                    boolean generate = data.getAsJsonPrimitive("generated").getAsBoolean(); //data.getBoolean("generated");
-                    String ownerId = data.getAsJsonPrimitive("playlistOwner").getAsString();
-
-                    List<Track> playlistTracks = service.getPlaylistSongs(playlistId, ownerId);
-                    List<Track> quizTracks;
-
-                    if (generate) {
-                        quizTracks = service.getSimilarTracks(playlistTracks, nbrOfSongs);
-                    } else {
-                        Collections.shuffle(playlistTracks);
-                        quizTracks = playlistTracks.subList(0, nbrOfSongs);
-                    }
-
-                    List<Question> questions = new ArrayList<>();
-                    for(int i = 0; i < quizTracks.size(); i++) {
-                        questions.add(new Question(quizTracks.get(i), service.getArtistOptions(quizTracks.get(i))));
-                    }
-
-                    // Get users
-                    List<UserIdentity> players = new ArrayList<>();
-                    for (JsonElement username : usernames) {
-                        UserIdentity userToAdd = sessionHandler.findUserByName(username.getAsString());
-                        if (userToAdd != null)
-                            players.add(userToAdd);
-                    }
-
-                    // Create quiz
-                    Quiz quiz = new Quiz(name, userSession.getUserIdentity(), players, questions);
-                    db.getQuizCatalogue().removeUserFromQuizes(userSession.getUserIdentity());
-                    userSession.setCurrentQuiz(quiz);
-                    db.getQuizCatalogue().addQuiz(quiz);
-
-                    // Send back the resulting quiz
-                    String jsonQuiz = GSON.toJson(quiz);
-                    response = createResponse(requestId, action, jsonQuiz);
-                    //response = provider.createObjectBuilder().add("request_id", requestId).add("action", action).add("data", jsonQuiz).build();
-                    session.getBasicRemote().sendText(response);
-                    sessionHandler.sendToSessions(players, "invitedTo", jsonQuiz);
-                    break;
-
-	            case "savePlaylist":
-                    String name1 = userSession.getCurrentQuiz().getName();
-                    List<Question> question1 = userSession.getCurrentQuiz().getQuestions();
-                    List<String> trackids = new ArrayList<>(question1.size());
-
-	                for (Question que : question1) {
-                        trackids.add(que.getTrackId().getId());
-                    }
-
-	                service.createAndPopulatePlaylist(trackids, name1);
-                    break;
-
-	            case "getQuiz":
-                    // Send back the resulting quiz
-                    String quizAsJson = GSON.toJson(userSession.getCurrentQuiz());
-                    response = createResponse(requestId, action, quizAsJson);
-                    session.getBasicRemote().sendText(response);
-                    break;
-
-	            default:
-                    sessionHandler.sendToAllConnectedSessions("noRequest", "error");
-                    break;
+        if (nextQuestion == null) {
+            // Quiz is over
+            Quiz over = session.getCurrentQuiz();
+            List<Player> results = over.getAllResults();
+            
+            JsonArray array = new JsonArray();
+            for (Player p : results) {
+                array.add(p.toJson());
             }
 
-            log("Response: " + response);
+            String arrayString = GSON.toJson(array);
 
-        }catch(IOException exception) {
-            exception.printStackTrace();
-            LOGGER.log(Level.WARNING, exception.toString());
+            sessionHandler.sendToQuizMemebrs(over, "gameOver", arrayString);
+            log("GameOver: " + arrayString);
+
+            String response = createResponse(requestId, action, "");
+            session.send(response);
+
+        } else {
+            // Send them back as json
+            String nextTrack = service.getTrackUrl(nextQuestion.getTrackId());
+            JsonElement artistsAsJson = GSON.toJsonTree(nextQuestion.getArtists()); //.toJson(nextQuestion.getArtists());
+            JsonObject obj = new JsonObject();
+            obj.addProperty("track_url", nextTrack);
+            obj.add("artists", artistsAsJson);
+            String objString = obj.toString();
+            //JsonObjectBuilder trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson);
+
+            sessionHandler.sendToSessions(session.getCurrentQuiz(), "newQuestion", objString);
+
+            String response = createResponse(requestId, action, objString);
+            session.send(response);
         }
+    }
+    
+    private void leaveQuiz(int requestId, String action, JsonObject data, UserSession session) {
+        session.getCurrentQuiz().leavePlayer(session.getUserIdentity());
+        session.setCurrentQuiz(null);
+    }
+    
+    private void joinQuiz(int requestId, String action, JsonObject data, UserSession session) {
+        String quizId = data.getAsJsonPrimitive("quizId").getAsString();
+        Quiz quizToJoin = db.getQuizCatalogue().findQuiz(quizId);
+        boolean joinSuccess = false;
+
+        if (quizToJoin != null) {
+            session.setCurrentQuiz(quizToJoin);
+            quizToJoin.joinPlayer(session.getUserIdentity());
+            sessionHandler.sendToQuizMemebrs(quizToJoin, "userJoined", session.getUserIdentity().toJson().toString());
+            joinSuccess = true;
+        }
+
+        String response = createResponse(requestId, action, joinSuccess);
+        System.out.println("Response: " + response);
+        session.send(response);
+    }
+    
+    private void answerQuestion(int requestId, String action, JsonObject data, UserSession userSession) {
+        String artist = data.getAsJsonPrimitive("artistName").getAsString(); //getString("artistName");
+        System.out.println("Answer: " + artist);
+        boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
+        log("After answer: " + userSession.getCurrentQuiz().getUserResults(userSession.getUserIdentity()));
+
+        String response = createResponse(requestId, action, right);
+        System.out.println("Response: " + response);
+        userSession.send(response);
     }
 
 }
