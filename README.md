@@ -19,6 +19,9 @@ All members are students of Chalmers University of Technology, Software Engineer
 | Simon Takman 		| 930321    | takman@student.chalmers.se 	|
 | Tim Kerschbaumer  | 931022	| ktim@student.chalmers.se		|
 
+### SLOC
+The git inspector was quite troublesome for us during this project. If someone auto indented or made a special merge, several hundred rows could be transfered from one person to another. This lead to some members being below the required limit for SLOCs. 
+
 ## Overview
 The application is a spotify based music quiz, which lets the user invite friends, choose a playlist and start a quiz based on that playlist. The creator will have control of the music but no other special permissions is given to the creator.
 
