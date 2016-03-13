@@ -1,10 +1,17 @@
 # Charlie
-Group #1's contribution to the web application project, 2016.
+A spotify based musical quiz application.
 
 ## About
 This project was created in Mars, 2016. The purpose of the application is to simplify the task to create and distribute music quizes. 
 
+### Presentation
+A presentation made at the end of this project, 2016-03-14.
+
+[presentation.pdf](docs/presentation.pdf)
+
 ## Contributors
+All members are students of Chalmers University of Technology, Software Engineering. This project was created for the course "DAT076 - Web Applications".
+
 | Name         		| SSN       | Email  						|
 | ----------------- |:---------:| ----------------------------- |
 | Erik Nordmark     | 870907 	| erinord@student.chalmers.se 	|
@@ -15,11 +22,11 @@ This project was created in Mars, 2016. The purpose of the application is to sim
 ## Overview
 The application is a spotify based music quiz, which lets the user invite friends, choose a playlist and start a quiz based on that playlist. The creator will have control of the music but no other special permissions is given to the creator.
 
-### Permissions
+### Permissions and requirements
 The application requires a spotify account, network connection and a modern web browser. 
 
 ### Use cases
-These use cases includes name, goal, actors, precondition, main flow, alternative flow and postcondition. 
+The use cases includes name, goal, actors, precondition, main flow, alternative flow and postcondition. 
 
 [use-cases.pdf](docs/use-cases.pdf)
 
@@ -30,7 +37,7 @@ These use cases includes name, goal, actors, precondition, main flow, alternativ
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
 
 ### UML
-![alt tag](docs/images/UML.png)
+![UML](docs/images/UML.png)
 
 ### Approach
 The application is built with the service based approach pattern.
@@ -60,7 +67,7 @@ Controllers
 - scoreboardController.js
 - profileController.js
 	
-View
+Views
 - create.html
 - profile.html
 - home.html
@@ -69,16 +76,16 @@ View
 - scoreboard.html
 
 ### Libraries
-Java Enterprise Edition
-Michaelthelin Spotify API
-Google Gson
-Apache Derby
-JUnit
-Arquillian
-Jasmine
-Angular
-Bootstrap
-JQuery
+- Java Enterprise Edition
+- Michaelthelin Spotify API
+- Google Gson
+- Apache Derby
+- JUnit
+- Arquillian
+- Jasmine
+- Angular
+- Bootstrap
+- JQuery
 
 ## Setup
 This section explains how to setup and run the project and its tests.
