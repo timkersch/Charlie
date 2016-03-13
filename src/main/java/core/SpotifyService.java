@@ -255,7 +255,8 @@ public class SpotifyService {
 	/**
 	 * Method that returns four artist options for a track.
 	 * @param t the Track
-	 * @return a hashtable with artists as keys and boolans as values
+	 * @return a hashtable with artists as keys and boolans as values.
+	 * returns null if there are less than 3 similar artists.
 	 */
 	public Hashtable<String, Boolean> getArtistOptions(Track t) {
 		List<SimpleArtist> artists = t.getArtists();
@@ -264,8 +265,12 @@ public class SpotifyService {
 			Hashtable<String, Boolean> ht = new Hashtable<>();
 			ht.put(artists.get(0).getName(), true);
 
-			for (int i = 0; i < 3; i++) {
-				ht.put(relatedArtists.get(i).getName(), false);
+			if (relatedArtists.size() >= 3) {
+				for (int i = 0; i < 3; i++) {
+					ht.put(relatedArtists.get(i).getName(), false);
+				}
+			} else {
+				return null;
 			}
 
 			return ht;

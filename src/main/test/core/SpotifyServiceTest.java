@@ -128,13 +128,13 @@ public class SpotifyServiceTest {
 				}
 			}
 		}
-	}
+	}*/
 
 	@Test
 	public void testGetSimilarTracks() throws Exception {
 		// This will eat up the requests from spotify
 		for (int i = 0; i < playlists.length; i++) {
-			Thread.sleep(2000);
+			Thread.sleep(3000);
 
 			List<Track> playlistSongs = s.getPlaylistSongs(playlists[i], user);
 			try {
@@ -144,7 +144,7 @@ public class SpotifyServiceTest {
 				throw new AssertionError();
 			}
 
-			Thread.sleep(2000);
+			Thread.sleep(3000);
 
 			List<Track> similarTracks = s.getSimilarTracks(playlistSongs, playlistSongs.size(), "SE");
 			try {
@@ -156,7 +156,7 @@ public class SpotifyServiceTest {
 
 			for(Track t : similarTracks) {
 				// So that rate limit does not exceed
-				Thread.sleep(2000);
+				Thread.sleep(2500);
 
 				try {
 					assertNotNull(t);
@@ -201,5 +201,5 @@ public class SpotifyServiceTest {
 				}
 			}
 		}
-	}*/
+	}
 }
