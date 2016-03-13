@@ -7,147 +7,148 @@ var charlieController = angular.module('charlieController', [
 ]);
 
 charlieController.controller('mainController', ['$scope', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
-    function($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
+    function ($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = {};
         $scope.url = "";
 
-        $scope.changeView = function(view){
+        $scope.changeView = function (view) {
             $location.path(view); // path not hash
             $scope.toggleLeftMenu();
         };
 
-        $scope.toggleLeftMenu = function() {
+        $scope.toggleLeftMenu = function () {
             $mdSidenav('left').toggle();
         };
-        
-        $scope.isLoggedIn = function(){
+
+        $scope.isLoggedIn = function () {
             return charlieProxy.isLoggedIn();
         };
 
-        var init = function(){
+        var init = function () {
             if (charlieProxy.isLoggedIn()) {
-                charlieProxy.getUser(function(user){
-                   $scope.user = user;
+                charlieProxy.getUser(function (user) {
+                    $scope.user = user;
                 });
             } else {
-                if ($routeParams.code){
-                    charlieProxy.login($routeParams.code, function(user){
+                if ($routeParams.code) {
+                    charlieProxy.login($routeParams.code, function (user) {
                         $scope.user = user;
                         $location.path("/");
                     });
                 } else {
-                    charlieProxy.getLoginUrl(function(url){
+                    charlieProxy.getLoginUrl(function (url) {
                         $scope.url = url;
                     });
                 }
             }
         };
 
-        $scope.$on('$routeChangeSuccess', function() {
+        $scope.$on('$routeChangeSuccess', function () {
             // Initialize when service is ready
-            charlieProxy.onReady(function(){
+            charlieProxy.onReady(function () {
                 init();
             });
         });
-        
-        var showActionToast = function(quiz) {
+
+        var showActionToast = function (quiz) {
             var toast = $mdToast.simple()
-                .textContent('You have been invited to ' + quiz.name)
-                .action('ACCEPT')
-                .highlightAction(true)
-                .hideDelay(10 * 1000);
-    
-            $mdToast.show(toast).then(function(response) {
-                if ( response == 'ok' ) {
-                    charlieProxy.joinQuiz(quiz, function(success) {
-                       if (success) {
-                           $location.path('/lobby');
-                       } else {
-                           alert('Something went wrong joining the quiz!');
-                       }
+                    .textContent('You have been invited to ' + quiz.name)
+                    .action('ACCEPT')
+                    .highlightAction(true)
+                    .hideDelay(10 * 1000);
+
+            $mdToast.show(toast).then(function (response) {
+                if (response == 'ok') {
+                    charlieProxy.joinQuiz(quiz, function (success) {
+                        if (success) {
+                            $location.path('/lobby');
+                        } else {
+                            alert('Something went wrong joining the quiz!');
+                        }
                     });
                 }
             });
         };
-        
-        charlieProxy.listenTo("invitedTo", function(quiz) {
+
+        charlieProxy.listenTo("invitedTo", function (quiz) {
             showActionToast(quiz);
         });
 
-        $scope.login = function (){
+        $scope.login = function () {
             window.location.href = $scope.url;
         };
 
-        $scope.logout = function (){
+        $scope.logout = function () {
             $scope.user = {};
             charlieProxy.logout();
-            charlieProxy.getLoginUrl(function(url){
+            charlieProxy.getLoginUrl(function (url) {
                 $scope.url = url;
             });
         };
-        
+
     }]);
 
 charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
-    function($scope, $location, charlieProxy){
+    function ($scope, $location, charlieProxy) {
         console.log("LobbyController!");
         $scope.status = '  ';
         $scope.quizname = "Quiz";
         $scope.users = [];
         $scope.isOwner = false;
-        
-        var init = function(){
-            charlieProxy.getQuiz(function(quiz){
+
+        var init = function () {
+            charlieProxy.getQuiz(function (quiz) {
                 $scope.quizname = quiz.name;
                 $scope.isOwner = charlieProxy.isQuizOwner();
-                charlieProxy.getUsersInQuiz(function(users){
+                charlieProxy.getUsersInQuiz(function (users) {
                     $scope.users = users;
                 });
             });
         };
-        
-        charlieProxy.onReady(function(){
+
+        charlieProxy.onReady(function () {
             init();
         });
-        
-        charlieProxy.listenTo("userJoined", function(user){
+
+        charlieProxy.listenTo("userJoined", function (user) {
             console.log(user);
-            $scope.$apply(function(){
+            $scope.$apply(function () {
                 $scope.users.push(user);
             });
         });
-        
-        $scope.startQuiz = function(){
+
+        $scope.startQuiz = function () {
             //$location.path('/question');
             if (charlieProxy.isQuizOwner())
-                charlieProxy.nextQuestion(function(data){});
+                charlieProxy.nextQuestion(function (data) {
+                });
         };
-            
-        charlieProxy.listenTo("quizStart", function(){
+
+        charlieProxy.listenTo("quizStart", function () {
             console.log("Now started!!");
-            $scope.$apply(function(){
+            $scope.$apply(function () {
                 $location.path('/question');
             });
         });
 
-        
+
     }]);
 
-charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy', 
-    function($scope, $location, charlieProxy) {
-        $scope.changeView = function(data){
+charlieController.controller('homeController', ['$scope', '$location', 'charlieProxy',
+    function ($scope, $location, charlieProxy) {
+        $scope.changeView = function (data) {
             $location.path(data);
         };
-        
-        $scope.isLoggedIn = function(){
+
+        $scope.isLoggedIn = function () {
             return charlieProxy.isLoggedIn();
         };
-        
+
         console.log("Init");
     }]);
 
-charlieController.controller('questionController', [ '$scope', '$location', '$interval', 'charlieProxy', '$document', '$timeout',
-    function($scope, $location, $interval, charlieProxy, $document, $timeout) {
+charlieController.controller('questionController', ['$scope', '$location', '$interval', 'charlieProxy', '$document', '$timeout',
+    function ($scope, $location, $interval, charlieProxy, $document, $timeout) {
         console.log("Inside questionController");
         $scope.timeLeft = 20;
         $scope.activated = true;
@@ -160,8 +161,8 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var hasAnswered = false;
         var intervalPromise;
         $scope.players = [];
-        
-        var play = function(url) {
+
+        var play = function (url) {
             // Stop previous
             audioElement.pause();
             audioElement.currentTime = 0;
@@ -169,19 +170,20 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             audioElement.src = url + ".mp3";
             audioElement.play();
         };
-        
-        var nextQuestion = function(){
-            charlieProxy.nextQuestion(function(data){});  
+
+        var nextQuestion = function () {
+            charlieProxy.nextQuestion(function (data) {
+            });
         };
-        
-        var init = function(){
+
+        var init = function () {
             $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
-            charlieProxy.getResults(function(players){
+            charlieProxy.getResults(function (players) {
                 $scope.players = players;
             });
-            charlieProxy.getCurrentQuestion(function(question){
+            charlieProxy.getCurrentQuestion(function (question) {
                 if (question.artists) {
-                    if (question.answer !== ""){
+                    if (question.answer !== "") {
                         hasAnswered = true;
                         $scope.myAnswer = question.answer;
                         $scope.correctAnswer = question.correct;
@@ -194,20 +196,20 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                 }
             });
         };
-        
-        charlieProxy.onReady(function(){
+
+        charlieProxy.onReady(function () {
             init();
         });
-        
-        charlieProxy.listenTo("gameOver", function(users){
-           $location.path("/scoreboard"); 
+
+        charlieProxy.listenTo("gameOver", function (users) {
+            $location.path("/scoreboard");
         });
-        
-        charlieProxy.listenTo("userPointsUpdate", function(player){
+
+        charlieProxy.listenTo("userPointsUpdate", function (player) {
             console.log("Player: " + player.name);
             var found = false;
             for (var i = 0; i < $scope.players.length; i++) {
-                if ($scope.players[i].name === player.name){
+                if ($scope.players[i].name === player.name) {
                     $scope.players[i].points = player.points;
                     found = true;
                     break;
@@ -216,8 +218,8 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             if (!found)
                 $scope.players.push(player);
         });
-        
-        charlieProxy.listenTo("newQuestion", function(question){
+
+        charlieProxy.listenTo("newQuestion", function (question) {
             console.log("New Question: " + question);
             $scope.possibleArtists = question.artists;
             if (charlieProxy.isQuizOwner())
@@ -227,63 +229,73 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             hasAnswered = false;
             $scope.showScores = false;
         });
-        
-        $scope.isDisabled = function(artist){
+
+        $scope.isDisabled = function (artist) {
             return hasAnswered && $scope.myAnswer !== artist;
         };
-        
-        $scope.selectedAnswer = function(data, index){
+
+        $scope.selectedAnswer = function (data, index) {
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;
-                charlieProxy.answerQuestion(data, function(artist){
-                   console.log("Correct answer is: " + artist); 
-                   $scope.correctAnswer = artist;
+                charlieProxy.answerQuestion(data, function (artist) {
+                    console.log("Correct answer is: " + artist);
+                    $scope.correctAnswer = artist;
                 });
             }
         };
 
-        $scope.retriveCursor = function() {
+        $scope.retriveCursor = function () {
             return hasAnswered ? 'selected' : 'notSelected';
         };
 
-        $scope.getColor = function(index) {
-          switch (index) {
-            case 0: return 'green';
-            case 1: return 'red';
-            case 2: return 'blue';
-            case 3: return 'yellow';
-            default: return 'grey';
-          }
-        };
-        
-        $scope.getTextColor = function(index) {
-          switch (index) {
-            case 0: return 'green-text';
-            case 1: return 'red-text';
-            case 2: return 'blue-text';
-            case 3: return 'yellow-text';
-            default: return 'grey-text';
-          }
+        $scope.getColor = function (index) {
+            switch (index) {
+                case 0:
+                    return 'green';
+                case 1:
+                    return 'red';
+                case 2:
+                    return 'blue';
+                case 3:
+                    return 'yellow';
+                default:
+                    return 'grey';
+            }
         };
 
-        var startInterval = function (){
+        $scope.getTextColor = function (index) {
+            switch (index) {
+                case 0:
+                    return 'green-text';
+                case 1:
+                    return 'red-text';
+                case 2:
+                    return 'blue-text';
+                case 3:
+                    return 'yellow-text';
+                default:
+                    return 'grey-text';
+            }
+        };
+
+        var startInterval = function () {
             if (angular.isDefined(intervalPromise)) {
                 $interval.cancel(intervalPromise);
                 intervalPromise = undefined;
             }
-            intervalPromise = $interval(function(){
+            intervalPromise = $interval(function () {
                 if ($scope.timeLeft > 0)
                     $scope.timeLeft--;
-                if($scope.timeLeft === 0 && !$scope.showScores){
+                if ($scope.timeLeft === 0 && !$scope.showScores) {
                     if (!hasAnswered) {
                         $scope.selectedAnswer("", "");
                     }
                     $scope.showScores = true;
                     $scope.timeLeft = 5;
                     // Question over
-                    if (charlieProxy.isQuizOwner()){
-                        $timeout(function() {
+                    if (charlieProxy.isQuizOwner()) {
+                        $timeout(function () {
                             nextQuestion();
                         }, 5000);
 
@@ -291,8 +303,8 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                 }
             }, 1000, 0, true);
         };
-        
-        $scope.$on('$destroy', function() {
+
+        $scope.$on('$destroy', function () {
             if (angular.isDefined(intervalPromise)) {
                 $interval.cancel(intervalPromise);
                 intervalPromise = undefined;
@@ -303,21 +315,16 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         });
     }]);
 
-charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
-    function($scope, $location, charlieProxy) {
+charlieController.controller('scoreboardController', ['$scope', '$document', '$location', 'charlieProxy',
+    function ($scope, $document, $location, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
-        /*-------------------------*/
-        
-        
-        
-        /*-------------------------*/
-        
+        var canvasChart = $document[0].createElement('canvas');
         $scope.chart = {
             values: [],
             labels: [],
-            colors: ["#F44336","#9C27B0","#00BCD4", "#4CAF50", "#FFC107", "#795548"],
-            options: { 
+            colors: ["#F44336", "#9C27B0", "#00BCD4", "#4CAF50", "#FFC107", "#795548"],
+            options: {
                 responsive: false,
                 maintainAspectRatio: false
             }
@@ -327,18 +334,23 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         var chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
         var classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
 
-        var init = function(){
-            charlieProxy.getResults(function(users){
+        var init = function () {
+            canvasChart.id = "scoreboardChart";
+            canvasChart.width = "200";
+            canvasChart.height = "200";
+            var scoreboardCenter = document.getElementById("centerScoreboard");
+            charlieProxy.getResults(function (users) {
                 if (users) {
                     var data = {
                         labels: [""],
                         datasets: []
                     };
-                    
+
+
                     $scope.scores = [];
                     $scope.chart.values = [];
                     $scope.chart.labels = [];
-                    for(var i = 0; i < users.length; i++){
+                    for (var i = 0; i < users.length; i++) {
                         /*Chart.js need to read data as an array*/
                         var tmpArray = [users[i].points];
                         console.log(tmpArray);
@@ -347,54 +359,64 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
                             data: tmpArray
                         });
                         $scope.scores.push({
-                            value : users[i].points,
+                            value: users[i].points,
                             userName: users[i].name,
                             color: classColors[i]
-                            /*$scope.chart.colors[i % 4] */
-                            
+
                         });
-                        /*$scope.chart.values.push(users[i].points);
-                        $scope.chart.labels.push(users[i].name);*/
-                    };
+
+                    }
+
                     console.log(data);
-                    var context = document.getElementById("scoreboardChart").getContext("2d");
-                    var scoreboardChart = new Chart(context).Bar(data);
-                    scoreboardChart.update();
+
+                    setTimeout(function () {
+                        scoreboardCenter.insertBefore(canvasChart, scoreboardCenter.firstChild);
+                        var context = canvasChart.getContext("2d");
+                        var scoreboardChart = new Chart(context).Bar(data);
+                        $scope.$apply();
+                    }, 50);
+
+
                 }
             });
         };
 
         // Initialize when service is ready
-        charlieProxy.onReady(function(){
-           init(); 
+        charlieProxy.onReady(function () {
+            init();
         });
-    
-        $scope.changeView = function(view){
+
+        $scope.changeView = function (view) {
             $location.path(view); // path not hash
         };
-        
-        $scope.savePlaylist = function(){
+
+        $scope.savePlaylist = function () {
             charlieProxy.savePlaylist();
             $scope.isDisabled = true;
             $scope.playlistText = "Playlist added";
         };
-        
-        $scope.getTextColor = function(index) {
-          switch (index) {
-            case 0: return 'green-text';
-            case 1: return 'red-text';
-            case 2: return 'blue-text';
-            case 3: return 'yellow-text';
-            default: return 'grey-text';
-          }
+
+        $scope.getTextColor = function (index) {
+            switch (index) {
+                case 0:
+                    return 'green-text';
+                case 1:
+                    return 'red-text';
+                case 2:
+                    return 'blue-text';
+                case 3:
+                    return 'yellow-text';
+                default:
+                    return 'grey-text';
+            }
         };
     }]);
 
-charlieController.controller('profileController', [ '$scope', 'charlieProxy',
-    function($scope, charlieProxy) {
+charlieController.controller('profileController', ['$scope', 'charlieProxy',
+    function ($scope, charlieProxy) {
         console.log("Inside profileController");
 
-        charlieProxy.getUser(function(user){
+        charlieProxy.getUser(function (user) {
             $scope.user = user;
             console.log(user);
         });
@@ -402,7 +424,7 @@ charlieController.controller('profileController', [ '$scope', 'charlieProxy',
     }]);
 
 charlieController.controller('createController', ['$scope', '$location', 'charlieProxy',
-    function($scope, $location, charlieProxy) {
+    function ($scope, $location, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
@@ -411,23 +433,23 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.tags = [];
         $scope.toggleSwitch = true;
         $scope.loading = false;
-        
-        var init = function (){
-            charlieProxy.getPlaylists(function(lists){
+
+        var init = function () {
+            charlieProxy.getPlaylists(function (lists) {
                 $scope.playlists = lists;
-            }); 
+            });
         };
-        
-        charlieProxy.onReady(function(){
+
+        charlieProxy.onReady(function () {
             init();
         });
 
-        $scope.submit = function() {
+        $scope.submit = function () {
             $scope.loading = true;
-            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected.id, $scope.playlistSelected.owner, $scope.nbrOfQuestions, $scope.toggleSwitch, function(quiz){
-               $location.path('/lobby'); 
+            charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected.id, $scope.playlistSelected.owner, $scope.nbrOfQuestions, $scope.toggleSwitch, function (quiz) {
+                $location.path('/lobby');
             });
-            
+
         };
 
     }]);

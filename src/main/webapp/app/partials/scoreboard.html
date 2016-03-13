@@ -8,14 +8,13 @@
     <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
-    <center>
-        <canvas id="scoreboardChart" width="200" height="200"></canvas> 
+    <center id="centerScoreboard" ng-cloak>
         <br>
         <md-list>
-            <md-list-item ng-repeat="person in scores | orderBy:'-value'">
+            <md-list-item ng-repeat="person in scores| orderBy:'-value'">
                 <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{person.color}}">
-                    <md-icon aria-label="Menu" class="material-icons {{person.color}}">person</md-icon>
-                    {{person.userName}}
+                <md-icon aria-label="Menu" class="material-icons {{person.color}}">person</md-icon>
+                {{person.userName}}
                 </p>
                 <p>{{person.value}} {{person.value == 1 ? "point" : "points"}}</p>
             </md-list-item>
