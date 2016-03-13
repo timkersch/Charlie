@@ -24,22 +24,23 @@ The application requires a spotify account, network connection and a modern web 
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
 
 ### UML
+![alt tag](docs/images/uml.png)
 
 ### Approach
 The application is built with the service based approach pattern.
 
 ### Layers
-- Model
- - Player.java
- - Question.java
- - Quiz.java
- - User.java
- - UserIdentity.java
- - UserSession.java
+Model
+- Player.java
+- Question.java
+- Quiz.java
+- User.java
+- UserIdentity.java
+- UserSession.java
 	
-- Persistence
- - UserIdentity.java
- - User.java
+Persistence
+- UserIdentity.java
+- User.java
 
 Service
 - charlieProxy.js
