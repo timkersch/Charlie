@@ -375,8 +375,8 @@ public class WebsocketServer {
             obj.addProperty("track_url", nextTrack);
             obj.add("artists", artistsAsJson);
             String objString = obj.toString();
-            //JsonObjectBuilder trackData = provider.createObjectBuilder().add("track_url", nextTrack).add("artists", artistsAsJson);
 
+            log("newQuestion: " + objString);
             sessionHandler.sendToSessions(session.getCurrentQuiz(), "newQuestion", objString);
 
             String response = createResponse(requestId, action, objString);
@@ -409,9 +409,10 @@ public class WebsocketServer {
     private void answerQuestion(int requestId, String action, JsonObject data, UserSession userSession) {
         Quiz quiz = userSession.getCurrentQuiz();
         String artist = data.getAsJsonPrimitive("artistName").getAsString();
-        boolean right = userSession.getCurrentQuiz().answerQuestion(userSession.getUserIdentity(), artist);
+        boolean right = quiz.answerQuestion(userSession.getUserIdentity(), artist);
+        String rightAnswer = quiz.getCurrentQuestion().getCorrect();
 
-        String response = createResponse(requestId, action, right);
+        String response = createResponse(requestId, action, rightAnswer);
         String player = GSON.toJson(quiz.getPlayer(userSession.getUserIdentity()).toJson());
         sessionHandler.sendToQuizMembers(quiz, "userPointsUpdate", player);
         log("Response: " + response);
