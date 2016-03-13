@@ -1,12 +1,10 @@
 package core;
 
-import com.wrapper.spotify.models.Track;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +24,8 @@ public class QuizTest {
 			"0VwMJ5cpmKirULOuW321Zc", "1eq1wUnLVLg4pdEfx9kajC"};
 	List<UserIdentity> ui;
 	UserIdentity owner;
+	Question q1;
+	Question q2;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -35,8 +35,10 @@ public class QuizTest {
 		ui.add(new UserIdentity());
 
 		List<Question> questions = new ArrayList<>();
-		Question q1 = new Question(s.getTrack(songs[0]), s.getArtistOptions(songs[0]));
-		Question q2 = new Question(s.getTrack(songs[1]), s.getArtistOptions(songs[1]));
+		q1 = new Question(s.getTrack(songs[0]), s.getArtistOptions(songs[0]));
+		q2 = new Question(s.getTrack(songs[1]), s.getArtistOptions(songs[1]));
+		questions.add(q1);
+		questions.add(q2);
 
 		owner = new UserIdentity();
 
@@ -68,8 +70,6 @@ public class QuizTest {
 		List<UserIdentity> u = q.getJoinedPlayers();
 		assertTrue(q.leavePlayer(u.get(1)));
 		assertTrue(q.getJoinedPlayers().size() == 1);
-		// TODO this assertion does not pass, something with equals?
-		// assertTrue(!q.leavePlayer(new UserIdentity()));
 		assertTrue(q.leavePlayer(u.get(0)));
 		assertTrue(!q.leavePlayer(new UserIdentity()));
 	}
@@ -81,52 +81,66 @@ public class QuizTest {
 
 	@Test
 	public void testGetUserResults() throws Exception {
-
+		assertNotNull(q.getUserResults(owner));
 	}
 
 	@Test
 	public void testGetUserPoints() throws Exception {
-
+		assertNotNull(q.getUserPoints(q.getOwner()));
 	}
 
 	@Test
 	public void testGetPlayer() throws Exception {
-
+		assertNotNull(q.getPlayer(q.getOwner()));
+		assertNotNull(q.getPlayer(ui.get(0)));
 	}
 
 	@Test
 	public void testGetAllResults() throws Exception {
+		assertTrue(q.getNextQuestion().equals(q1));
+		q.answerQuestion(q.getOwner(), q1.getCorrect());
 
+		List<Player> results = q.getAllResults();
+		for (Player p : results) {
+			assertNotNull(p.getAnswerCorrect(q1));
+		}
 	}
 
 	@Test
 	public void testGetQuestions() throws Exception {
-
+		List<Question> que = q.getQuestions();
+		for(Question w : que) {
+			assertTrue(w.equals(q1) || w.equals(q2));
+		}
 	}
 
 	@Test
 	public void testGetCurrentQuestion() throws Exception {
-
+		assertTrue(q.getCurrentQuestion() == null);
+		Question qq = q.getNextQuestion();
+		assertTrue(q.getCurrentQuestion().equals(qq));
 	}
 
 	@Test
 	public void testAnswerQuestion() throws Exception {
-
+		assertTrue(q.getNextQuestion().equals(q1));
+		assertTrue(q.answerQuestion(ui.get(0), q1.getCorrect()));
+		assertTrue(q.getNextQuestion().equals(q2));
+		assertTrue(!q.answerQuestion(ui.get(0), "wrong"));
 	}
 
 	@Test
 	public void testGetNextQuestion() throws Exception {
-
-	}
-
-	@Test
-	public void testGetUUID() throws Exception {
-
+		Question qq = q.getNextQuestion();
+		assertTrue(qq.equals(q.getCurrentQuestion()));
+		Question qqq = q.getNextQuestion();
+		assertTrue(qqq.equals(q.getCurrentQuestion()));
+		assertTrue(q.getNextQuestion() == null);
 	}
 
 	@Test
 	public void testGetName() throws Exception {
-
+		assertTrue(q.getName().equals("quiz1"));
 	}
 
 }
