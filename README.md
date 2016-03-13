@@ -43,7 +43,7 @@ The application is built with AngularJS as the frontend application and Java EE 
 The application is built with the service based approach pattern.
 
 ### Layers
-Model
+#### Model
 ```
 Charlie/src/main/java/core/Player.java
 Charlie/src/main/java/core/Question.java
@@ -53,28 +53,28 @@ Charlie/src/main/java/core/UserIdentity.java
 Charlie/src/main/java/core/UserSession.java
 ```
 	
-Persistence
+#### Persistence
 ```
 Charlie/src/main/java/core/UserIdentity.java
 Charlie/src/main/java/core/User.java
 ```
 
-Service
+#### Service
 ```
 Charlie/src/main/java/core/SpotifyService.java
 ```
 
-Communication
+#### Communication
 ```
 Charlie/src/main/java/web/WebsocketServer.java
 ```
 
-Control
+#### Control
 ```
 Charlie/src/main/webapp/app/js/controllers.js
 ```
 	
-View
+#### View
 ```
 Charlie/src/main/webapp/app/partials/create.html
 Charlie/src/main/webapp/app/partials/profile.html
