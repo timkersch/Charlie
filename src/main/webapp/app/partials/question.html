@@ -39,7 +39,7 @@
     </md-toolbar>
 
     <div ng-cloak>
-        <h3 class="detValue"><span ng-show="showScores">Next question in </span>{{timeLeft}}</h3>
+        <h3 class="detValue"><span ng-show="showScores && currentQuestion < lastQuestion">Next question in </span>{{timeLeft}}</h3>
         <md-progress-linear md-mode="indeterminate"></md-progress-linear>
         <br />
     </div>
