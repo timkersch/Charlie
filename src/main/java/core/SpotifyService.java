@@ -13,10 +13,7 @@ import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -302,46 +299,66 @@ public class SpotifyService {
 	 */
 	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks, String countryCode) {
 		List<Track> chosenTracks = new ArrayList<>(noTracks);
-		for(int i = 0; i < noTracks; i++) {
-			int randTrack = randomInt(0, tracks.size() - 1);
-			int rand = randomInt(0, 1);
-			Track t = tracks.get(randTrack);
-			if (rand == 0) {
-				try {
-					List<Artist> relart = api.getArtistRelatedArtists(t.getArtists().get(0).getId()).build().get();
-					Track track = null;
-					do {
-						if (!relart.isEmpty()){
-							Artist a = relart.get(randomInt(0, relart.size() - 1));
-							List<Track> popularTracks = api.getTopTracksForArtist(a.getId(), countryCode).build().get();
-							track = popularTracks.get(randomInt(0, popularTracks.size() - 1));
-						}
-					} while(relart.isEmpty() || chosenTracks.contains(track) || track.getPreviewUrl().equals("null"));
-					chosenTracks.add(track);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-				try {
-					SimpleAlbum album = t.getAlbum();
-					try {
-						Album a = api.getAlbum(album.getId()).build().get();
-						List<SimpleTrack> strack = a.getTracks().getItems();
-						Track tt;
-						do {
-							SimpleTrack st = strack.get(randomInt(0, strack.size()-1));
-							tt = api.getTrack(st.getId()).build().get();
-						} while(chosenTracks.contains(tt) || tt.getPreviewUrl().equals("null"));
-						chosenTracks.add(tt);
-					} catch (Exception e) {
-						e.printStackTrace();
+
+		int i = 0;
+		while (i < noTracks) {
+			// Choose a track randomly
+			int randInt = randomInt(0, tracks.size() - 1);
+			Track randomTrack = tracks.get(randInt);
+
+			try {
+				// Get tracks from popular tracks of related artists
+				if (randInt % 2 == 0) {
+					Track track = trackFromRelatedArtist(randomTrack, chosenTracks, countryCode);
+					if (track != null) {
+						chosenTracks.add(track);
+						i++;
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
+
+				// Get tracks from songs on the same album
+				} else {
+					Track track = trackFromAlbum(randomTrack, chosenTracks);
+					if (track != null) {
+						chosenTracks.add(track);
+						i++;
+					}
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return chosenTracks;
+	}
+
+	// This method generates a track from related artists, if possible
+	private Track trackFromRelatedArtist(Track randomTrack, List<Track> chosenTracks, String countryCode) throws Exception {
+		List<Artist> relatedArtists = api.getArtistRelatedArtists(randomTrack.getArtists().get(0).getId()).build().get();
+		Collections.shuffle(relatedArtists);
+		for(Artist artist : relatedArtists) {
+			List<Track> popularTracks = api.getTopTracksForArtist(artist.getId(), countryCode).build().get();
+			Collections.shuffle(popularTracks);
+			for (Track track : popularTracks) {
+				if (!track.getPreviewUrl().equals("null") && !chosenTracks.contains(track)) {
+					return track;
+				}
+			}
+		}
+		return null;
+	}
+
+	// This method generates a track from the same album, if possible
+	private Track trackFromAlbum(Track randomTrack, List<Track> chosenTracks) throws Exception {
+		SimpleAlbum simpleAlbum = randomTrack.getAlbum();
+		Album album = api.getAlbum(simpleAlbum.getId()).build().get();
+		List<SimpleTrack> albumsTracks = album.getTracks().getItems();
+		Collections.shuffle(albumsTracks);
+		for (SimpleTrack strack : albumsTracks) {
+			Track track = api.getTrack(strack.getId()).build().get();
+			if (!track.getPreviewUrl().equals("null") && !chosenTracks.contains(track)) {
+				return track;
+			}
+		}
+		return null;
 	}
 
 	/**
