@@ -6,7 +6,7 @@ This project was created in Mars, 2016. The purpose of the application is to sim
 
 ## Members
 | Name         		| SSN       | Email  						|
-| ------------- 	|:---------:| -----------------------------:|
+| ----------------- |:---------:| ----------------------------- |
 | Erik Nordmark     | 870907 	| erinord@student.chalmers.se 	|
 | Joakim Berntsson  | 940524    | joabern@student.chalmers.se 	|
 | Simon Takman 		| 930321    | takman@student.chalmers.se 	|
