@@ -47,18 +47,15 @@ public class PlayerTest {
 
 	@Test
 	public void testSetAnswer() throws Exception {
-		// TODO error here in first if
-		try {
-			assertTrue(!p1.setAnswer(q1, ""));
-			for (String s : options1.keySet()) {
-				if (options1.get(s)) {
-					assertTrue(p1.setAnswer(q1, s));
-				} else {
-					assertTrue(!p1.setAnswer(q1, s));
-				}
+		assertTrue(!p1.setAnswer(q1, ""));
+		for (String s : options1.keySet()) {
+			if (options1.get(s)) {
+				assertTrue(p2.setAnswer(q1, s));
+				break;
+			} else {
+				assertTrue(!p2.setAnswer(q1, s));
+				break;
 			}
-		} catch(AssertionError e) {
-			System.out.println("");
 		}
 	}
 
