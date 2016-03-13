@@ -19,26 +19,11 @@ The application is a spotify based music quiz, which lets the user invite friend
 The application requires a spotify account, network connection and a modern web browser. 
 
 ### Use cases
-Name: Create a quiz 
-Goal: To get a quiz in return. 
-Actors: Owner 
-Precondition: 
-- Need to have logged in to the Spotify Account.
-- Need to have playlists on your Spotify Account. 
-Main Flow:
-1. On homepage – press start or new quiz in the menu.
-2. Give the quiz a name, number of questions and choose the playlist you want to generate the quiz from.
-3. Invite users to play with.
-4. Press CREATE.
-Alternative Flow:
-1. On homepage – press start or new quiz in the menu.
-2. Give the quiz a name, number of questions and choose the playlist you want to use the songs in the quiz.
-3. Invite users to play with.
-4. Press CREATE
-Postcondition:
-- Redirect to game lobby.
+These use cases includes name, goal, actors, precondition, main flow, alternative flow and postcondition. 
+[use-cases.pdf](docs/use-cases.pdf)
 
 ### Graphical interface
+
 
 ## Technical design
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
