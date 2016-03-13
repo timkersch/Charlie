@@ -158,12 +158,10 @@ public class SpotifyService {
 	 * @return a list of SimplePlaylist
 	 */
 	public List<SimplePlaylist> getUsersPlaylists(String userId) {
+		final UserPlaylistsRequest request = api.getPlaylistsForUser(userId).limit(50).build();
 		try {
-			UserPlaylistsRequest request = api.getPlaylistsForUser(userId).build();
-			Page<SimplePlaylist> pl = request.get();
-			// TODO this limit is not set??
-			pl.setLimit(50);
-			return pl.getItems();
+			final Page<SimplePlaylist> page = request.get();
+			return page.getItems();
 		} catch (Exception e) {
 			System.out.println("Something went wrong in getUsersPlaylists!" + e.getMessage());
 			return null;
