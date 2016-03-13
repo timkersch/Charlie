@@ -105,14 +105,17 @@ Charlie/src/main/webapp/app/partials/scoreboard.html
 ```
 
 ### Libraries
+Backend
 - Java Enterprise Edition
 - Michaelthelin Spotify API
 - Google Gson
 - Apache Derby
 - JUnit
 - Arquillian
+Frontend
 - Jasmine
 - Angular
+- Angular Material Design
 - Bootstrap
 - JQuery
 
