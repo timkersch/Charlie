@@ -44,36 +44,40 @@ The application is built with the service based approach pattern.
 
 ### Layers
 Models
-- Player.java
-- Question.java
-- Quiz.java
-- User.java
-- UserIdentity.java
-- UserSession.java
+```
+Charlie/src/main/java/core/Player.java
+Charlie/src/main/java/core/Question.java
+Charlie/src/main/java/core/Quiz.java
+Charlie/src/main/java/core/User.java
+Charlie/src/main/java/core/UserIdentity.java
+Charlie/src/main/java/core/UserSession.java
+```
 	
 Persistence
-- UserIdentity.java
-- User.java
+```
+Charlie/src/main/java/core/UserIdentity.java
+Charlie/src/main/java/core/User.java
+```
 
 Service
-- charlieProxy.js
-	
-Controllers
-- mainController.js
-- homeController.js
-- lobbyController.js
-- createController.js
-- questionController.js
-- scoreboardController.js
-- profileController.js
+```
+Charlie/src/main/webapp/app/js/services.js
+```
+
+Control
+```
+Charlie/src/main/webapp/app/js/controllers.js
+```
 	
 Views
-- create.html
-- profile.html
-- home.html
-- lobby.html
-- question.html
-- scoreboard.html
+```
+Charlie/src/main/webapp/app/partials/create.html
+Charlie/src/main/webapp/app/partials/profile.html
+Charlie/src/main/webapp/app/partials/home.html
+Charlie/src/main/webapp/app/partials/lobby.html
+Charlie/src/main/webapp/app/partials/question.html
+Charlie/src/main/webapp/app/partials/scoreboard.html
+```
 
 ### Libraries
 - Java Enterprise Edition
