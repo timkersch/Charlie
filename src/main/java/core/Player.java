@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by: Tim Kerschbaumer Project: SpotHoot Date: 2016-03-11 Time: 15:27
+ * Created by: Tim Kerschbaumer
+ * Project: SpotHoot
+ * Date: 2016-03-11
+ * Time: 15:27
  */
 public class Player {
 

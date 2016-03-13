@@ -8,7 +8,10 @@ import java.util.*;
 import web.WebsocketServer;
 
 /**
- * Created by: Tim Kerschbaumer Project: SpotHoot Date: 2016-03-10 Time: 10:31
+ * Created by: Tim Kerschbaumer
+ * Project: SpotHoot
+ * Date: 2016-03-10
+ * Time: 10:31
  */
 public class Question {
 
