@@ -17,7 +17,6 @@ import static org.junit.Assert.*;
  * Time: 17:38
  */
 public class QuestionTest {
-	/*
 	SpotifyService s = new SpotifyService();
 	String[] songs = {"57ay2J7PoNPKUGIncs3lHi", "4ycUbcT3euZ3ICarb23fQF", "0SVZV4iQ9Qi5mEpijs63v1",
 			"0VwMJ5cpmKirULOuW321Zc", "1eq1wUnLVLg4pdEfx9kajC"};
@@ -74,5 +73,5 @@ public class QuestionTest {
 				break;
 			}
 		}
-	}*/
+	}
 }

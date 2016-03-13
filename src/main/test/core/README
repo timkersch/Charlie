@@ -7,7 +7,7 @@
 # CODE 429 - MEANING THAT TOO MANY REQUESTS HAS BEEN SENT TO THE SPOTIFY                      #
 # REST-API.                                                                                   #
 #                                                                                             #
-# PLEASE INSERT THREAD.SLEEP(MILLIS) OR RUN THE TEST SEPERATELY                               #
+# PLEASE INSERT THREAD.SLEEP(MILLIS) AND/OR RUN THE TEST SEPERATELY                               #
 # TO OVERCOME THIS PROBLEM.                                                                   #
 #                                                                                             #
 ###############################################################################################
