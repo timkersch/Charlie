@@ -105,7 +105,6 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             call: function (method, data, callback) {
                 invoke(method, data, callback);
             },
-            
             /**
              * Service
              */
@@ -234,10 +233,9 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                         callback(quiz);
                     });
             },
-            getNumberOfQuestions: function(){
+            getNumberOfQuestions: function () {
                 return !currentQuiz ? 0 : currentQuiz.questions.length;
             },
-            
             /* action: 
              *      userJoined          --> callback(newUser)
              *      invitedTo           --> callback(quiz)
