@@ -192,7 +192,7 @@ public class SpotifyServiceTest {
 				}
 
 				// So that rate limit does not exceed
-				Thread.sleep(5000);
+				Thread.sleep(2000);
 			}
 		}
 	}
