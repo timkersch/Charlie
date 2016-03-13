@@ -20,6 +20,7 @@ The application requires a spotify account, network connection and a modern web 
 
 ### Use cases
 These use cases includes name, goal, actors, precondition, main flow, alternative flow and postcondition. 
+
 [use-cases.pdf](docs/use-cases.pdf)
 
 ### Graphical interface
