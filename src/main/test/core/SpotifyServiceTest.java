@@ -128,7 +128,7 @@ public class SpotifyServiceTest {
 				}
 			}
 		}
-	}*/
+	}
 
 	@Test
 	public void testGetSimilarTracks() throws Exception {
@@ -201,5 +201,5 @@ public class SpotifyServiceTest {
 				}
 			}
 		}
-	}
+	}*/
 }

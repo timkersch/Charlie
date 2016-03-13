@@ -11,6 +11,9 @@ import com.wrapper.spotify.methods.PlaylistTracksRequest;
 import com.wrapper.spotify.methods.UserPlaylistsRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.*;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 import java.io.IOException;
 import java.util.*;
@@ -337,13 +340,15 @@ public class SpotifyService {
 
 	// This method generates a track from related artists, if possible
 	private Track trackFromRelatedArtist(Track randomTrack, List<Track> chosenTracks, String countryCode) throws Exception {
+		HttpClient client = new HttpClient();
 		List<Artist> relatedArtists = api.getArtistRelatedArtists(randomTrack.getArtists().get(0).getId()).build().get();
 		Collections.shuffle(relatedArtists);
 		for(Artist artist : relatedArtists) {
 			List<Track> popularTracks = api.getTopTracksForArtist(artist.getId(), countryCode).build().get();
 			Collections.shuffle(popularTracks);
 			for (Track track : popularTracks) {
-				if (!track.getPreviewUrl().equals("null") && !chosenTracks.contains(track)) {
+				GetMethod getter = new GetMethod(track.getPreviewUrl());
+				if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.contains(track)) {
 					return track;
 				}
 			}
@@ -353,13 +358,15 @@ public class SpotifyService {
 
 	// This method generates a track from the same album, if possible
 	private Track trackFromAlbum(Track randomTrack, List<Track> chosenTracks) throws Exception {
+		HttpClient client = new HttpClient();
 		SimpleAlbum simpleAlbum = randomTrack.getAlbum();
 		Album album = api.getAlbum(simpleAlbum.getId()).build().get();
 		List<SimpleTrack> albumsTracks = album.getTracks().getItems();
 		Collections.shuffle(albumsTracks);
 		for (SimpleTrack strack : albumsTracks) {
 			Track track = api.getTrack(strack.getId()).build().get();
-			if (!track.getPreviewUrl().equals("null") && !chosenTracks.contains(track)) {
+			GetMethod getter = new GetMethod(track.getPreviewUrl());
+			if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.contains(track)) {
 				return track;
 			}
 		}
