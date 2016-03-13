@@ -3,8 +3,8 @@
 var charlieService = angular.module('charlieService', []);
 
 
-charlieService.factory('charlieProxy', ['$q', '$rootScope',
-    function ($q, $rootScope) {
+charlieService.factory('charlieProxy', ['$rootScope',
+    function ($rootScope) {
         var socket = new WebSocket("ws://localhost:8080/Charlie/api");
 
         var requestId = 0;
@@ -54,17 +54,8 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 request_id: getRequestId(),
                 data: data
             };
-            //var deferred = $q.defer();
             callbacks[request.request_id] = callback;
             socket.send(angular.toJson(request));
-            /*return deferred.promise.then(function(response) {
-             console.log("Invoke(" + name + "), response: ", response);
-             request.response = response;
-             try {
-             response.data = JSON.parse(response.data);
-             } catch(error) {}
-             return response.data;
-             });*/
         };
 
         var setReady = function () {

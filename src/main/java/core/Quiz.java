@@ -8,6 +8,7 @@ import java.util.*;
 
 /**
  * Created by jcber on 2016-03-04.
+ * Model for a quiz. This will be stored in-memory and not stored in database.
  */
 public class Quiz {
 
