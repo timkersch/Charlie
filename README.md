@@ -24,7 +24,7 @@ The application requires a spotify account, network connection and a modern web 
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
 
 ### UML
-![alt tag](docs/images/uml.png)
+![alt tag](docs/images/UML.png)
 
 ### Approach
 The application is built with the service based approach pattern.
