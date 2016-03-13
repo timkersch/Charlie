@@ -5,7 +5,7 @@ var charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$q', '$rootScope',
     function($q, $rootScope){
-        var socket = new WebSocket("ws://localhost:8080/SpotHoot/api");
+        var socket = new WebSocket("ws://localhost:8080/Charlie/api");
 
         var requestId = 0;
         var getRequestId = function(){
