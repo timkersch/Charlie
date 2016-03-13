@@ -6,6 +6,7 @@ import java.util.Objects;
 
 /**
  * Created by jcber on 2016-03-03.
+ * An embeddable User class.
  */
 
 @Embeddable

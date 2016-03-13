@@ -1,6 +1,4 @@
-package core; /**
- * Created by jcber on 2016-03-01.
- */
+package core; 
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.JsonObject;
@@ -12,6 +10,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+/**
+ * Created by jcber on 2016-03-01.
+ * A handler for UserSessions. This will be a collection of all connected
+ * sessions and it should be possible to communicate to them  by calling
+ * methods in this class.
+ */
 
 @ApplicationScoped
 public class SessionHandler {
