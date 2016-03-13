@@ -241,7 +241,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                 charlieProxy.answerQuestion(data, function(artist){
                    console.log("Correct answer is: " + artist); 
                    $scope.correctAnswer = artist;
-                   $scope.showScores = true;
+                   //$scope.showScores = true;
                 });
             }
         };
@@ -282,6 +282,7 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
                     if (!hasAnswered) {
                         $scope.selectedAnswer("", "");
                     }
+                    $scope.showScores = true;
                     $scope.showCorrect = true;
                     // Question over
                     if (charlieProxy.isQuizOwner()){
