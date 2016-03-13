@@ -70,7 +70,6 @@ public class Question {
      */
     public List<String> getArtists() {
         List<String> artists = new ArrayList<>(artistNames.keySet());
-        Collections.shuffle(artists);
         return artists;
     }
 

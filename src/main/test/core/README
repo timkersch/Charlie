@@ -1,0 +1,13 @@
+###############################################################################################
+#                                                                                             #
+# PLEASE OBSERVE THAT THE TEST FILES IN THIS TEST-DIRECTORY                                   #
+# ARE CONNECTED TO THE SPOTIFY API.                                                           #
+#                                                                                             #
+# RUNNING ALL THESE TEST MAY CAUSE AN EXCEPTION WITH HTTP ERROR                               #
+# CODE 429 - MEANING THAT TOO MANY REQUESTS HAS BEEN SENT TO THE SPOTIFY                      #
+# REST-API.                                                                                   #
+#                                                                                             #
+# PLEASE INSERT THREAD.SLEEP(MILLIS) OR RUN THE TEST SEPERATELY                               #
+# TO OVERCOME THIS PROBLEM.                                                                   #
+#                                                                                             #
+###############################################################################################

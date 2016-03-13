@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import com.wrapper.spotify.models.SimplePlaylist;
 import com.wrapper.spotify.models.Track;
 import core.*;
+import util.NoRelatedArtistsException;
+
 import java.lang.reflect.Method;
 
 import javax.inject.Inject;
@@ -329,7 +331,7 @@ public class WebsocketServer {
 
         List<Question> questions = new ArrayList<>();
         for (int i = 0; i < quizTracks.size(); i++) {
-            questions.add(new Question(quizTracks.get(i), service.getArtistOptions(quizTracks.get(i))));
+	        questions.add(new Question(quizTracks.get(i), service.getArtistOptions(quizTracks.get(i))));
         }
 
         // Get users
