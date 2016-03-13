@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
  */
 
 public class QuizTest {
-	/*
 	Quiz q;
 	SpotifyService s = new SpotifyService();
 	String[] songs = {"57ay2J7PoNPKUGIncs3lHi", "4ycUbcT3euZ3ICarb23fQF", "0SVZV4iQ9Qi5mEpijs63v1",
@@ -143,6 +142,6 @@ public class QuizTest {
 	@Test
 	public void testGetName() throws Exception {
 		assertTrue(q.getName().equals("quiz1"));
-	}*/
+	}
 
 }
