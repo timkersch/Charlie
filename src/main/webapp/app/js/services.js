@@ -14,6 +14,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var isReady = false;
         var callbacks = {};
         var listenCallbacks = {};
+		var readyCallbacks = [];
         var user = {};
         var currentQuiz;
 
@@ -62,6 +63,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var setReady = function(){
             console.log("service-ready");
             isReady = true;
+			for (var i = 0; i < readyCallbacks.length; i++) {
+				readyCallbacks[i]();
+			}
+			readyCallbacks = [];
             $rootScope.$broadcast('service-ready');
         };
 
@@ -90,6 +95,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
 
         return {
+			
+			call: function(method, data, callback){
+				invoke(method, data).then(callback);
+			},
 
             /**
              * Service
@@ -98,6 +107,13 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             isReady: function(){
                 return isReady;
             },
+			
+			onReady: function(callback){
+				if (!isReady)
+					readyCallbacks.push(callback);
+				else 
+					callback();
+			},
             
             /**
              * User
