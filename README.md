@@ -29,37 +29,37 @@ The application is built with AngularJS as the frontend application and Java EE 
 The application is built with the service based approach pattern.
 
 ### Layers
-Model
-- Player
-- Question
-- Quiz
-- User
-- UserIdentity
-- UserSession
+- Model
+ - Player.java
+ - Question.java
+ - Quiz.java
+ - User.java
+ - UserIdentity.java
+ - UserSession.java
 	
-Persistence
-- UserIdentity
-- User
+- Persistence
+ - UserIdentity.java
+ - User.java
 
 Service
-- charlieProxy
+- charlieProxy.js
 	
 Control
-- mainController
-- homeController
-- lobbyController
-- createController
-- questionController
-- scoreboardController
-- profileController
+- mainController.js
+- homeController.js
+- lobbyController.js
+- createController.js
+- questionController.js
+- scoreboardController.js
+- profileController.js
 	
 View
-- create
-- profile
-- home
-- lobby
-- question
-- scoreboard
+- create.html
+- profile.html
+- home.html
+- lobby.html
+- question.html
+- scoreboard.html
 
 ### Libraries
 
