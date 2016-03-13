@@ -215,7 +215,9 @@ public class WebsocketServer {
         JsonObject object = new JsonObject();
         object.addProperty("track_url", trackUrl);
         object.add("artists", artistsJson);
-        object.addProperty("answered", player.hasAnswered(currentQuestion));
+        object.addProperty("number", userSession.getCurrentQuiz().getQuestions().indexOf(currentQuestion) + 1);
+        object.addProperty("answer", player.getAnswer(currentQuestion));
+        object.addProperty("correct", currentQuestion.getCorrect());
         String objAsString = object.toString();
 
         String response = createResponse(requestId, action, objAsString);
@@ -400,6 +402,7 @@ public class WebsocketServer {
             JsonObject obj = new JsonObject();
             obj.addProperty("track_url", nextTrack);
             obj.add("artists", artistsAsJson);
+            obj.addProperty("number", session.getCurrentQuiz().getQuestions().indexOf(nextQuestion) + 1);
             String objString = obj.toString();
 
             log("newQuestion: " + objString);
