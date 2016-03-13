@@ -33,14 +33,22 @@ The use cases includes name, goal, actors, precondition, main flow, alternative 
 ### Graphical interface
 
 #### Home
+![Home](docs/images/home.png)
+![Invited](docs/images/invited.png)
 
 #### Create Quiz
+![Created](docs/images/create-quiz.png)
 
 #### Lobby
+![Lobby](docs/images/lobby.png)
 
 #### Questions
+![Question](docs/images/question.png)
+![Answered](docs/images/answered.png)
+![Score](docs/images/score.png)
 
 #### Scoreboard
+![Scoreboard](docs/images/scoreboard.png)
 
 ## Technical design
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
