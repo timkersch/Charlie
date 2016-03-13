@@ -60,6 +60,9 @@
     </md-grid-list>
     
     <center ng-show="showScores">
+        
+        <canvas id="questionScores" width="400" height="400"></canvas>
+        
         <md-list>
             <md-list-item ng-repeat="player in players| orderBy:'-points'">
                 <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">

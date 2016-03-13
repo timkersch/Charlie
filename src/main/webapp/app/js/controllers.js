@@ -161,6 +161,25 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var intervalPromise;
         $scope.players = [];
         
+        var data = {
+          labels: [""],
+          datasets: [{
+            fillColor: "#0033cc",
+            data: [1]
+          },{
+            fillColor: "#006600",
+            data: [3]
+          },{
+            fillColor: "#ff3300",
+            data: [2]
+          },{
+            fillColor: "#ff00ff",
+            data: [4]
+          }]};
+        
+        var context = document.getElementById("questionScores").getContext("2d");
+        var questionChart = new Chart(context).Bar(data);
+        
         var play = function(url) {
             // Stop previous
             audioElement.pause();
