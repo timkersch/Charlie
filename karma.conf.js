@@ -18,8 +18,8 @@ module.exports = function(config) {
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-resource/angular-resource.js',
-      'src/main/webapp/app/**/*.js',
-      'src/main/webapp/test/**/*.js'
+      'src/main/webapp/app/js/*.js',
+      'src/main/webapp/test/js/*.js'
     ],
 
 

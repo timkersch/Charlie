@@ -14,16 +14,21 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
         var isReady = false;
         var callbacks = {};
         var listenCallbacks = {};
+		var readyCallbacks = [];
         var user = {};
         var currentQuiz;
 
-        socket.onmessage = function(event){
-            console.log(event);
+        socket.onmessage = function(event){;
             var response = angular.fromJson(event.data);
             if (angular.isDefined(callbacks[response.request_id])) {
                 var callback = callbacks[response.request_id];
                 delete callbacks[response.request_id];
-                callback.resolve(response);
+                try {
+                    response.data = JSON.parse(response.data);
+                } catch(error) {}
+				console.log("Invoke(" + response.action + "), response: ", response.data);
+                callback(response.data);
+				$rootScope.$apply();
             } else {
                 console.log("ListenEvent(%o)", response.action);
                 var action = response.action;
@@ -39,29 +44,33 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             }
         };
 
-        var invoke = function(name, data) {
+        var invoke = function(name, data, callback) {
             console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
             var request = {
                 action: name,
                 request_id: getRequestId(),
                 data: data
             };
-            var deferred = $q.defer();
-            callbacks[request.request_id] = deferred;
+            //var deferred = $q.defer();
+            callbacks[request.request_id] = callback;
             socket.send(angular.toJson(request));
-            return deferred.promise.then(function(response) {
+            /*return deferred.promise.then(function(response) {
                 console.log("Invoke(" + name + "), response: ", response);
                 request.response = response;
                 try {
                     response.data = JSON.parse(response.data);
                 } catch(error) {}
                 return response.data;
-            });
+            });*/
         };
         
         var setReady = function(){
             console.log("service-ready");
             isReady = true;
+			for (var i = 0; i < readyCallbacks.length; i++) {
+				readyCallbacks[i]();
+			}
+			readyCallbacks = [];
             $rootScope.$broadcast('service-ready');
         };
 
@@ -72,12 +81,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 var data = {
                     id: user.id
                 };
-                invoke("setUser", data).then(function(success){
+                invoke("setUser", data, function(success){
                     if (!success) {
                         sessionStorage.user = "";
                         setReady();
                     }else{
-                        invoke("getQuiz").then(function(quiz){
+                        invoke("getQuiz", {}, function(quiz){
                             currentQuiz = quiz;
                             setReady();
                         });
@@ -90,6 +99,10 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
 
         return {
+			
+			call: function(method, data, callback){
+				invoke(method, data, callback);
+			},
 
             /**
              * Service
@@ -98,6 +111,13 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             isReady: function(){
                 return isReady;
             },
+			
+			onReady: function(callback){
+				if (!isReady)
+					readyCallbacks.push(callback);
+				else 
+					callback();
+			},
             
             /**
              * User
@@ -105,7 +125,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
             // callback(url)
             getLoginUrl: function(callback) {
-                invoke("getLoginURL").then(callback);
+                invoke("getLoginURL", {}, callback);
             },
 
             isLoggedIn: function(){
@@ -116,7 +136,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 var data = {
                     code: code
                 };
-                invoke("login", data).then(function(userData){
+                invoke("login", data, function(userData){
                     user = userData;
                     sessionStorage.user = angular.toJson(user);
                     callback(user);
@@ -140,7 +160,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
             // callback(users)
             getUsers: function(callback){
-                invoke("getUsers").then(callback);
+                invoke("getUsers", {}, callback);
             },
             
             /**
@@ -157,7 +177,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                     nbrOfSongs: nbrOfSongs,
                     generated: generated
                 };
-                invoke("createQuiz", data).then(function(quiz){
+                invoke("createQuiz", data, function(quiz){
                     currentQuiz = quiz;
                     callback(currentQuiz);
                 });
@@ -165,7 +185,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
             // callback(lists)
             getPlaylists: function(callback){
-                invoke("getPlaylists").then(callback);
+                invoke("getPlaylists", {}, callback);
             },
             
             // callback(isCorrect)
@@ -173,12 +193,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 var data = {
                     artistName: artistName
                 };
-                invoke('answerQuestion', data).then(callback);
+                invoke('answerQuestion', data, callback);
             },
             
             // callback(question)
             getCurrentQuestion: function(callback) {
-                invoke('getCurrentQuestion').then(callback);
+                invoke('getCurrentQuestion', {}, callback);
             },
             
             isQuizOwner: function() {
@@ -187,12 +207,12 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             
             // callback(started)
             isQuizStarted: function(callback){
-                invoke("isQuizStarted").then(callback);
+                invoke("isQuizStarted", {}, callback);
             },
             
             // callback(users)
             getUsersInQuiz: function(callback){
-                invoke('getUsersInQuiz').then(callback);
+                invoke('getUsersInQuiz', {}, callback);
             },
             
             // callback(success)
@@ -200,7 +220,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 var data = {
                     quizId: quiz.uuid
                 };
-                invoke('joinQuiz', data).then(function(success){
+                invoke('joinQuiz', data, function(success){
                     if (success)
                         currentQuiz = quiz;
                     callback(success);
@@ -209,7 +229,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
 
             // callback(question)
             nextQuestion: function(callback) {
-                invoke('nextQuestion').then(callback);
+                invoke('nextQuestion', {}, callback);
             },
 
             savePlaylist: function() {
@@ -218,7 +238,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
             
             // callback(users)
             getResults: function(callback){
-                invoke('getResults').then(callback);
+                invoke('getResults', {}, callback);
             },
 
             // callback(quiz)
@@ -226,7 +246,7 @@ charlieService.factory('charlieProxy', ['$q', '$rootScope',
                 if (currentQuiz)
                     callback(currentQuiz);
                 else
-                    invoke("getQuiz").then(function(quiz){
+                    invoke("getQuiz", {}, function(quiz){
                         currentQuiz = quiz;
                         callback(quiz);
                     });
