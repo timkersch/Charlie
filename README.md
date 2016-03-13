@@ -32,6 +32,15 @@ The use cases includes name, goal, actors, precondition, main flow, alternative 
 
 ### Graphical interface
 
+#### Home
+
+#### Create Quiz
+
+#### Lobby
+
+#### Questions
+
+#### Scoreboard
 
 ## Technical design
 The application is built with AngularJS as the frontend application and Java EE as the backend solution. 
