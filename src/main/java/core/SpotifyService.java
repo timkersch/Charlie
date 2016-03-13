@@ -14,6 +14,7 @@ import com.wrapper.spotify.models.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import util.LocalSongsException;
 
 import java.io.IOException;
 import java.util.*;
@@ -186,18 +187,25 @@ public class SpotifyService {
 	 * @param playlistId a playlist id
 	 * @return List of Track in the playlist
 	 */
-	public List<Track> getPlaylistSongs(String playlistId, String ownerId) {
+	public List<Track> getPlaylistSongs(String playlistId, String ownerId) throws LocalSongsException {
 		try {
 			PlaylistTracksRequest request = api.getPlaylistTracks(ownerId, playlistId).build();
 			List<PlaylistTrack> playlistTracks = request.get().getItems();
 			List<Track> tracks = new ArrayList<>(playlistTracks.size());
 			for (PlaylistTrack pt : playlistTracks) {
-				tracks.add(pt.getTrack());
+				if (SpotifyEntityType.TRACK == pt.getTrack().getType()) {
+					tracks.add(pt.getTrack());
+				}
 			}
 			return tracks;
 
 		} catch (Exception e) {
 			System.out.println("Something went wrong in getPlaylistSongs!" + e.getMessage());
+			if (e.getMessage().equals("No enum constant com.wrapper.spotify.models.AlbumType.NULL")) {
+				// This is a known error in the Spotify wrapper, nothing to do until
+				// they give a new release in maven...
+				throw new LocalSongsException("Local songs in the playlist selected");
+			}
 			return null;
 		}
 	}
