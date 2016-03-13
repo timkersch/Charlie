@@ -1,0 +1,28 @@
+<style>
+    div .chart {
+        margin: 1.5em 0 1.2em 0;
+    }
+</style>
+
+<md-content class="autoScroll" ng-cloak>
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
+    </md-toolbar>
+    <center id="centerScoreboard" ng-cloak>
+        <br>
+        <md-list>
+            <md-list-item ng-repeat="person in scores| orderBy:'-value'">
+                <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{person.color}}">
+                <md-icon aria-label="Menu" class="material-icons {{person.color}}">person</md-icon>
+                {{person.userName}}
+                </p>
+                <p>{{person.value}} {{person.value == 1 ? "point" : "points"}}</p>
+            </md-list-item>
+        </md-list>
+        <br><br>
+        <md-button ng-click="savePlaylist()" ng-disabled="isDisabled" class="md-primary md-raised">{{playlistText}}</md-button>
+    </center>
+    <div class="end">
+        <md-button ng-click="changeView('/')" class="md-primary md-raised">GO TO HOME</md-button>
+    </div>
+</md-content>

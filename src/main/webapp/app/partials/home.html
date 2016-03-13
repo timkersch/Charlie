@@ -1,0 +1,29 @@
+<style>
+
+    #music_note{
+        color:rgb(245,0,87);
+        font-size:145px;
+        height:145px;
+        width:145px;
+        margin-top:50px;
+        margin-bottom:40px;
+        display:block;
+    }
+
+    h4 {
+        text-align: center;
+    }
+
+</style>
+<md-content class="autoScroll" ng-cloak>
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">home</md-icon>Home</span></div>
+    </md-toolbar>
+    <h4>
+        <md-icon aria-label="Menu" class="material-icons" id="music_note">music_note</md-icon>
+        Charlie is a musical adventure through songs related to your favourite playlists. 
+    </h4>  
+    <div ng-cloak class="end">
+        <md-button class="md-accent md-raised" ng-click="changeView('/create')" ng-show="isLoggedIn()">Start</md-button>
+    </div>
+</md-content>  

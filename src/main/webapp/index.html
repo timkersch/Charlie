@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Charlie</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+        <link rel="stylesheet" type="text/css" href="app/style.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+        <!-- Angular.js-->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-animate.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-aria.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-messages.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+
+
+        <!-- Internal Angular.js files -->
+        <script src="app/js/app.js"></script>
+        <script src="app/js/controllers.js"></script>
+        <script src="app/js/services.js"></script>
+
+        <!-- Angular Material-->
+        <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.4/angular-material.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+        <base href="/Charlie/" />
+    </head>
+    <body ng-app="charlieApp">
+        <div layout="row" ng-controller="mainController">
+            <md-toolbar class="md-toolbar-tools">
+                <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
+                    <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
+                </md-button>
+                <h2> <a ng-href="/Charlie">Charlie</a></h2>
+                <span flex="" class="flex"></span>
+                <span>{{user.name}}</span>
+                <md-button ng-show="!user.name" ng-click="login()">Login</md-button>
+                <md-button ng-show="user.name" ng-click="logout()">Logout</md-button>
+            </md-toolbar>
+            <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
+                <md-toolbar ng-click="toggleLeftMenu()">
+                    <div layout="row" layout-padding>
+                        <h1 class="md-toolbar-tools">Menu</h1>
+                    </div>
+                </md-toolbar>
+
+                <md-list>
+                    <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/')">
+                        <div class="inset">
+                            <md-icon aria-label="Menu" class="material-icons">home</md-icon>
+                        </div>
+                        <div class="inset ng-binding">Home</div>
+                        <div class="md-ripple-container"></div>
+                    </md-list-item>
+
+                    <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/create')" ng-show="isLoggedIn()">
+                        <div class="inset">
+                            <md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>
+                        </div>
+                        <div class="inset ng-binding">New Quiz</div>
+                        <div class="md-ripple-container"></div>
+                    </md-list-item>
+
+                    <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/profile')" ng-show="isLoggedIn()">
+                        <div class="inset">
+                            <md-icon aria-label="Menu" class="material-icons">person</md-icon>
+                        </div>
+                        <div class="inset ng-binding">Profile</div>
+                        <div class="md-ripple-container"></div>
+                    </md-list-item>
+                </md-list>
+            </md-sidenav>
+        </div>
+
+        <div ng-view class="partials-cont">
+        </div>
+    </body>
+</html>
