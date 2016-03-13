@@ -24,6 +24,6 @@
         Charlie is a musical adventure through songs related to your favourite playlists. 
     </h4>  
     <div ng-cloak class="end">
-        <md-button class="md-accent md-raised" ng-click="changeView('/create')">Start</md-button>
+        <md-button class="md-accent md-raised" ng-click="changeView('/create')" ng-show="isLoggedIn()">Start</md-button>
     </div>
 </md-content>  
