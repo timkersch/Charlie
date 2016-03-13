@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
  * Time: 13:16
  */
 public class SpotifyServiceTest {
+	/*
 	SpotifyService s = new SpotifyService();
 	String user = "tiimiz";
 	String[] songs = {"57ay2J7PoNPKUGIncs3lHi", "4ycUbcT3euZ3ICarb23fQF", "0SVZV4iQ9Qi5mEpijs63v1",
@@ -131,6 +132,7 @@ public class SpotifyServiceTest {
 
 	@Test
 	public void testGetSimilarTracks() throws Exception {
+		// This will eat up the requests from spotify
 		for (int i = 0; i < playlists.length; i++) {
 			List<Track> playlistSongs = s.getPlaylistSongs(playlists[i], user);
 			try {
@@ -195,5 +197,5 @@ public class SpotifyServiceTest {
 				Thread.sleep(2000);
 			}
 		}
-	}
+	}*/
 }
