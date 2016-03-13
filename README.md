@@ -4,7 +4,7 @@ Group #1's contribution to the web application project, 2016.
 ## About
 This project was created in Mars, 2016. The purpose of the application is to simplify the task to create and distribute music quizes. 
 
-## Members
+## Contributors
 | Name         		| SSN       | Email  						|
 | ----------------- |:---------:| ----------------------------- |
 | Erik Nordmark     | 870907 	| erinord@student.chalmers.se 	|
@@ -19,12 +19,12 @@ The application is a spotify based music quiz, which lets the user invite friend
 The application requires a spotify account, network connection and a modern web browser. 
 
 ### Use cases
-Name: Create a quiz
-Goal: To get a quiz in return.
-Actors: Owner
-Precondition:
+Name: Create a quiz 
+Goal: To get a quiz in return. 
+Actors: Owner 
+Precondition: 
 - Need to have logged in to the Spotify Account.
-- Need to have playlists on your Spotify Account.
+- Need to have playlists on your Spotify Account. 
 Main Flow:
 1. On homepage – press start or new quiz in the menu.
 2. Give the quiz a name, number of questions and choose the playlist you want to generate the quiz from.
