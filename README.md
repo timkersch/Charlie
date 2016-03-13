@@ -110,7 +110,7 @@ npm install
 karma start
 ```
 
-## Run JUnit and Arquillian tests
+### Run JUnit and Arquillian tests
 To run the JUnit and Arquillian tests for this project do the following.
 ```
 git clone https://github.com/jcberntsson/Charlie.git
