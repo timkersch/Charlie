@@ -303,13 +303,13 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         });
     }]);
 
-charlieController.controller('scoreboardController', [ '$scope', '$location' , 'charlieProxy',
-    function($scope, $location, charlieProxy) {
+charlieController.controller('scoreboardController', [ '$scope', '$document', '$location' , 'charlieProxy',
+    function($scope, $document, $location, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
         /*-------------------------*/
         
-        
+        var canvasChart = $document[0].createElement('canvas');
         
         /*-------------------------*/
         
@@ -328,12 +328,17 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         var classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
 
         var init = function(){
+            canvasChart.id = "scoreboardChart";
+            canvasChart.width="200"; 
+            canvasChart.height="200";
+            var scoreboardCenter = document.getElementById("centerScoreboard");
             charlieProxy.getResults(function(users){
                 if (users) {
                     var data = {
                         labels: [""],
                         datasets: []
                     };
+                    
                     
                     $scope.scores = [];
                     $scope.chart.values = [];
@@ -355,11 +360,18 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
                         });
                         /*$scope.chart.values.push(users[i].points);
                         $scope.chart.labels.push(users[i].name);*/
-                    };
+                    }
+                    
                     console.log(data);
-                    var context = document.getElementById("scoreboardChart").getContext("2d");
-                    var scoreboardChart = new Chart(context).Bar(data);
-                    scoreboardChart.update();
+                   
+                   setTimeout(function(){
+                        scoreboardCenter.insertBefore(canvasChart, scoreboardCenter.firstChild);
+                        var context = canvasChart.getContext("2d");
+                        var scoreboardChart = new Chart(context).Bar(data);
+                        $scope.$apply();
+                    }, 50);
+                    
+                    
                 }
             });
         };

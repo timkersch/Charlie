@@ -8,8 +8,8 @@
     <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
-    <center>
-        <canvas id="scoreboardChart" width="200" height="200"></canvas> 
+    <center id="centerScoreboard" ng-cloak>
+        <!--<canvas id="scoreboardChart" width="200" height="200"></canvas>--> 
         <br>
         <md-list>
             <md-list-item ng-repeat="person in scores | orderBy:'-value'">
