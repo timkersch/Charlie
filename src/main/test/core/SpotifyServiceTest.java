@@ -29,7 +29,6 @@ public class SpotifyServiceTest {
 		s.initTests();
 	}
 
-	/*
 	@Test
 	public void testRandomInt() throws Exception {
 		int rand = s.randomInt(1, 1);
@@ -201,5 +200,5 @@ public class SpotifyServiceTest {
 				}
 			}
 		}
-	}*/
+	}
 }
