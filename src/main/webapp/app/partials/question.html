@@ -59,15 +59,21 @@
         </md-grid-tile>
     </md-grid-list>
     
-    <md-list ng-show="showScores">
-        <md-list-item ng-repeat="player in players| orderBy:'-points'">
-            <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">
-                <md-icon aria-label="Menu" class="material-icons {{getTextColor($index)}}">person</md-icon>
-                {{player.name}}
-            </p>
-            <p>{{player.points}} {{player.points == 1 ? "point" : "points"}}</p>
-        </md-list-item>
-    </md-list>
+
+    <center ng-show="showScores">
+        
+        
+        <md-list>
+            <md-list-item ng-repeat="player in players| orderBy:'-points'">
+                <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">
+                    <md-icon aria-label="Menu" class="material-icons {{getTextColor($index)}}">person</md-icon>
+                    {{player.name}}
+                </p>
+                <p>{{player.points}} {{player.points == 1 ? "point" : "points"}}</p>
+            </md-list-item>
+        </md-list>
+    </center>
+
 
     <md-grid-list md-cols-xs="2" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="4" ng-show="!showScores"
                   md-row-height-gt-md="4:4" md-row-height="2:2" md-gutter="0" md-gutter-gt-sm="0">
