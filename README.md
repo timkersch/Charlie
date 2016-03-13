@@ -65,5 +65,33 @@ View
 ### Libraries
 
 
-### Setup
-Explain how to setup the project.
+## Setup
+This section explains how to setup and run the project and its tests.
+
+### Build and run
+To run this project follow the instructions below.
+```
+git clone https://github.com/jcberntsson/Charlie.git
+```
+Then open the project in Netbeans and add a database called "db" in the services tab. 
+
+### Build and run tests
+To run the jasmine tests do the following.
+```
+git clone https://github.com/jcberntsson/Charlie.git
+cd Charlie
+npm install
+karma start
+```
+To run the JUnit and arquillian tests for this project do the following.
+```
+git clone https://github.com/jcberntsson/Charlie.git
+```
+Open in Netbeans and run test files: 
+```
+Charlie/src/test/java/TestUserPersistence.java
+Charlie/src/main/test/core/PlayerTest.java
+Charlie/src/main/test/core/QuestionTest.java
+Charlie/src/main/test/core/QuizTest.java
+Charlie/src/main/test/core/SpotifyServiceTest.java
+```
