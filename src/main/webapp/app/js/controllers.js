@@ -338,6 +338,7 @@ charlieController.controller('scoreboardController', ['$scope', '$document', '$l
             canvasChart.id = "scoreboardChart";
             canvasChart.width = "200";
             canvasChart.height = "200";
+            canvasChart.style = "margin-top: 20px;";
             var scoreboardCenter = document.getElementById("centerScoreboard");
             charlieProxy.getResults(function (users) {
                 if (users) {
