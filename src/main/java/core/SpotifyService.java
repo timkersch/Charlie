@@ -15,6 +15,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import util.LocalSongsException;
+import util.NoRelatedArtistsException;
 
 import java.io.IOException;
 import java.util.*;
@@ -267,7 +268,7 @@ public class SpotifyService {
 	 * @return a hashtable with artists as keys and boolans as values.
 	 * returns null if there are less than 3 similar artists.
 	 */
-	public Hashtable<String, Boolean> getArtistOptions(Track t) {
+	public Hashtable<String, Boolean> getArtistOptions(Track t) throws NoRelatedArtistsException {
 		List<SimpleArtist> artists = t.getArtists();
 		try {
 			List<Artist> relatedArtists = api.getArtistRelatedArtists(artists.get(0).getId()).build().get();
@@ -279,11 +280,14 @@ public class SpotifyService {
 					ht.put(relatedArtists.get(i).getName(), false);
 				}
 			} else {
-				return null;
+				throw new NoRelatedArtistsException("Not enough related artists");
 			}
 
 			return ht;
-		} catch (Exception e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (WebApiException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -312,7 +316,7 @@ public class SpotifyService {
 	 * @return a list of tracks similar to the tracks given as parameter.
 	 */
 	public List<Track> getSimilarTracks(List<Track> tracks, int noTracks, String countryCode) {
-		List<Track> chosenTracks = new ArrayList<>(noTracks);
+		Map<String, Track> chosenTracks = new HashMap<>();
 
 		int i = 0;
 		while (i < noTracks) {
@@ -325,7 +329,7 @@ public class SpotifyService {
 				if (randInt % 2 == 0) {
 					Track track = trackFromRelatedArtist(randomTrack, chosenTracks, countryCode);
 					if (track != null) {
-						chosenTracks.add(track);
+						chosenTracks.put(track.getId(), track);
 						i++;
 					}
 
@@ -333,7 +337,7 @@ public class SpotifyService {
 				} else {
 					Track track = trackFromAlbum(randomTrack, chosenTracks);
 					if (track != null) {
-						chosenTracks.add(track);
+						chosenTracks.put(track.getId(), track);
 						i++;
 					}
 				}
@@ -341,11 +345,11 @@ public class SpotifyService {
 				e.printStackTrace();
 			}
 		}
-		return chosenTracks;
+		return new ArrayList<>(chosenTracks.values());
 	}
 
 	// This method generates a track from related artists, if possible
-	private Track trackFromRelatedArtist(Track randomTrack, List<Track> chosenTracks, String countryCode) throws Exception {
+	private Track trackFromRelatedArtist(Track randomTrack, Map<String, Track> chosenTracks, String countryCode) throws Exception {
 		HttpClient client = new HttpClient();
 		List<Artist> relatedArtists = api.getArtistRelatedArtists(randomTrack.getArtists().get(0).getId()).build().get();
 		Collections.shuffle(relatedArtists);
@@ -353,8 +357,8 @@ public class SpotifyService {
 			List<Track> popularTracks = api.getTopTracksForArtist(artist.getId(), countryCode).build().get();
 			Collections.shuffle(popularTracks);
 			for (Track track : popularTracks) {
-				GetMethod getter = new GetMethod(track.getPreviewUrl());
-				if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.contains(track)) {
+				GetMethod getter = new GetMethod(track.getPreviewUrl() + ".mp3");
+				if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.containsKey(track.getId())) {
 					return track;
 				}
 			}
@@ -363,7 +367,7 @@ public class SpotifyService {
 	}
 
 	// This method generates a track from the same album, if possible
-	private Track trackFromAlbum(Track randomTrack, List<Track> chosenTracks) throws Exception {
+	private Track trackFromAlbum(Track randomTrack, Map<String, Track> chosenTracks) throws Exception {
 		HttpClient client = new HttpClient();
 		SimpleAlbum simpleAlbum = randomTrack.getAlbum();
 		Album album = api.getAlbum(simpleAlbum.getId()).build().get();
@@ -371,8 +375,8 @@ public class SpotifyService {
 		Collections.shuffle(albumsTracks);
 		for (SimpleTrack strack : albumsTracks) {
 			Track track = api.getTrack(strack.getId()).build().get();
-			GetMethod getter = new GetMethod(track.getPreviewUrl());
-			if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.contains(track)) {
+			GetMethod getter = new GetMethod(track.getPreviewUrl() + ".mp3");
+			if (!track.getPreviewUrl().equals("null") && client.executeMethod(getter) == HttpStatus.SC_OK && !chosenTracks.containsKey(track.getId())) {
 				return track;
 			}
 		}

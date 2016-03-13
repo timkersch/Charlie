@@ -1,1 +1,16 @@
+- Group name
+- Group members (Name, SSnumber, Mail)
+- General overview of the system
+    - What is it?
+    - What should it do?
+    - Roles of the user
+    - Permissions
+    - List of fully functional use-cases (One scentence)
+- Technical design of the system
+    - Object oriented model as UML
+    - Selected approach
+    - Physical setup
+    - Participating software components (Libs, osv)
+    - The modules of each component and the responsibilites for each module
+    - A layered view of the application (model, percistance, service, control & view)
 
