@@ -61,7 +61,7 @@ Charlie/src/main/java/core/User.java
 
 Service
 ```
-Charlie/src/main/webapp/app/js/services.js
+Charlie/src/main/java/core/SpotifyService.java
 ```
 
 Control
@@ -69,7 +69,7 @@ Control
 Charlie/src/main/webapp/app/js/controllers.js
 ```
 	
-Views
+View
 ```
 Charlie/src/main/webapp/app/partials/create.html
 Charlie/src/main/webapp/app/partials/profile.html
