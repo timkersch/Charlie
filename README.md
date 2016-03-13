@@ -96,6 +96,7 @@ Charlie/src/main/webapp/app/js/controllers.js
 	
 #### View
 ```
+Charlie/src/main/webapp/index.html
 Charlie/src/main/webapp/app/partials/create.html
 Charlie/src/main/webapp/app/partials/profile.html
 Charlie/src/main/webapp/app/partials/home.html
@@ -130,6 +131,22 @@ git clone https://github.com/jcberntsson/Charlie.git
 ```
 Then open the project in Netbeans and add a database called "db" in the services tab. 
 
+You must also create a file for connecting with the Spotify API.
+```
+Charlie/src/main/java/core/SpotifyCredentials.java
+```
+The credentials can be obtained from Spotifys website.
+The structure of the file should be the following:
+```
+package core;
+
+public class SpotifyCredentials {
+    public static final String clientID = "...";
+    public static final String clientSecret = "...";
+    public static final String redirectURI = "http://localhost:8080/Charlie/callback.html";
+}
+```
+
 ### Run Jasmine tests
 To run the jasmine tests do the following.
 ```
@@ -139,16 +156,26 @@ npm install
 karma start
 ```
 
-### Run JUnit and Arquillian tests
-To run the JUnit and Arquillian tests for this project do the following.
+### Run JUnit
+To run the JUnit for this project do the following.
 ```
 git clone https://github.com/jcberntsson/Charlie.git
 ```
+Please read JUNIT_README for further information.
 Open in Netbeans and run test files: 
 ```
-Charlie/src/test/java/TestUserPersistence.java
 Charlie/src/main/test/core/PlayerTest.java
 Charlie/src/main/test/core/QuestionTest.java
 Charlie/src/main/test/core/QuizTest.java
 Charlie/src/main/test/core/SpotifyServiceTest.java
+```
+
+### Run Arquillian
+To run the Arquillian test for this project do the following.
+```
+git clone https://github.com/jcberntsson/Charlie.git
+```
+Open in Netbeans and run the following file:
+```
+Charlie/src/test/java/TestUserPersistence.java
 ```
