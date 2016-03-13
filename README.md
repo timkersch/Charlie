@@ -30,7 +30,7 @@ The application is built with AngularJS as the frontend application and Java EE 
 The application is built with the service based approach pattern.
 
 ### Layers
-Model
+Models
 - Player.java
 - Question.java
 - Quiz.java
@@ -45,7 +45,7 @@ Persistence
 Service
 - charlieProxy.js
 	
-Control
+Controllers
 - mainController.js
 - homeController.js
 - lobbyController.js
@@ -63,19 +63,28 @@ View
 - scoreboard.html
 
 ### Libraries
-
+Java Enterprise Edition
+Michaelthelin Spotify API
+Google Gson
+Apache Derby
+JUnit
+Arquillian
+Jasmine
+Angular
+Bootstrap
+JQuery
 
 ## Setup
 This section explains how to setup and run the project and its tests.
 
-### Build and run
+### Run project
 To run this project follow the instructions below.
 ```
 git clone https://github.com/jcberntsson/Charlie.git
 ```
 Then open the project in Netbeans and add a database called "db" in the services tab. 
 
-### Build and run tests
+### Run Jasmine tests
 To run the jasmine tests do the following.
 ```
 git clone https://github.com/jcberntsson/Charlie.git
@@ -83,7 +92,9 @@ cd Charlie
 npm install
 karma start
 ```
-To run the JUnit and arquillian tests for this project do the following.
+
+## Run JUnit and Arquillian tests
+To run the JUnit and Arquillian tests for this project do the following.
 ```
 git clone https://github.com/jcberntsson/Charlie.git
 ```
