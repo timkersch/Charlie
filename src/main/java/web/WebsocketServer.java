@@ -96,6 +96,32 @@ public class WebsocketServer {
         }
     }
     
+    private void loginForTest(int requestId, String action, JsonObject data, UserSession userSession) {
+        // Check if user already exists
+        List<UserIdentity> users = db.getUserCatalogue().findAll();
+        UserIdentity current;
+        boolean success = false;
+        if (users.size() > 0){
+            current = users.get(0);
+            success = true;
+            String newAccessToken = service.refreshAccessToken(current.getRefreshToken());
+            current.setAccessToken(newAccessToken);
+            service.setTokens(current.getAccessToken(), current.getRefreshToken());
+            userSession.setCurrentQuiz(db.getQuizCatalogue().getQuiz(current));
+        }else // New user 
+            current = UserIdentity.createDummyUser();
+        
+        userSession.setUserIdentity(current);
+
+        // Create user json
+        String userAsString = GSON.toJson(current.toJson());
+        String response = createResponse(requestId, action, userAsString);
+
+        // Send back result
+        System.out.println("User: " + userAsString);
+        userSession.send(response);
+    }
+    
     private void getLoginURL(int requestId, String action, JsonObject data, UserSession userSession) {
         // Retrieve login URL from spotify service
         String url = service.getAuthorizeURL();
