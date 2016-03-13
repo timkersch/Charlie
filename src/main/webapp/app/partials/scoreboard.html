@@ -9,12 +9,12 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
     <center>
-        <canvas id="doughnut" class="chart chart-doughnut" chart-data="chart.values" chart-labels="chart.labels" chart-colours="chart.colors" chart-options="chart.options" width="220" height="220"></canvas> 
+        <canvas id="scoreboardChart" width="200" height="200"></canvas> 
         <br>
         <md-list>
             <md-list-item ng-repeat="person in scores | orderBy:'-value'">
-                <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">
-                    <md-icon aria-label="Menu" class="material-icons {{getTextColor($index)}}">person</md-icon>
+                <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{person.color}}">
+                    <md-icon aria-label="Menu" class="material-icons {{person.color}}">person</md-icon>
                     {{person.userName}}
                 </p>
                 <p>{{person.value}} {{person.value == 1 ? "point" : "points"}}</p>

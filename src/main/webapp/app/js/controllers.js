@@ -3,7 +3,6 @@
 var charlieController = angular.module('charlieController', [
     'ngRoute',
     'charlieService',
-    'chart.js',
     'ngMaterial'
 ]);
 
@@ -161,25 +160,6 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         var intervalPromise;
         $scope.players = [];
         
-        var data = {
-          labels: [""],
-          datasets: [{
-            fillColor: "#0033cc",
-            data: [1]
-          },{
-            fillColor: "#006600",
-            data: [3]
-          },{
-            fillColor: "#ff3300",
-            data: [2]
-          },{
-            fillColor: "#ff00ff",
-            data: [4]
-          }]};
-        
-        var context = document.getElementById("questionScores").getContext("2d");
-        var questionChart = new Chart(context).Bar(data);
-        
         var play = function(url) {
             // Stop previous
             audioElement.pause();
@@ -329,6 +309,12 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
     function($scope, $location, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
+        /*-------------------------*/
+        
+        
+        
+        /*-------------------------*/
+        
         $scope.chart = {
             values: [],
             labels: [],
@@ -340,22 +326,42 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         };
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
-        
+        var chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
+        var classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
+
         var init = function(){
             charlieProxy.getResults(function(users){
                 if (users) {
+                    var data = {
+                        labels: [""],
+                        datasets: []
+                    };
+                    
                     $scope.scores = [];
                     $scope.chart.values = [];
                     $scope.chart.labels = [];
                     for(var i = 0; i < users.length; i++){
+                        /*Chart.js need to read data as an array*/
+                        var tmpArray = [users[i].points];
+                        console.log(tmpArray);
+                        data.datasets.push({
+                            fillColor: chartColors[i],
+                            data: tmpArray
+                        });
                         $scope.scores.push({
                             value : users[i].points,
                             userName: users[i].name,
-                            color: $scope.chart.colors[i % 4]
+                            color: classColors[i]
+                            /*$scope.chart.colors[i % 4] */
+                            
                         });
-                        $scope.chart.values.push(users[i].points);
-                        $scope.chart.labels.push(users[i].name);
-                    }
+                        /*$scope.chart.values.push(users[i].points);
+                        $scope.chart.labels.push(users[i].name);*/
+                    };
+                    console.log(data);
+                    var context = document.getElementById("scoreboardChart").getContext("2d");
+                    var scoreboardChart = new Chart(context).Bar(data);
+                    scoreboardChart.update();
                 }
             });
         };
