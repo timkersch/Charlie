@@ -12,7 +12,6 @@
     <properties>
         <app.id>charlie-1239</app.id>
         <app.version>1</app.version>
-        <appengine.version>1.9.32</appengine.version>
         <gcloud.plugin.version>2.0.9.74.v20150814</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -99,11 +98,6 @@
 
 
         <!-- Compile/runtime dependencies -->
-        <dependency>
-            <groupId>com.google.appengine</groupId>
-            <artifactId>appengine-api-1.0-sdk</artifactId>
-            <version>${appengine.version}</version>
-        </dependency>
         <!--<dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
