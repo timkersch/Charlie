@@ -5,10 +5,12 @@ Group #1's contribution to the web application project, 2016.
 This project was created in Mars, 2016. The purpose of the application is to simplify the task to create and distribute music quizes. 
 
 ## Members
-Erik Nordmark		870907		erinord@student.chalmers.se
-Joakim Berntsson	940524		joabern@student.chalmers.se
-Simon Takman		930321		takman@student.chalmers.se
-Tim Kerschbaumer	931022		ktim@student.chalmers.se
+| Name         		| SSN       | Email  						|
+| ------------- 	|:---------:| -----------------------------:|
+| Erik Nordmark     | 870907 	| erinord@student.chalmers.se 	|
+| Joakim Berntsson  | 940524    | joabern@student.chalmers.se 	|
+| Simon Takman 		| 930321    | takman@student.chalmers.se 	|
+| Tim Kerschbaumer  | 931022	| ktim@student.chalmers.se		|
 
 ## Overview
 The application is a spotify based music quiz, which lets the user invite friends, choose a playlist and start a quiz based on that playlist. The creator will have control of the music but no other special permissions is given to the creator.
@@ -17,6 +19,24 @@ The application is a spotify based music quiz, which lets the user invite friend
 The application requires a spotify account, network connection and a modern web browser. 
 
 ### Use cases
+Name: Create a quiz
+Goal: To get a quiz in return.
+Actors: Owner
+Precondition:
+- Need to have logged in to the Spotify Account.
+- Need to have playlists on your Spotify Account.
+Main Flow:
+1. On homepage – press start or new quiz in the menu.
+2. Give the quiz a name, number of questions and choose the playlist you want to generate the quiz from.
+3. Invite users to play with.
+4. Press CREATE.
+Alternative Flow:
+1. On homepage – press start or new quiz in the menu.
+2. Give the quiz a name, number of questions and choose the playlist you want to use the songs in the quiz.
+3. Invite users to play with.
+4. Press CREATE
+Postcondition:
+- Redirect to game lobby.
 
 ### Graphical interface
 
