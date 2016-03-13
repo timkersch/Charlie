@@ -60,7 +60,7 @@
                 <div class="md-ripple-container"></div>
             </md-list-item>
 
-            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/create')">
+            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/create')" ng-show="isLoggedIn()">
                 <div class="inset">
                     <md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>
                 </div>
@@ -68,7 +68,7 @@
                 <div class="md-ripple-container"></div>
             </md-list-item>
 
-            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/profile')">
+            <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-click="changeView('/profile')" ng-show="isLoggedIn()">
                 <div class="inset">
                     <md-icon aria-label="Menu" class="material-icons">person</md-icon>
                 </div>

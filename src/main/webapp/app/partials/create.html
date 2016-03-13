@@ -1,9 +1,37 @@
 <style>
+    @keyframes rotate360 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @-webkit-keyframes rotate360 {
+        from { -webkit-transform: rotate(0deg); }
+        to { -webkit-transform: rotate(360deg); }
+    }
+    .spinner {
+        display:inline-block;
+        border-radius: 50px;
+        border-style: solid;
+        border-bottom-color: #3b5641;
+        border-top-color: #67b3a9;
+        border-left-color: #df7950;
+        border-right-color: #decb3f;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+        animation: rotate360 1s linear infinite;
+        -webkit-animation: rotate360 1s linear infinite;
+
+        border-width: 4px;
+        width: 24px;
+        height: 24px;
+    }
+
     form {
         padding: 1em;
         margin-bottom: 5em;
     }
-    
+
     .end {
         margin: -1em;
     }
@@ -44,12 +72,12 @@
         <md-input-container class="md-block">
             <label></label>
             <md-chips
-                    ng-model="tags"
-                    readonly="readonly"
-                    placeholder="+Friend"
-                    delete-button-label="Remove Tag"
-                    delete-hint="Press delete to remove tag"
-                    secondary-placeholder="Enter a Friend">
+                ng-model="tags"
+                readonly="readonly"
+                placeholder="+Friend"
+                delete-button-label="Remove Tag"
+                delete-hint="Press delete to remove tag"
+                secondary-placeholder="Enter a Friend">
             </md-chips>
         </md-input-container>
         <md-input-container class="md-block">
@@ -66,7 +94,10 @@
 
         </md-input-container>
         <div class="end">
-            <md-button type="submit" class="md-primary md-raised">CREATE</md-button>
+            <md-button type="submit" class="md-primary md-raised">
+                <span ng-hide="loading">CREATE</span>
+                <div class="spinner" ng-show="loading"></div>
+            </md-button>
         </div>
     </form>
 </md-content>

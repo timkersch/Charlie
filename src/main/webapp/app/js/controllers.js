@@ -19,6 +19,10 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
         $scope.toggleLeftMenu = function() {
             $mdSidenav('left').toggle();
         };
+        
+        $scope.isLoggedIn = function(){
+            return charlieProxy.isLoggedIn();
+        };
 
         var init = function(){
             if (charlieProxy.isLoggedIn()) {
@@ -41,13 +45,9 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
 
         $scope.$on('$routeChangeSuccess', function() {
             // Initialize when service is ready
-            if (charlieProxy.isReady()){
+            charlieProxy.onReady(function(){
                 init();
-            }else{
-                $scope.$on('service-ready', function(event, args) {
-                    init();
-                });
-            }
+            });
         });
         
         var showActionToast = function(quiz) {
@@ -106,13 +106,9 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
             });
         };
         
-        if (charlieProxy.isReady()){
+        charlieProxy.onReady(function(){
             init();
-        }else{
-            $scope.$on('service-ready', function(event, args) {
-                init();
-            });
-        }
+        });
         
         charlieProxy.listenTo("userJoined", function(user){
             console.log(user);
@@ -137,11 +133,16 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         
     }]);
 
-charlieController.controller('homeController', [ '$scope', '$location',
-    function($scope, $location) {
+charlieController.controller('homeController', [ '$scope', '$location', 'charlieProxy', 
+    function($scope, $location, charlieProxy) {
         $scope.changeView = function(data){
             $location.path(data);
         };
+        
+        $scope.isLoggedIn = function(){
+            return charlieProxy.isLoggedIn();
+        };
+        
         console.log("Init");
     }]);
 
@@ -151,11 +152,11 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         $scope.timeLeft = 20;
         $scope.activated = true;
         $scope.showScores = false;
-        $scope.showCorrect = false;
         $scope.correctAnswer = "";
         $scope.myAnswer = "";
+        $scope.currentQuestion = 1;
+        $scope.lastQuestion = 1;
         var audioElement = $document[0].createElement('audio');
-        var hasIndex = '';
         var hasAnswered = false;
         var intervalPromise;
         $scope.players = [];
@@ -174,29 +175,29 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
         };
         
         var init = function(){
+            $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
             charlieProxy.getResults(function(players){
                 $scope.players = players;
             });
-            charlieProxy.getCurrentQuestion(function(data){
-                if (data.artists) {
-                    if (data.answered)
-                        $scope.showScores = true;
-                    
-                    $scope.possibleArtists = data.artists;
+            charlieProxy.getCurrentQuestion(function(question){
+                if (question.artists) {
+                    if (question.answer !== ""){
+                        hasAnswered = true;
+                        $scope.myAnswer = question.answer;
+                        $scope.correctAnswer = question.correct;
+                    }
+                    $scope.currentQuestion = question.number;
+                    $scope.possibleArtists = question.artists;
                     if (charlieProxy.isQuizOwner())
-                        play(data.track_url);
+                        play(question.track_url);
                     startInterval();
                 }
             });
         };
         
-        if (charlieProxy.isReady()){
+        charlieProxy.onReady(function(){
             init();
-        }else{
-            $scope.$on('service-ready', function(event, args) {
-                init();
-            });
-        }
+        });
         
         charlieProxy.listenTo("gameOver", function(users){
            $location.path("/scoreboard"); 
@@ -221,26 +222,23 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             $scope.possibleArtists = question.artists;
             if (charlieProxy.isQuizOwner())
                 play(question.track_url);
+            $scope.currentQuestion = question.number;
             $scope.timeLeft = 20;
             hasAnswered = false;
-            hasIndex = '';
             $scope.showScores = false;
-            $scope.showCorrect = false;
         });
         
-        $scope.isDisabled = function(index){
-            return hasAnswered && hasIndex !== index;
+        $scope.isDisabled = function(artist){
+            return hasAnswered && $scope.myAnswer !== artist;
         };
         
         $scope.selectedAnswer = function(data, index){
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;
-                hasIndex = index;
                 charlieProxy.answerQuestion(data, function(artist){
                    console.log("Correct answer is: " + artist); 
                    $scope.correctAnswer = artist;
-                   //$scope.showScores = true;
                 });
             }
         };
@@ -277,12 +275,12 @@ charlieController.controller('questionController', [ '$scope', '$location', '$in
             intervalPromise = $interval(function(){
                 if ($scope.timeLeft > 0)
                     $scope.timeLeft--;
-                if($scope.timeLeft === 0 && !$scope.showCorrect){
+                if($scope.timeLeft === 0 && !$scope.showScores){
                     if (!hasAnswered) {
                         $scope.selectedAnswer("", "");
                     }
                     $scope.showScores = true;
-                    $scope.showCorrect = true;
+                    $scope.timeLeft = 5;
                     // Question over
                     if (charlieProxy.isQuizOwner()){
                         $timeout(function() {
@@ -367,13 +365,9 @@ charlieController.controller('scoreboardController', [ '$scope', '$location' , '
         };
 
         // Initialize when service is ready
-        if (charlieProxy.isReady()){
-            init();
-        }else{
-            $scope.$on('service-ready', function(event, args) {
-                init();
-            });
-        }
+        charlieProxy.onReady(function(){
+           init(); 
+        });
     
         $scope.changeView = function(view){
             $location.path(view); // path not hash
@@ -416,21 +410,20 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.readonly = false;
         $scope.tags = [];
         $scope.toggleSwitch = true;
+        $scope.loading = false;
+        
         var init = function (){
             charlieProxy.getPlaylists(function(lists){
                 $scope.playlists = lists;
             }); 
         };
         
-        if (charlieProxy.isReady()){
+        charlieProxy.onReady(function(){
             init();
-        }else{
-            $scope.$on('service-ready', function(event, args) {
-                init();
-            });
-        }
+        });
 
         $scope.submit = function() {
+            $scope.loading = true;
             charlieProxy.createQuiz($scope.name, $scope.tags, $scope.playlistSelected.id, $scope.playlistSelected.owner, $scope.nbrOfQuestions, $scope.toggleSwitch, function(quiz){
                $location.path('/lobby'); 
             });

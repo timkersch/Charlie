@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by: Tim Kerschbaumer
@@ -85,6 +86,15 @@ public class Player {
     public boolean hasAnswered(Question q) {
         return this.answers.containsKey(q);
     }
+    
+    /**
+     * Returns the player's answer for the specified question
+     * @param q the question
+     * @return the artist (answer)
+     */
+    public String getAnswer(Question q) {
+        return answers.getOrDefault(q, "");
+    }
 
     /**
      * Return the score of a playee
@@ -109,8 +119,16 @@ public class Player {
         this.score = score;
     }
 
+    @Override
     public boolean equals(Object o) {
         return this.userIdentity.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + Objects.hashCode(this.userIdentity);
+        return hash;
     }
     
     public JsonObject toJson(){

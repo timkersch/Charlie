@@ -18,7 +18,6 @@ import static org.junit.Assert.assertTrue;
  * Time: 13:16
  */
 public class SpotifyServiceTest {
-	/*
 	SpotifyService s = new SpotifyService();
 	String user = "tiimiz";
 	String[] songs = {"57ay2J7PoNPKUGIncs3lHi", "4ycUbcT3euZ3ICarb23fQF", "0SVZV4iQ9Qi5mEpijs63v1",
@@ -30,6 +29,7 @@ public class SpotifyServiceTest {
 		s.initTests();
 	}
 
+	/*
 	@Test
 	public void testRandomInt() throws Exception {
 		int rand = s.randomInt(1, 1);
@@ -134,6 +134,8 @@ public class SpotifyServiceTest {
 	public void testGetSimilarTracks() throws Exception {
 		// This will eat up the requests from spotify
 		for (int i = 0; i < playlists.length; i++) {
+			Thread.sleep(3000);
+
 			List<Track> playlistSongs = s.getPlaylistSongs(playlists[i], user);
 			try {
 				assertNotNull(playlistSongs);
@@ -141,6 +143,8 @@ public class SpotifyServiceTest {
 				System.out.println("Playlistsongs is null");
 				throw new AssertionError();
 			}
+
+			Thread.sleep(3000);
 
 			List<Track> similarTracks = s.getSimilarTracks(playlistSongs, playlistSongs.size(), "SE");
 			try {
@@ -151,6 +155,9 @@ public class SpotifyServiceTest {
 			}
 
 			for(Track t : similarTracks) {
+				// So that rate limit does not exceed
+				Thread.sleep(2500);
+
 				try {
 					assertNotNull(t);
 				} catch (AssertionError e) {
@@ -192,9 +199,6 @@ public class SpotifyServiceTest {
 					System.out.println("Failed: " + t + " has url null");
 					throw new AssertionError();
 				}
-
-				// So that rate limit does not exceed
-				Thread.sleep(2000);
 			}
 		}
 	}*/
