@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var spotify = require('./core/spotify-service.js');
 
 var app = express();
 var http = require('http').Server(app);
@@ -16,19 +17,16 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log('user', socket.id, 'connected');
 
-    socket.on('catch all', function(data) {
-        console.log('catch all', data);
-        socket.emit('message', 'http://www.google.com/');
+    socket.on('getLoginURL', function(msg) {
+        var json = JSON.parse(msg);
+        var obj = {action: json.action, data: spotify.getRedirectURL(), request_id: json.request_id};
+        socket.emit('message', obj);
     });
 
-    socket.on('getLoginURL', function(id, msg) {
-        socket.broadcast.to(id).emit('getLoginURL', msg);
-    });
-
-    socket.on('login', function(id, msg) {
-        socket.broadcast.to(id).emit('login', msg);
+    socket.on('login', function(msg) {
+        console.log('invoked login', msg);
     });
 
     socket.on('setUser', function(id, msg) {
@@ -97,7 +95,8 @@ io.on('connection', function(socket){
 
 
     socket.on('disconnect', function(){
-        console.log('user disconnected');
+        console.log('user', socket.id, 'disconnected');
+        //socket.emit('disconnect', {});
     });
 });
 

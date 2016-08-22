@@ -37,7 +37,6 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
                     });
                 } else {
                     charlieProxy.getLoginUrl(function (url) {
-                        console.log("got a url", url);
                         $scope.url = url;
                     });
                 }

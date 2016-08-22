@@ -35,7 +35,6 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.10.0/angular-material.min.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-        <!-- TODO, needed? <base href="/Charlie/" /-->
     </head>
     <body ng-app="charlieApp">
         <div layout="row" ng-controller="mainController">
@@ -43,7 +42,7 @@
                 <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
                     <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
                 </md-button>
-                <h2> <a ng-href="/Charlie">Charlie</a></h2>
+                <h2> <a ng-href="#/">Charlie</a></h2>
                 <span flex="" class="flex"></span>
                 <span>{{user.name}}</span>
                 <md-button ng-show="!user.name" ng-click="login()">Login</md-button>

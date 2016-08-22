@@ -30,7 +30,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             }
         });
 
-        socket.on('close',function(){
+        socket.on('disconnect', function(){
             console.log("socketio close!");
         });
 
@@ -46,8 +46,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
         var currentQuiz;
 
         socket.on('message', function (event) {
-            console.log('Got message', event);
-            var response = angular.fromJson(event.data);
+            var response = angular.fromJson(event);
             if (angular.isDefined(callbacks[response.request_id])) {
                 var callback = callbacks[response.request_id];
                 delete callbacks[response.request_id];
@@ -78,12 +77,11 @@ charlieService.factory('charlieProxy', ['$rootScope',
         var invoke = function (name, data, callback) {
             console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
             var request = {
-                action: name,
                 request_id: getRequestId(),
                 data: data
             };
             callbacks[request.request_id] = callback;
-            socket.emit('catch all', angular.toJson(request));
+            socket.emit(name, angular.toJson(request));
         };
 
         var setReady = function () {
