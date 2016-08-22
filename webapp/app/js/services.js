@@ -6,12 +6,23 @@ charlieService.factory('charlieProxy', ['$rootScope',
     function ($rootScope) {
         const socket = io('ws://localhost:8080/');
 
+        let requestId = 0;
+        const getRequestId = function () {
+            return requestId++;
+        };
+        let isReady = false;
+        let callbacks = {};
+        let listenCallbacks = {};
+        let readyCallbacks = [];
+        let user = {};
+        let currentQuiz;
+
         socket.on('connect', function(){
             console.log("socketio open!");
             if (sessionStorage.user) {
                 // User in storage
-                user = angular.fromJson(sessionStorage.user);
-                var data = {
+                user = sessionStorage.user;
+                let data = {
                     id: user.id
                 };
                 invoke("setUser", data, function (success) {
@@ -34,60 +45,42 @@ charlieService.factory('charlieProxy', ['$rootScope',
             console.log("socketio close!");
         });
 
-        var requestId = 0;
-        var getRequestId = function () {
-            return requestId++;
-        };
-        var isReady = false;
-        var callbacks = {};
-        var listenCallbacks = {};
-        var readyCallbacks = [];
-        var user = {};
-        var currentQuiz;
+        socket.on('callback', function (event) {
+            console.log("Callback event(%o)", event);
+            const action = event.action;
+            const data = event.data;
+            const id = event.request_id;
+            const callback = callbacks[id];
+            delete callbacks[id];
+            callback(data);
+            $rootScope.$apply();
+        });
 
-        socket.on('message', function (event) {
-            var response = angular.fromJson(event);
-            if (angular.isDefined(callbacks[response.request_id])) {
-                var callback = callbacks[response.request_id];
-                delete callbacks[response.request_id];
-                try {
-                    response.data = JSON.parse(response.data);
-                } catch (error) {
-                    console.error(error);
-                }
-                console.log("Invoke(" + response.action + "), response: ", response.data);
-                callback(response.data);
-                $rootScope.$apply();
-            } else {
-                console.log("ListenEvent(%o)", response.action);
-                var action = response.action;
-                var data = response.data;
-                try {
-                    data = JSON.parse(data);
-                } catch (error) {
-                }
-                if (Array.isArray(listenCallbacks[action])) {
-                    for (var i = 0; i < listenCallbacks[action].length; i++) {
-                        listenCallbacks[action][i](data);
-                    }
+        socket.on('listen', function (event) {
+            console.log("ListenEvent(%o)", event);
+            const action = event.action;
+            const data = event.data;
+            if (Array.isArray(listenCallbacks[action])) {
+                for (let i = 0; i < listenCallbacks[action].length; i++) {
+                    listenCallbacks[action][i](data);
                 }
             }
         });
 
-        var invoke = function (name, data, callback) {
+        let invoke = function (name, data, callback) {
             console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
-            var request = {
+            let request = {
                 request_id: getRequestId(),
                 data: data
             };
             callbacks[request.request_id] = callback;
-            socket.emit(name, angular.toJson(request));
+            socket.emit(name, request);
         };
 
-        var setReady = function () {
+        let setReady = function () {
             console.log("service-ready");
             isReady = true;
-            for (var i = 0; i < readyCallbacks.length; i++) {
+            for (let i = 0; i < readyCallbacks.length; i++) {
                 readyCallbacks[i]();
             }
             readyCallbacks = [];
@@ -120,15 +113,15 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 invoke("getLoginURL", {}, callback);
             },
             isLoggedIn: function () {
-                return ("name" in user);
+                return ('name' in user);
             },
             login: function (code, callback) {
-                var data = {
+                let data = {
                     code: code
                 };
                 invoke("login", data, function (userData) {
-                    user = userData;
-                    sessionStorage.user = angular.toJson(user);
+                    user.name = userData;
+                    sessionStorage.user = user;
                     callback(user);
                 });
             },
@@ -155,7 +148,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
             // callback(quiz)
             createQuiz: function (name, userIds, playlistId, playlistOwner, nbrOfSongs, generated, callback) {
-                var data = {
+                let data = {
                     name: name,
                     users: userIds,
                     playlist: playlistId,
@@ -174,7 +167,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
             // callback(isCorrect)
             answerQuestion: function (artistName, callback) {
-                var data = {
+                let data = {
                     artistName: artistName
                 };
                 invoke('answerQuestion', data, callback);
@@ -196,7 +189,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
             // callback(success)
             joinQuiz: function (quiz, callback) {
-                var data = {
+                let data = {
                     quizId: quiz.uuid
                 };
                 invoke('joinQuiz', data, function (success) {

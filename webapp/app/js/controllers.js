@@ -1,6 +1,6 @@
 'use strict';
 
-var charlieController = angular.module('charlieController', [
+let charlieController = angular.module('charlieController', [
     'ngRoute',
     'charlieService',
     'ngMaterial'
@@ -24,7 +24,7 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
             return charlieProxy.isLoggedIn();
         };
 
-        var init = function () {
+        let init = function () {
             if (charlieProxy.isLoggedIn()) {
                 charlieProxy.getUser(function (user) {
                     $scope.user = user;
@@ -50,8 +50,8 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
             });
         });
 
-        var showActionToast = function (quiz) {
-            var toast = $mdToast.simple()
+        let showActionToast = function (quiz) {
+            let toast = $mdToast.simple()
                     .textContent('You have been invited to ' + quiz.name)
                     .action('ACCEPT')
                     .highlightAction(true)
@@ -96,7 +96,7 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         $scope.users = [];
         $scope.isOwner = false;
 
-        var init = function () {
+        let init = function () {
             charlieProxy.getQuiz(function (quiz) {
                 $scope.quizname = quiz.name;
                 $scope.isOwner = charlieProxy.isQuizOwner();
@@ -157,12 +157,12 @@ charlieController.controller('questionController', ['$scope', '$location', '$int
         $scope.myAnswer = "";
         $scope.currentQuestion = 1;
         $scope.lastQuestion = 1;
-        var audioElement = $document[0].createElement('audio');
-        var hasAnswered = false;
-        var intervalPromise;
+        let audioElement = $document[0].createElement('audio');
+        let hasAnswered = false;
+        let intervalPromise;
         $scope.players = [];
 
-        var play = function (url) {
+        let play = function (url) {
             // Stop previous
             audioElement.pause();
             audioElement.currentTime = 0;
@@ -171,12 +171,12 @@ charlieController.controller('questionController', ['$scope', '$location', '$int
             audioElement.play();
         };
 
-        var nextQuestion = function () {
+        let nextQuestion = function () {
             charlieProxy.nextQuestion(function (data) {
             });
         };
 
-        var init = function () {
+        let init = function () {
             $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
             charlieProxy.getResults(function (players) {
                 $scope.players = players;
@@ -207,8 +207,8 @@ charlieController.controller('questionController', ['$scope', '$location', '$int
 
         charlieProxy.listenTo("userPointsUpdate", function (player) {
             console.log("Player: " + player.name);
-            var found = false;
-            for (var i = 0; i < $scope.players.length; i++) {
+            let found = false;
+            for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].name === player.name) {
                     $scope.players[i].points = player.points;
                     found = true;
@@ -279,7 +279,7 @@ charlieController.controller('questionController', ['$scope', '$location', '$int
             }
         };
 
-        var startInterval = function () {
+        let startInterval = function () {
             if (angular.isDefined(intervalPromise)) {
                 $interval.cancel(intervalPromise);
                 intervalPromise = undefined;
@@ -319,7 +319,7 @@ charlieController.controller('scoreboardController', ['$scope', '$document', '$l
     function ($scope, $document, $location, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
-        var canvasChart = $document[0].createElement('canvas');
+        let canvasChart = $document[0].createElement('canvas');
         $scope.chart = {
             values: [],
             labels: [],
@@ -331,18 +331,18 @@ charlieController.controller('scoreboardController', ['$scope', '$document', '$l
         };
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
-        var chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
-        var classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
+        let chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
+        let classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
 
-        var init = function () {
+        let init = function () {
             canvasChart.id = "scoreboardChart";
             canvasChart.width = "200";
             canvasChart.height = "200";
             canvasChart.style = "margin-top: 20px;";
-            var scoreboardCenter = document.getElementById("centerScoreboard");
+            let scoreboardCenter = document.getElementById("centerScoreboard");
             charlieProxy.getResults(function (users) {
                 if (users) {
-                    var data = {
+                    let data = {
                         labels: [""],
                         datasets: []
                     };
@@ -351,9 +351,9 @@ charlieController.controller('scoreboardController', ['$scope', '$document', '$l
                     $scope.scores = [];
                     $scope.chart.values = [];
                     $scope.chart.labels = [];
-                    for (var i = 0; i < users.length; i++) {
+                    for (let i = 0; i < users.length; i++) {
                         /*Chart.js need to read data as an array*/
-                        var tmpArray = [users[i].points];
+                        let tmpArray = [users[i].points];
                         console.log(tmpArray);
                         data.datasets.push({
                             fillColor: chartColors[i],
@@ -372,8 +372,8 @@ charlieController.controller('scoreboardController', ['$scope', '$document', '$l
 
                     setTimeout(function () {
                         scoreboardCenter.insertBefore(canvasChart, scoreboardCenter.firstChild);
-                        var context = canvasChart.getContext("2d");
-                        var scoreboardChart = new Chart(context).Bar(data);
+                        let context = canvasChart.getContext("2d");
+                        let scoreboardChart = new Chart(context).Bar(data);
                         $scope.$apply();
                     }, 50);
 
@@ -435,7 +435,7 @@ charlieController.controller('createController', ['$scope', '$location', 'charli
         $scope.toggleSwitch = true;
         $scope.loading = false;
 
-        var init = function () {
+        let init = function () {
             charlieProxy.getPlaylists(function (lists) {
                 $scope.playlists = lists;
             });
