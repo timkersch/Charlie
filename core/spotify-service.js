@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Created by Tim on 22/08/16.
  */
@@ -11,15 +13,28 @@ const credentials = {
     redirectUri : process.env.CALLBACK
 };
 
-const api = new SpotifyWebApi(credentials);
+class SpotifyApi {
+    constructor() {
+        this.api = new SpotifyWebApi(credentials);
+    }
 
-function getRedirectURL() {
-    const scope = ['playlist-read-private', 'playlist-read-collaborative',
-        'playlist-modify-private', 'playlist-modify-public', 'user-read-email', 'user-read-private'];
-    const state = 'someState';
-    return api.createAuthorizeURL(scope, state);
+    getRedirectURL() {
+        const scope = ['playlist-read-private', 'playlist-read-collaborative',
+            'playlist-modify-private', 'playlist-modify-public', 'user-read-email', 'user-read-private'];
+        const state = 'someState';
+        return this.api.createAuthorizeURL(scope, state);
+    }
+
+    getUser(code) {
+        this.api.authorizationCodeGrant(code).then((data) => {
+            api.setAccessToken(data.body['access_token']);
+            api.setRefreshToken(data.body['refresh_token']);
+        },(err) => {
+            console.log('Something went wrong!', err);
+        });
+    }
 }
 
 module.exports = {
-    getRedirectURL : getRedirectURL
+    SpotifyApi : SpotifyApi
 };

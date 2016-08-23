@@ -4,7 +4,7 @@ const charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$rootScope',
     function ($rootScope) {
-        const socket = io('ws://localhost:8080/');
+        const socket = io.connect('ws://localhost:8080/');
 
         let requestId = 0;
         const getRequestId = function () {

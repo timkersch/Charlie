@@ -1,34 +1,54 @@
 'use strict';
 
-const express = require('express');
+const dotenv = require('dotenv').config({path: '.env'});
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
+const cookie = require('cookie');
 const bodyParser = require('body-parser');
 const spotify = require('./core/spotify-service.js');
+const express = require('express');
 
+const expressSession = require('express-session');
+const SessionStore = require('session-file-store')(expressSession);
+const session = expressSession({store: new SessionStore({path: __dirname+'/tmp/sessions'}), secret: 'pass', resave: false, saveUninitialized: true});
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
 
-app.use(express.static('webapp'));
+app.use(session);
 
-app.get('/', function(req, res){
+app.get('/', function(req, res) {
+    req.session['halo'] = "hajlo";
     res.sendFile(__dirname + '/webapp/index.html');
 });
 
-io.on('connection', function(socket){
-    console.log('user', socket.id, 'connected');
+app.use(express.static('webapp'));
 
+const server = require('http').Server(app);
+server.listen(8080, function() {
+    console.log('Listening on 8080');
+});
+
+const ios = require('socket.io-express-session');
+const io = require('socket.io')(server);
+
+io.use(ios(session));
+io.on('connection', function(socket){
     socket.on('getLoginURL', function(msg) {
-        let obj = {data: spotify.getRedirectURL(), request_id: msg.request_id};
+        const api = new spotify.SpotifyApi();
+        const url = api.getRedirectURL();
+        socket.handshake.session['spotify'] = api;
+        let obj = {data: url, request_id: msg.request_id};
+
+        console.log(socket.handshake.sessionID);
+        console.log(socket.handshake.session);
+
         socket.emit('callback', obj);
     });
 
     socket.on('login', function(msg) {
-        msg.data = 'Tim';
-        socket.emit('callback', msg);
+        console.log(socket.handshake.sessionID);
+        console.log(socket.handshake.session);
     });
 
     socket.on('setUser', function(id, msg) {
@@ -97,14 +117,8 @@ io.on('connection', function(socket){
 
 
     socket.on('disconnect', function(){
-        console.log('user', socket.id, 'disconnected');
-        //socket.emit('disconnect', {});
+        // TODO
     });
-});
-
-
-http.listen(8080, function(){
-    console.log('listening on *:8080');
 });
 
 // view engine setup
