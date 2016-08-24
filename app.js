@@ -4,21 +4,28 @@ const dotenv = require('dotenv').config({path: '.env'});
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const cookie = require('cookie');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const cookParse = require('cookie');
 const spotify = require('./core/spotify-service.js');
 const express = require('express');
+const sessionStore = require('sessionstore').createSessionStore();
 
 const expressSession = require('express-session');
-const SessionStore = require('session-file-store')(expressSession);
-const session = expressSession({store: new SessionStore({path: __dirname+'/tmp/sessions'}), secret: 'pass', resave: false, saveUninitialized: true});
+const session = expressSession({
+    store: sessionStore,
+    key: 'connect.sid',
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: true
+});
+
 const app = express();
 
 app.use(session);
 
 app.get('/', function(req, res) {
-    req.session['halo'] = "hajlo";
+    //req.session['halo'] = "hajlo";
     res.sendFile(__dirname + '/webapp/index.html');
 });
 
@@ -29,96 +36,117 @@ server.listen(8080, function() {
     console.log('Listening on 8080');
 });
 
-const ios = require('socket.io-express-session');
 const io = require('socket.io')(server);
 
-io.use(ios(session));
+io.set('authorization', function(data, accept) {
+    if (data.headers.cookie) {
+        data.cookie = cookParse.parse(data.headers.cookie);
+        data.sessionID = cookieParser.signedCookie(data.cookie['connect.sid'], process.env.COOKIE_SECRET);
+        sessionStore.load(data.sessionID, function(err, session) {
+            if (err || !session) {
+                accept('Error', false);
+            } else {
+                data.session = session;
+                accept(null, true);
+            }
+        });
+    } else {
+        return accept('No cookie transmitted', false);
+    }
+});
+
 io.on('connection', function(socket){
-    socket.on('getLoginURL', function(msg) {
-        const api = new spotify.SpotifyApi();
-        const url = api.getRedirectURL();
-        socket.handshake.session['spotify'] = api;
-        let obj = {data: url, request_id: msg.request_id};
+    let cookie =  cookParse.parse(socket.handshake.headers.cookie);
+    let session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
 
-        console.log(socket.handshake.sessionID);
-        console.log(socket.handshake.session);
+    if (session_id) {
+        socket.on('getLoginURL', function (msg) {
+            const api = new spotify.SpotifyApi();
+            const url = api.getRedirectURL();
+            let obj = {data: url, request_id: msg.request_id};
 
-        socket.emit('callback', obj);
-    });
+            sessionStore.load(session_id, function (err, storage) {
+                // TODO store stuff
+                sessionStore.set(session_id, storage);
+            });
+            socket.emit('callback', obj);
+        });
 
-    socket.on('login', function(msg) {
-        console.log(socket.handshake.sessionID);
-        console.log(socket.handshake.session);
-    });
+        socket.on('login', function (msg) {
+            sessionStore.load(session_id, function (err, storage) {
+                console.log(storage);
+            });
+        });
 
-    socket.on('setUser', function(id, msg) {
-        socket.broadcast.to(id).emit('setUser', msg);
-    });
+        socket.on('setUser', function (id, msg) {
+            socket.broadcast.to(id).emit('setUser', msg);
+        });
 
-    socket.on('getPlaylists', function(id, msg) {
-        socket.broadcast.to(id).emit('getPlaylists', msg);
-    });
+        socket.on('getPlaylists', function (id, msg) {
+            socket.broadcast.to(id).emit('getPlaylists', msg);
+        });
 
-    socket.on('getCurrentQuestion', function(id, msg) {
-        socket.broadcast.to(id).emit('getCurrentQuestion', msg);
-    });
+        socket.on('getCurrentQuestion', function (id, msg) {
+            socket.broadcast.to(id).emit('getCurrentQuestion', msg);
+        });
 
-    socket.on('isQuizStarted', function(id, msg) {
-        socket.broadcast.to(id).emit('isQuizStarted', msg);
-    });
+        socket.on('isQuizStarted', function (id, msg) {
+            socket.broadcast.to(id).emit('isQuizStarted', msg);
+        });
 
-    socket.on('getUsers', function(id, msg) {
-        socket.broadcast.to(id).emit('getUsers', msg);
-    });
+        socket.on('getUsers', function (id, msg) {
+            socket.broadcast.to(id).emit('getUsers', msg);
+        });
 
-    socket.on('getUsersInQuiz', function(id, msg) {
-        socket.broadcast.to(id).emit('getUsersInQuiz', msg);
-    });
+        socket.on('getUsersInQuiz', function (id, msg) {
+            socket.broadcast.to(id).emit('getUsersInQuiz', msg);
+        });
 
-    socket.on('logout', function(id, msg) {
-        socket.broadcast.to(id).emit('logout', msg);
-    });
+        socket.on('logout', function (id, msg) {
+            socket.broadcast.to(id).emit('logout', msg);
+        });
 
-    socket.on('getResults', function(id, msg) {
-        socket.broadcast.to(id).emit('getResults', msg);
-    });
+        socket.on('getResults', function (id, msg) {
+            socket.broadcast.to(id).emit('getResults', msg);
+        });
 
-    socket.on('getQuiz', function(id, msg) {
-        socket.broadcast.to(id).emit('getQuiz', msg);
-    });
+        socket.on('getQuiz', function (id, msg) {
+            socket.broadcast.to(id).emit('getQuiz', msg);
+        });
 
-    socket.on('savePlaylist', function(id, msg) {
-        socket.broadcast.to(id).emit('savePlaylist', msg);
-    });
+        socket.on('savePlaylist', function (id, msg) {
+            socket.broadcast.to(id).emit('savePlaylist', msg);
+        });
 
-    socket.on('createQuiz', function(id, msg) {
-        socket.broadcast.to(id).emit('createQuiz', msg);
-    });
+        socket.on('createQuiz', function (id, msg) {
+            socket.broadcast.to(id).emit('createQuiz', msg);
+        });
 
-    socket.on('getUserResults', function(id, msg) {
-        socket.broadcast.to(id).emit('getUserResults', msg);
-    });
+        socket.on('getUserResults', function (id, msg) {
+            socket.broadcast.to(id).emit('getUserResults', msg);
+        });
 
-    socket.on('nextQuestion', function(id, msg) {
-        socket.broadcast.to(id).emit('nextQuestion', msg);
-    });
+        socket.on('nextQuestion', function (id, msg) {
+            socket.broadcast.to(id).emit('nextQuestion', msg);
+        });
 
-    socket.on('leaveQuiz', function(id, msg) {
-        socket.broadcast.to(id).emit('leaveQuiz', msg);
-    });
+        socket.on('leaveQuiz', function (id, msg) {
+            socket.broadcast.to(id).emit('leaveQuiz', msg);
+        });
 
-    socket.on('joinQuiz', function(id, msg) {
-        socket.broadcast.to(id).emit('joinQuiz', msg);
-    });
+        socket.on('joinQuiz', function (id, msg) {
+            socket.broadcast.to(id).emit('joinQuiz', msg);
+        });
 
-    socket.on('answerQuestion', function(id, msg) {
-        socket.broadcast.to(id).emit('answerQuestion', msg);
-    });
+        socket.on('answerQuestion', function (id, msg) {
+            socket.broadcast.to(id).emit('answerQuestion', msg);
+        });
 
 
-    socket.on('disconnect', function(){
-        // TODO
-    });
+        socket.on('disconnect', function () {
+            // TODO
+        });
+    }
 });
 
 // view engine setup
