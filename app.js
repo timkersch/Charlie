@@ -24,6 +24,8 @@ const app = express();
 
 app.use(session);
 
+const openRooms = [];
+
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/webapp/index.html');
 });
@@ -75,11 +77,12 @@ io.on('connection', function(socket){
                         access_token: result['access_token'],
                         refresh_token: result['refresh_token']
                     };
-                    sessionStore.set(session_id, storage);
                     new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
                         msg.data = user.id;
+                        storage.user = user.id;
+                        sessionStore.set(session_id, storage);
                         socket.emit('callback', msg);
-                    })
+                    });
                 });
             });
         });
@@ -96,11 +99,41 @@ io.on('connection', function(socket){
 
         socket.on('createQuiz', function (msg) {
             console.log("in createQuiz", msg);
+            sessionStore.load(session_id, function (err, storage) {
+                const quizID = generateUID();
+                const quizDetails = msg.data;
+                quizDetails.id = quizID;
+                quizDetails.owner = storage.user;
+                openRooms.push(quizDetails);
+                msg.data = quizDetails;
+                socket.emit('callback', msg);
+            });
+        });
 
+        socket.on('joinQuiz', function (msg) {
+            console.log("in joinQuiz", msg);
+            // The user joins a room
+            if (msg.room in openRooms) {
+                msg.data = true;
+                socket.join(msg.room);
+                socket.emit('callback', msg);
+                io.to(msg.room).emit('userJoined', { msg: msg.user });
+            } else {
+                msg.data=false;
+                socket.emit('callback', msg);
+            }
+        });
+
+        socket.on('nextQuestion', function (id, msg) {
+            console.log("in nextQuestion", msg);
         });
 
         socket.on('getCurrentQuestion', function (msg) {
             console.log("in getCurrentQuestion", msg);
+        });
+
+        socket.on('leaveQuiz', function (id, msg) {
+            console.log("in leaveQuiz", msg);
         });
 
         socket.on('isQuizStarted', function (msg) {
@@ -133,18 +166,6 @@ io.on('connection', function(socket){
 
         socket.on('getUserResults', function (id, msg) {
             console.log("in getUserResults", msg);
-        });
-
-        socket.on('nextQuestion', function (id, msg) {
-            console.log("in nextQuestion", msg);
-        });
-
-        socket.on('leaveQuiz', function (id, msg) {
-            console.log("in leaveQuiz", msg);
-        });
-
-        socket.on('joinQuiz', function (id, msg) {
-            console.log("in joinQuiz", msg);
         });
 
         socket.on('answerQuestion', function (id, msg) {
@@ -204,6 +225,10 @@ io.on('connection', function(socket){
 //     //error: {}
 //   //});
 // });
+
+function generateUID() {
+    return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
+}
 
 
 module.exports = app;

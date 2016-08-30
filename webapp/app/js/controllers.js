@@ -91,14 +91,16 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
 charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
     function ($scope, $location, charlieProxy) {
         console.log("LobbyController!");
-        $scope.status = '  ';
+        $scope.status = '';
         $scope.quizname = "Quiz";
+        $scope.id = "Id";
         $scope.users = [];
         $scope.isOwner = false;
 
         let init = function () {
             charlieProxy.getQuiz(function (quiz) {
                 $scope.quizname = quiz.name;
+                $scope.id = quiz.id;
                 $scope.isOwner = charlieProxy.isQuizOwner();
                 charlieProxy.getUsersInQuiz(function (users) {
                     $scope.users = users;

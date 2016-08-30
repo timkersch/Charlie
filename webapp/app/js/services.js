@@ -4,7 +4,7 @@ const charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$rootScope',
     function ($rootScope) {
-        const socket = io.connect('ws://localhost:8080/');
+        const socket = io();
 
         let requestId = 0;
         const getRequestId = function () {
@@ -157,6 +157,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     generated: generated
                 };
                 invoke("createQuiz", data, function (quiz) {
+                    console.log('QUIZZER', quiz);
                     currentQuiz = quiz;
                     callback(currentQuiz);
                 });
@@ -177,7 +178,9 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 invoke('getCurrentQuestion', {}, callback);
             },
             isQuizOwner: function () {
-                return currentQuiz.owner.name === user.name;
+                console.log(currentQuiz.owner);
+                console.log(user.name);
+                return currentQuiz.owner === user.name;
             },
             // callback(started)
             isQuizStarted: function (callback) {
