@@ -25,7 +25,6 @@ const app = express();
 app.use(session);
 
 app.get('/', function(req, res) {
-    //req.session['halo'] = "hajlo";
     res.sendFile(__dirname + '/webapp/index.html');
 });
 
@@ -61,91 +60,104 @@ io.on('connection', function(socket){
 
     if (session_id) {
         socket.on('getLoginURL', function (msg) {
-            const api = new spotify.SpotifyApi();
-            const url = api.getRedirectURL();
+            console.log("in getURL", msg);
+            const url = spotify.getRedirectURL();
             let obj = {data: url, request_id: msg.request_id};
-
-            sessionStore.load(session_id, function (err, storage) {
-                // TODO store stuff
-                sessionStore.set(session_id, storage);
-            });
             socket.emit('callback', obj);
         });
 
         socket.on('login', function (msg) {
+            console.log("in login", msg);
+            const tokenPromise = spotify.getTokens(msg.data.code);
             sessionStore.load(session_id, function (err, storage) {
-                console.log(storage);
+                tokenPromise.then((result) => {
+                    storage.tokens = {
+                        access_token: result['access_token'],
+                        refresh_token: result['refresh_token']
+                    };
+                    sessionStore.set(session_id, storage);
+                    new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
+                        msg.data = user.id;
+                        socket.emit('callback', msg);
+                    })
+                });
             });
         });
 
-        socket.on('setUser', function (id, msg) {
-            socket.broadcast.to(id).emit('setUser', msg);
+        socket.on('getPlaylists', function (msg) {
+            console.log("in getPlaylists", msg);
+            sessionStore.load(session_id, function (err, storage) {
+                new spotify.SpotifyApi(storage.tokens).getPlaylists().then((playlists) => {
+                    msg.data = playlists;
+                    socket.emit('callback', msg);
+                });
+            });
         });
 
-        socket.on('getPlaylists', function (id, msg) {
-            socket.broadcast.to(id).emit('getPlaylists', msg);
+        socket.on('createQuiz', function (msg) {
+            console.log("in createQuiz", msg);
+
         });
 
-        socket.on('getCurrentQuestion', function (id, msg) {
-            socket.broadcast.to(id).emit('getCurrentQuestion', msg);
+        socket.on('getCurrentQuestion', function (msg) {
+            console.log("in getCurrentQuestion", msg);
         });
 
-        socket.on('isQuizStarted', function (id, msg) {
-            socket.broadcast.to(id).emit('isQuizStarted', msg);
+        socket.on('isQuizStarted', function (msg) {
+            console.log("in isQuizStarted", msg);
         });
 
         socket.on('getUsers', function (id, msg) {
-            socket.broadcast.to(id).emit('getUsers', msg);
+            console.log("in getUsers", msg);
         });
 
         socket.on('getUsersInQuiz', function (id, msg) {
-            socket.broadcast.to(id).emit('getUsersInQuiz', msg);
+            console.log("in getUsersInQuiz", msg);
         });
 
         socket.on('logout', function (id, msg) {
-            socket.broadcast.to(id).emit('logout', msg);
+            console.log("in logout", msg);
         });
 
         socket.on('getResults', function (id, msg) {
-            socket.broadcast.to(id).emit('getResults', msg);
+            console.log("in getResults", msg);
         });
 
         socket.on('getQuiz', function (id, msg) {
-            socket.broadcast.to(id).emit('getQuiz', msg);
+            console.log("in getQuiz", msg);
         });
 
         socket.on('savePlaylist', function (id, msg) {
-            socket.broadcast.to(id).emit('savePlaylist', msg);
-        });
-
-        socket.on('createQuiz', function (id, msg) {
-            socket.broadcast.to(id).emit('createQuiz', msg);
+            console.log("in savePlaylist", msg);
         });
 
         socket.on('getUserResults', function (id, msg) {
-            socket.broadcast.to(id).emit('getUserResults', msg);
+            console.log("in getUserResults", msg);
         });
 
         socket.on('nextQuestion', function (id, msg) {
-            socket.broadcast.to(id).emit('nextQuestion', msg);
+            console.log("in nextQuestion", msg);
         });
 
         socket.on('leaveQuiz', function (id, msg) {
-            socket.broadcast.to(id).emit('leaveQuiz', msg);
+            console.log("in leaveQuiz", msg);
         });
 
         socket.on('joinQuiz', function (id, msg) {
-            socket.broadcast.to(id).emit('joinQuiz', msg);
+            console.log("in joinQuiz", msg);
         });
 
         socket.on('answerQuestion', function (id, msg) {
-            socket.broadcast.to(id).emit('answerQuestion', msg);
+            console.log("in answerQuestion", msg);
         });
-
 
         socket.on('disconnect', function () {
-            // TODO
+            console.log("in disconnect");
         });
+
+        /*socket.on('setUser', function (id, msg) {
+         socket.broadcast.to(id).emit('setUser', msg);
+         });*/
     }
 });
 
