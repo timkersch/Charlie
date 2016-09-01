@@ -96,12 +96,17 @@ charlieController.controller('homeController', ['$scope', '$location', 'charlieP
 
         $scope.changeView = function () {
             if($scope.joinText && $scope.joinText.length > 0) {
-                $location.path('/lobby');
+                charlieProxy.joinQuiz($scope.joinText, function(result) {
+                    if(result) {
+                        $location.path('/lobby');
+                    } else {
+                        alert('Could not find quiz!');
+                    }
+                });
             } else {
                 $location.path('/create');
             }
         };
-
         $scope.isLoggedIn = function () {
             return charlieProxy.isLoggedIn();
         };
@@ -124,15 +129,17 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         $scope.id = "Id";
         $scope.users = [];
         $scope.isOwner = false;
+        $scope.owner = '';
 
         let init = function () {
             charlieProxy.getQuiz(function (quiz) {
                 $scope.quizname = quiz.name;
+                $scope.owner = quiz.owner;
                 $scope.id = quiz.id;
                 $scope.isOwner = charlieProxy.isQuizOwner();
-                charlieProxy.getUsersInQuiz(function (users) {
-                    $scope.users = users;
-                });
+                //charlieProxy.getUsersInQuiz(function (users) {
+                //    $scope.users = users;
+                //});
             });
         };
 
@@ -140,8 +147,14 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
             init();
         });
 
-        charlieProxy.listenTo("userJoined", function (user) {
-            console.log(user);
+        //charlieProxy.listenTo("userJoined", function (user) {
+        //    console.log(user);
+        //    $scope.$apply(function () {
+        //        $scope.users.push(user);
+        //    });
+        //});
+
+        charlieProxy.userJoined(function(user) {
             $scope.$apply(function () {
                 $scope.users.push(user);
             });

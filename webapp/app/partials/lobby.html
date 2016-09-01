@@ -25,11 +25,13 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>{{quizname}}</span></div>
     </md-toolbar>
 
-    <md-label style="display: block;text-align: center;font-size:2.5em;margin-top: 1em">Join {{quizname}} with code <br> <b>{{id}}</b></md-label>
+    <md-label ng-show="isOwner" style="display: block;text-align: center;font-size:2.5em;margin-top: 1em">Your friends can now join {{quizname}} with code <br> <b>{{id}}</b></md-label>
+    <md-label ng-show="!isOwner" style="display: block;text-align: center;font-size:2.5em;margin-top: 1em">Welcome to {{owner}} quiz!</md-label>
+
     <br>
     <md-list layout="column" layout-align="center center">
         <md-list-item ng-repeat="user in users" style="font-size:1.8em;margin-top:10px;">
-            {{user.name}}
+            {{user}}
         </md-list-item>
     </md-list>
     <div class="end" ng-show="isOwner">

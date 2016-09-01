@@ -52,6 +52,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             const id = event.request_id;
             const callback = callbacks[id];
             delete callbacks[id];
+            console.log("got data", data);
             callback(data);
             $rootScope.$apply();
         });
@@ -178,8 +179,6 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 invoke('getCurrentQuestion', {}, callback);
             },
             isQuizOwner: function () {
-                console.log(currentQuiz.owner);
-                console.log(user.name);
                 return currentQuiz.owner === user.name;
             },
             // callback(started)
@@ -193,12 +192,16 @@ charlieService.factory('charlieProxy', ['$rootScope',
             // callback(success)
             joinQuiz: function (quiz, callback) {
                 let data = {
-                    quizId: quiz.uuid
+                    id: quiz
                 };
-                invoke('joinQuiz', data, function (success) {
-                    if (success)
-                        currentQuiz = quiz;
-                    callback(success);
+                invoke('joinQuiz', data, function (result) {
+                    console.log(result);
+                    if (result.quiz) {
+                        currentQuiz = result.quiz;
+                        callback(result.quiz);
+                    } else {
+                        callback();
+                    }
                 });
             },
             // callback(question)
@@ -225,6 +228,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
             getNumberOfQuestions: function () {
                 return !currentQuiz ? 0 : currentQuiz.questions.length;
             },
+
+            userJoined : function(callback) {
+                socket.on('userJoined', function(msg) {
+                    callback(msg.user);
+                });
+            },
+
             /* action: 
              *      userJoined          --> callback(newUser)
              *      invitedTo           --> callback(quiz)

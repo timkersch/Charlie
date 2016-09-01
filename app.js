@@ -102,8 +102,10 @@ io.on('connection', function(socket){
             sessionStore.load(session_id, function (err, storage) {
                 const quizID = generateUID();
                 const quizDetails = msg.data;
+                socket.join(quizID);
                 quizDetails.id = quizID;
                 quizDetails.owner = storage.user;
+                quizDetails.users.push(storage.user);
                 openRooms.push(quizDetails);
                 msg.data = quizDetails;
                 socket.emit('callback', msg);
@@ -111,18 +113,32 @@ io.on('connection', function(socket){
         });
 
         socket.on('joinQuiz', function (msg) {
-            console.log("in joinQuiz", msg);
-            // The user joins a room
-            let room = msg.data.room;
-            if (room in openRooms) {
-                socket.join(room);
-                msg.data = true;
+            sessionStore.load(session_id, function (err, storage) {
+                console.log("in joinQuiz", msg);
+                console.log("the open rooms are", openRooms);
+                // The user joins a room
+                let room = msg.data.id;
+                    for(let i = 0; i < openRooms.length; i++) {
+                        if (openRooms[i].id === room) {
+                            // Push the new user to the list of users
+                            openRooms[i].users.push(storage.user);
+
+                            // Join the room
+                            socket.join(room);
+
+                            // Emit result back to client
+                            msg.data = {
+                                quiz: openRooms[i]
+                            };
+
+                            socket.emit('callback', msg);
+
+                            // Emit to room that user with name joined
+                            return io.to(room).emit('userJoined', {user: storage.user});
+                        }
+                    }
                 socket.emit('callback', msg);
-                io.to(room).emit('userJoined', { user: msg.data.user });
-            } else {
-                msg.data=false;
-                socket.emit('callback', msg);
-            }
+            });
         });
 
         socket.on('nextQuestion', function (id, msg) {
