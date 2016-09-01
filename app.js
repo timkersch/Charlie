@@ -113,11 +113,12 @@ io.on('connection', function(socket){
         socket.on('joinQuiz', function (msg) {
             console.log("in joinQuiz", msg);
             // The user joins a room
-            if (msg.room in openRooms) {
+            let room = msg.data.room;
+            if (room in openRooms) {
+                socket.join(room);
                 msg.data = true;
-                socket.join(msg.room);
                 socket.emit('callback', msg);
-                io.to(msg.room).emit('userJoined', { msg: msg.user });
+                io.to(room).emit('userJoined', { user: msg.data.user });
             } else {
                 msg.data=false;
                 socket.emit('callback', msg);

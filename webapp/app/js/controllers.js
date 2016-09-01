@@ -88,6 +88,34 @@ charlieController.controller('mainController', ['$scope', '$routeParams', '$loca
 
     }]);
 
+charlieController.controller('homeController', ['$scope', '$location', 'charlieProxy',
+    function ($scope, $location, charlieProxy) {
+        console.log("Homecontroller");
+
+        $scope.beginButton = "Create Quiz";
+
+        $scope.changeView = function () {
+            if($scope.joinText && $scope.joinText.length > 0) {
+                $location.path('/lobby');
+            } else {
+                $location.path('/create');
+            }
+        };
+
+        $scope.isLoggedIn = function () {
+            return charlieProxy.isLoggedIn();
+        };
+
+        $scope.joinTextChange = function () {
+            if($scope.joinText && $scope.joinText.length > 0) {
+                $scope.beginButton = "Join Quiz";
+            } else {
+                $scope.beginButton = "Create Quiz";
+            }
+        };
+
+    }]);
+
 charlieController.controller('lobbyController', ['$scope', '$location', 'charlieProxy',
     function ($scope, $location, charlieProxy) {
         console.log("LobbyController!");
@@ -134,19 +162,6 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         });
 
 
-    }]);
-
-charlieController.controller('homeController', ['$scope', '$location', 'charlieProxy',
-    function ($scope, $location, charlieProxy) {
-        $scope.changeView = function (data) {
-            $location.path(data);
-        };
-
-        $scope.isLoggedIn = function () {
-            return charlieProxy.isLoggedIn();
-        };
-
-        console.log("Init");
     }]);
 
 charlieController.controller('questionController', ['$scope', '$location', '$interval', 'charlieProxy', '$document', '$timeout',
