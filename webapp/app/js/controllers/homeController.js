@@ -11,7 +11,6 @@ angular.module('charlieController').controller('homeController', ['$scope', '$lo
         $scope.changeView = function () {
             if($scope.joinText && $scope.joinText.length > 0) {
                 charlieProxy.joinQuiz($scope.joinText, function(result) {
-                    console.log(result);
                     if(result) {
                         $location.path('/lobby');
                     } else {

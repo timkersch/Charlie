@@ -150,17 +150,23 @@ io.on('connection', function(socket){
         socket.on('startQuiz', function(quizID) {
             console.log('in startQuiz', quizID);
             openRooms[quizID].started = true;
+            openRooms[quizID].current = 0;
             io.to(quizID).emit('quizStart');
         });
 
         socket.on('nextQuestion', function (quizID) {
             console.log("in nextQuestion", quizID);
-            io.to(quizID).emit('newQuestion', openRooms[quizID].questions[1]);
+            if (openRooms[quizID].current + 1 < openRooms[quizID].questions.length) {
+                const next = openRooms[quizID].questions[++openRooms[quizID].current];
+                io.to(quizID).emit('newQuestion', next);
+            } else {
+                io.to(quizID).emit('gameOver');
+            }
         });
 
         socket.on('getCurrentQuestion', function (quizID) {
             console.log('in get current question', quizID);
-            io.to(quizID).emit('getCurrentQuestionCallback', openRooms[quizID].questions[0]);
+            io.to(quizID).emit('getCurrentQuestionCallback', openRooms[quizID].questions[openRooms[quizID].current]);
         });
 
         socket.on('answerQuestion', function (answer) {

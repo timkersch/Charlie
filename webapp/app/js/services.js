@@ -271,8 +271,8 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
 
             gameOver : function(callback) {
-                socket.on('gameOver', function(data) {
-                    callback(data);
+                socket.on('gameOver', function() {
+                    callback();
                     $rootScope.$apply();
                 });
             },

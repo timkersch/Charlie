@@ -51,7 +51,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             init();
         });
 
-        charlieProxy.gameOver(function(users) {
+        charlieProxy.gameOver(function() {
             $location.path("/scoreboard");
         });
 
