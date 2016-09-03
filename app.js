@@ -20,6 +20,8 @@ const session = expressSession({
     saveUninitialized: true
 });
 
+const uids = {};
+
 const app = express();
 
 app.use(session);
@@ -79,52 +81,54 @@ io.on('connection', function(socket){
                     };
                     new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
                         storage.user = user.id;
+                        sessionStore.set(session_id, storage);
+
                         const returnObj = {
                             id : user.id,
                             email : user.email,
                             country : user.country,
                             product : user.product
                         };
-                        sessionStore.set(session_id, storage);
                         socket.emit('loginCallback', returnObj);
                     });
                 });
             });
         });
 
-        socket.on('getPlaylists', function (msg) {
-            console.log("in getPlaylists", msg);
+        socket.on('getPlaylists', function () {
+            console.log("in getPlaylists");
             sessionStore.load(session_id, function (err, storage) {
                 new spotify.SpotifyApi(storage.tokens).getPlaylists().then((playlists) => {
-                    msg.data = playlists;
-                    socket.emit('callback', msg);
+                    socket.emit('getPlaylistsCallback', playlists);
                 });
             });
         });
 
-        socket.on('createQuiz', function (msg) {
-            console.log("in createQuiz", msg);
+        socket.on('createQuiz', function (quiz) {
+            console.log("in createQuiz", quiz);
             sessionStore.load(session_id, function (err, storage) {
-                const quizID = generateUID();
-                const quizDetails = msg.data;
-                socket.join(quizID);
-                storage.quizID = quizID;
-                sessionStore.set(session_id, storage);
-                quizDetails.id = quizID;
+                const uid = generateUID();
+                const quizDetails = quiz;
+                socket.join(uid);
+
+                quizDetails.id = uid;
                 quizDetails.owner = storage.user;
                 quizDetails.users.push(storage.user);
+
                 openRooms.push(quizDetails);
-                msg.data = quizDetails;
-                socket.emit('callback', msg);
+
+                storage.quizID = uid;
+                sessionStore.set(session_id, storage);
+
+                socket.emit('createQuizCallback', quizDetails);
             });
         });
 
-        socket.on('joinQuiz', function (msg) {
+        socket.on('joinQuiz', function (room) {
             sessionStore.load(session_id, function (err, storage) {
-                console.log("in joinQuiz", msg);
+                console.log("in joinQuiz", room);
                 console.log("the open rooms are", openRooms);
                 // The user joins a room
-                let room = msg.data.id;
                     for(let i = 0; i < openRooms.length; i++) {
                         if (openRooms[i].id === room) {
                             // Push the new user to the list of users
@@ -134,17 +138,13 @@ io.on('connection', function(socket){
                             socket.join(room);
 
                             // Emit result back to client
-                            msg.data = {
-                                quiz: openRooms[i]
-                            };
-
-                            socket.emit('callback', msg);
+                            socket.emit('joinQuizCallback', openRooms[i]);
 
                             // Emit to room that user with name joined
-                            return io.to(room).emit('userJoined', {user: storage.user});
+                            return io.to(room).emit('userJoined', storage.user);
                         }
                     }
-                socket.emit('callback', msg);
+                socket.emit('joinQuizCallback');
             });
         });
 
@@ -210,6 +210,29 @@ io.on('connection', function(socket){
     }
 });
 
+function generateUID() {
+    let uid = getUID();
+    while (uids.uid) {
+        uid = getUID();
+    }
+    uids.uid = true;
+    return uid;
+}
+
+function getUID() {
+    return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+}
+
+module.exports = app;
+
+
+
+
+
+
+
+
+
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
@@ -253,10 +276,3 @@ io.on('connection', function(socket){
 //     //error: {}
 //   //});
 // });
-
-function generateUID() {
-    return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4)
-}
-
-
-module.exports = app;

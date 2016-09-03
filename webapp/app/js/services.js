@@ -77,6 +77,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('getLoginURL');
                 socket.on('getLoginURLCallback', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -90,6 +91,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     user = userData.id;
                     sessionStorage.setItem('user', userData.id);
                     callback(userData.id);
+                    $rootScope.$apply();
                 });
             },
 
@@ -111,7 +113,8 @@ charlieService.factory('charlieProxy', ['$rootScope',
             getUsers: function (callback) {
                 socket.emit('getUsers', {});
                 socket.on('getUsersCallback', function(data) {
-                   callback(data);
+                    callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -133,6 +136,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.on('createQuizCallback', function(quiz) {
                     currentQuiz = quiz;
                     callback(currentQuiz);
+                    $rootScope.$apply();
                 });
             },
 
@@ -140,7 +144,9 @@ charlieService.factory('charlieProxy', ['$rootScope',
             getPlaylists: function (callback) {
                 socket.emit('getPlaylists', {});
                 socket.on('getPlaylistsCallback', function(data) {
+                    console.log(data);
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -151,7 +157,8 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 };
                 socket.emit('answerQuestion', data);
                 socket.on('answerQuestionCallback', function(data) {
-                   callback(data);
+                    callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -160,11 +167,12 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('getCurrentQuestion', {});
                 socket.on('getCurrentQuestionCallback', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             isQuizOwner: function () {
-                return currentQuiz.owner === user.id;
+                return currentQuiz.owner === user;
             },
 
             // callback(started)
@@ -172,6 +180,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('isQuizStarted', {});
                 socket.on('isQuizStartedCallback', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -180,21 +189,20 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('getUsersInQuiz', {});
                 socket.on('getUsersInQuizCallback', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             // callback(success)
-            joinQuiz: function (quiz, callback) {
-                let data = {
-                    id: quiz
-                };
-                socket.emit('joinQuiz', data);
-                socket.on('joinQuizCallback', function(result) {
-                    if (result.quiz) {
-                        currentQuiz = result.quiz;
-                        callback(result.quiz);
+            joinQuiz: function (quizID, callback) {
+                socket.emit('joinQuiz', quizID);
+                socket.on('joinQuizCallback', function(quiz) {
+                    if (quiz) {
+                        currentQuiz = quiz;
+                        callback(true);
+                        $rootScope.$apply();
                     } else {
-                        callback();
+                        callback(false);
                     }
                 });
             },
@@ -204,6 +212,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('nextQuestion', {});
                 socket.on('nextQuestionCallback', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
@@ -215,12 +224,14 @@ charlieService.factory('charlieProxy', ['$rootScope',
             getResults: function (callback) {
                 socket.emit('getResults', {});
                 socket.on('getResultsCallback', function(data) {
-                   callback(data);
+                    callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             // callback(quiz)
             getQuiz: function (callback) {
+                console.log('blah', currentQuiz);
                 if (currentQuiz) {
                     callback(currentQuiz);
                 } else {
@@ -228,6 +239,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     socket.on('getQuizCallback', function (quiz) {
                         currentQuiz = quiz;
                         callback(quiz);
+                        $rootScope.$apply();
                     });
                 }
             },
@@ -237,32 +249,37 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
 
             userJoined : function(callback) {
-                socket.on('userJoined', function(msg) {
-                    callback(msg.user);
+                socket.on('userJoined', function(user) {
+                    callback(user);
+                    $rootScope.$apply();
                 });
             },
 
             quizStart : function(callback) {
                 socket.on('quizStart', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             gameOver : function(callback) {
                 socket.on('gameOver', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             newQuestion : function(callback) {
                 socket.on('newQuestion', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             },
 
             userPointsUpdate : function(callback) {
                 socket.on('userPointsUpdate', function(data) {
                     callback(data);
+                    $rootScope.$apply();
                 });
             }
 

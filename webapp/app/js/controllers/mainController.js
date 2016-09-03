@@ -5,7 +5,7 @@
 angular.module('charlieController').controller('mainController', ['$scope', '$routeParams', '$route', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
     function ($scope, $routeParams, $route, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = '';
-        $scope.url = "";
+        $scope.url = '';
 
         $scope.changeView = function (view) {
             $location.path(view); // path not hash
@@ -30,7 +30,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
                     charlieProxy.login(sessionStorage.getItem('code'), function (user) {
                         console.log('called back');
                         $scope.user = user;
-                        $route.reload();
                     });
                 } else {
                     charlieProxy.getLoginUrl(function (url) {
@@ -47,36 +46,11 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
             });
         });
 
-        // let showActionToast = function (quiz) {
-        //     let toast = $mdToast.simple()
-        //         .textContent('You have been invited to ' + quiz.name)
-        //         .action('ACCEPT')
-        //         .highlightAction(true)
-        //         .hideDelay(10 * 1000);
-        //
-        //     $mdToast.show(toast).then(function (response) {
-        //         if (response == 'ok') {
-        //             charlieProxy.joinQuiz(quiz, function (success) {
-        //                 if (success) {
-        //                     $location.path('/lobby');
-        //                 } else {
-        //                     alert('Something went wrong joining the quiz!');
-        //                 }
-        //             });
-        //         }
-        //     });
-        // };
-
-        // charlieProxy.listenTo("invitedTo", function (quiz) {
-        //     showActionToast(quiz);
-        // });
-
         $scope.login = function () {
             window.location.href = $scope.url;
         };
 
         $scope.logout = function () {
-            console.log('in logout');
             $scope.user = {};
             charlieProxy.logout();
             charlieProxy.getLoginUrl(function (url) {

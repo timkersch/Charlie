@@ -18,22 +18,12 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
                 $scope.owner = quiz.owner;
                 $scope.id = quiz.id;
                 $scope.isOwner = charlieProxy.isQuizOwner();
-                //charlieProxy.getUsersInQuiz(function (users) {
-                //    $scope.users = users;
-                //});
             });
         };
 
         charlieProxy.onReady(function () {
             init();
         });
-
-        //charlieProxy.listenTo("userJoined", function (user) {
-        //    console.log(user);
-        //    $scope.$apply(function () {
-        //        $scope.users.push(user);
-        //    });
-        //});
 
         charlieProxy.userJoined(function(user) {
             $scope.$apply(function () {
@@ -52,12 +42,5 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
                 $location.path('/question');
             });
         });
-
-        //charlieProxy.listenTo("quizStart", function () {
-        //    console.log("Now started!!");
-        //    $scope.$apply(function () {
-        //        $location.path('/question');
-        //    });
-        //});
 
     }]);
