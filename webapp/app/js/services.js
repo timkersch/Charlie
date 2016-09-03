@@ -16,14 +16,14 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
         socket.on('connect', function(){
             console.log('socketio open!');
-            if (localStorage.getItem('user')) {
+            if (sessionStorage.getItem('user')) {
                 // User in storage
-                user = localStorage.getItem('user');
+                user = sessionStorage.getItem('user');
                 setReady();
                 // socket.emit('setUser', user.id);
                 // socket.on('setUserCallback', function(data) {
                 //     if(!data) {
-                //         localStorage.user = "";
+                //         sessionStorage.user = "";
                 //         setReady();
                 //     } else {
                 //         socket.emit('getQuiz', {});
@@ -34,13 +34,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 //     }
                 // });
             } else {
-                //localStorage.clear();
+                //sessionStorage.clear();
                 setReady();
             }
         });
 
         socket.on('disconnect', function(){
-            localStorage.setItem('user', user);
+            sessionStorage.setItem('user', user);
             console.log("socketio close!");
         });
 
@@ -88,13 +88,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('login', code);
                 socket.on('loginCallback', function(userData) {
                     user = userData.id;
-                    localStorage.setItem('user', userData.id);
+                    sessionStorage.setItem('user', userData.id);
                     callback(userData.id);
                 });
             },
 
             logout: function () {
-                //localStorage.clear();
+                //sessionStorage.clear();
                 user = {};
                 socket.emit('logout', {});
             },

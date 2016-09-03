@@ -26,9 +26,8 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
                     $scope.user = user;
                 });
             } else {
-                if (localStorage.getItem('code')) {
-                    console.log('called');
-                    charlieProxy.login(localStorage.getItem('code'), function (user) {
+                if (sessionStorage.getItem('code')) {
+                    charlieProxy.login(sessionStorage.getItem('code'), function (user) {
                         console.log('called back');
                         $scope.user = user;
                         $route.reload();
