@@ -58,11 +58,48 @@ class SpotifyApi {
     }
 
     getPlaylistTracks(playlistID, ownerID) {
-        return this.api.getPlaylistTracks(ownerID, playlistID).then((data)  => {
-            console.log('The playlist contains these tracks', data.body);
-        },(err) => {
-            console.log('Something went wrong!', err);
+        return new Promise((resolve, reject) => {
+            this.api.getPlaylistTracks(ownerID, playlistID).then((data) => {
+                resolve(data.body.items);
+            },(err) => {
+                reject(err);
+            });
         });
+    }
+
+    getArtistOptions(artistId) {
+        return new Promise((resolve, reject) => {
+            this.api.getArtistRelatedArtists(artistId).then((data) => {
+                const relatedArtists = data.body.artists;
+                const artists = [];
+                for (let i = 0; i < 3; i++) {
+                    if(relatedArtists[i]) {
+                        artists.push(relatedArtists[i].name);
+                    } else {
+                        artists.push('');
+                    }
+                }
+                resolve(artists);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    getSimilarTracks(track, noSimilarTracks, countryCode) {
+
+    }
+
+    similarTrackFromRelatedArtist(track) {
+
+    }
+
+    similarTrackFromAlbum(track) {
+
+    }
+
+    newPlaylist(trackIDList, playlistName) {
+
     }
 }
 

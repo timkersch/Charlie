@@ -26,17 +26,12 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             audioElement.play();
         };
 
-        let nextQuestion = function () {
-            charlieProxy.nextQuestion(function (data) {
-            });
-        };
-
         let init = function () {
             $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
             charlieProxy.getResults(function (players) {
                 $scope.players = players;
             });
-            charlieProxy.getCurrentQuestion(function (question) {
+            charlieProxy.getCurrentQuestion(charlieProxy.getQuizID(), function (question) {
                 if (question.artists) {
                     if (question.answer !== "") {
                         hasAnswered = true;
@@ -56,34 +51,34 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             init();
         });
 
-        // charlieProxy.listenTo("gameOver", function (users) {
-        //     $location.path("/scoreboard");
-        // });
-        //
-        // charlieProxy.listenTo("userPointsUpdate", function (player) {
-        //     console.log("Player: " + player.name);
-        //     let found = false;
-        //     for (let i = 0; i < $scope.players.length; i++) {
-        //         if ($scope.players[i].name === player.name) {
-        //             $scope.players[i].points = player.points;
-        //             found = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!found)
-        //         $scope.players.push(player);
-        // });
-        //
-        // charlieProxy.listenTo("newQuestion", function (question) {
-        //     console.log("New Question: " + question);
-        //     $scope.possibleArtists = question.artists;
-        //     if (charlieProxy.isQuizOwner())
-        //         play(question.track_url);
-        //     $scope.currentQuestion = question.number;
-        //     $scope.timeLeft = 20;
-        //     hasAnswered = false;
-        //     $scope.showScores = false;
-        // });
+        charlieProxy.gameOver(function(users) {
+            $location.path("/scoreboard");
+        });
+
+        charlieProxy.userPointsUpdate(function (player) {
+            console.log("Player: " + player.name);
+            let found = false;
+            for (let i = 0; i < $scope.players.length; i++) {
+                if ($scope.players[i].name === player.name) {
+                    $scope.players[i].points = player.points;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                $scope.players.push(player);
+        });
+
+        charlieProxy.newQuestion(function (question) {
+            console.log("New Question: " + question);
+            $scope.possibleArtists = question.artists;
+            if (charlieProxy.isQuizOwner())
+                play(question.track_url);
+            $scope.currentQuestion = question.number;
+            $scope.timeLeft = 20;
+            hasAnswered = false;
+            $scope.showScores = false;
+        });
 
         $scope.isDisabled = function (artist) {
             return hasAnswered && $scope.myAnswer !== artist;
@@ -151,7 +146,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                     // Question over
                     if (charlieProxy.isQuizOwner()) {
                         $timeout(function () {
-                            nextQuestion();
+                            charlieProxy.nextQuestion(charlieProxy.getQuizID());
                         }, 5000);
 
                     }

@@ -152,19 +152,16 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
             // callback(isCorrect)
             answerQuestion: function (artistName, callback) {
-                let data = {
-                    artistName: artistName
-                };
-                socket.emit('answerQuestion', data);
-                socket.on('answerQuestionCallback', function(data) {
-                    callback(data);
+                socket.emit('answerQuestion', artistName);
+                socket.on('answerQuestionCallback', function(correct) {
+                    callback(correct);
                     $rootScope.$apply();
                 });
             },
 
             // callback(question)
-            getCurrentQuestion: function (callback) {
-                socket.emit('getCurrentQuestion', {});
+            getCurrentQuestion: function (quizID, callback) {
+                socket.emit('getCurrentQuestion', quizID);
                 socket.on('getCurrentQuestionCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();
@@ -207,13 +204,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 });
             },
 
+            startQuiz : function (quizID) {
+                socket.emit('startQuiz', quizID);
+            },
+
             // callback(question)
-            nextQuestion: function (callback) {
-                socket.emit('nextQuestion', {});
-                socket.on('nextQuestionCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
+            nextQuestion: function (quizID) {
+                socket.emit('nextQuestion', quizID);
             },
 
             savePlaylist: function () {
@@ -231,7 +228,6 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
             // callback(quiz)
             getQuiz: function (callback) {
-                console.log('blah', currentQuiz);
                 if (currentQuiz) {
                     callback(currentQuiz);
                 } else {
@@ -244,9 +240,21 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 }
             },
 
-            getNumberOfQuestions: function () {
-                return !currentQuiz ? 0 : currentQuiz.questions.length;
+            getQuizID: function() {
+                try {
+                    return currentQuiz.id
+                } catch(err) {
+                    return err;
+                }
             },
+
+            getNumberOfQuestions: function () {
+                return !currentQuiz ? 0 : currentQuiz.nbrOfSongs;
+            },
+
+            /**
+             * Listeners
+             */
 
             userJoined : function(callback) {
                 socket.on('userJoined', function(user) {
@@ -270,7 +278,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
 
             newQuestion : function(callback) {
-                socket.on('newQuestion', function(data) {
+                socket.on('newQuestion', function(data) {;
                     callback(data);
                     $rootScope.$apply();
                 });

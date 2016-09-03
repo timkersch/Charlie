@@ -5,7 +5,6 @@
 angular.module('charlieController').controller('lobbyController', ['$scope', '$location', 'charlieProxy',
     function ($scope, $location, charlieProxy) {
         console.log("LobbyController!");
-        $scope.status = '';
         $scope.quizname = "Quiz";
         $scope.id = "Id";
         $scope.users = [];
@@ -32,12 +31,12 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
         });
 
         $scope.startQuiz = function () {
-            if (charlieProxy.isQuizOwner())
-                charlieProxy.nextQuestion(function (data) {
-                });
+            if (charlieProxy.isQuizOwner()) {
+                charlieProxy.startQuiz($scope.id);
+            }
         };
 
-        charlieProxy.quizStart(function(data) {
+        charlieProxy.quizStart(function() {
             $scope.$apply(function () {
                 $location.path('/question');
             });

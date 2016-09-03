@@ -3,8 +3,6 @@
 const dotenv = require('dotenv').config({path: '.env'});
 const path = require('path');
 const favicon = require('serve-favicon');
-const logger = require('morgan');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cookParse = require('cookie');
 const spotify = require('./core/spotify-service.js');
@@ -20,13 +18,11 @@ const session = expressSession({
     saveUninitialized: true
 });
 
-const uids = {};
+const openRooms = {};
 
 const app = express();
 
 app.use(session);
-
-const openRooms = [];
 
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/webapp/index.html');
@@ -104,62 +100,74 @@ io.on('connection', function(socket){
             });
         });
 
-        socket.on('createQuiz', function (quiz) {
-            console.log("in createQuiz", quiz);
+        socket.on('createQuiz', function (quizDetails) {
+            console.log("in createQuiz", quizDetails);
             sessionStore.load(session_id, function (err, storage) {
                 const uid = generateUID();
-                const quizDetails = quiz;
                 socket.join(uid);
-
-                quizDetails.id = uid;
-                quizDetails.owner = storage.user;
-                quizDetails.users.push(storage.user);
-
-                openRooms.push(quizDetails);
 
                 storage.quizID = uid;
                 sessionStore.set(session_id, storage);
 
-                socket.emit('createQuizCallback', quizDetails);
+                quizDetails.id = uid;
+                quizDetails.owner = storage.user;
+                quizDetails.users.push(storage.user);
+                const obj = {
+                    started: false,
+                    quiz: quizDetails
+                };
+
+                const api = new spotify.SpotifyApi(storage.tokens);
+                getQuestions(api, quizDetails.playlist, storage.user, quizDetails.nbrOfSongs).then((result) => {
+                    obj.questions = result;
+                    openRooms[uid] = obj;
+                    socket.emit('createQuizCallback', obj.quiz);
+                });
             });
         });
 
         socket.on('joinQuiz', function (room) {
             sessionStore.load(session_id, function (err, storage) {
                 console.log("in joinQuiz", room);
-                console.log("the open rooms are", openRooms);
                 // The user joins a room
-                    for(let i = 0; i < openRooms.length; i++) {
-                        if (openRooms[i].id === room) {
-                            // Push the new user to the list of users
-                            openRooms[i].users.push(storage.user);
+                if (openRooms[room] && openRooms[room].started === false) {
+                    // Push the new user to the list of users
+                    openRooms[room].quiz.users.push(storage.user);
 
-                            // Join the room
-                            socket.join(room);
+                    // Join the room
+                    socket.join(room);
 
-                            // Emit result back to client
-                            socket.emit('joinQuizCallback', openRooms[i]);
+                    // Emit result back to client
+                    socket.emit('joinQuizCallback', openRooms[room].quiz);
 
-                            // Emit to room that user with name joined
-                            return io.to(room).emit('userJoined', storage.user);
-                        }
-                    }
+                    // Emit to room that user with name joined
+                    return io.to(room).emit('userJoined', storage.user);
+                }
                 socket.emit('joinQuizCallback');
             });
         });
 
-        socket.on('nextQuestion', function (msg) {
-            console.log("in nextQuestion", msg);
-            sessionStore.load(session_id, function(err, storage) {
-                io.to(storage.quizID).emit('quizStart', {});
-            });
+        socket.on('startQuiz', function(quizID) {
+            console.log('in startQuiz', quizID);
+            openRooms[quizID].started = true;
+            io.to(quizID).emit('quizStart');
         });
 
-        socket.on('getCurrentQuestion', function (msg) {
-            console.log("in getCurrentQuestion", msg);
+        socket.on('nextQuestion', function (quizID) {
+            console.log("in nextQuestion", quizID);
+            io.to(quizID).emit('newQuestion', openRooms[quizID].questions[1]);
         });
 
-        socket.on('leaveQuiz', function (id, msg) {
+        socket.on('getCurrentQuestion', function (quizID) {
+            console.log('in get current question', quizID);
+            io.to(quizID).emit('getCurrentQuestionCallback', openRooms[quizID].questions[0]);
+        });
+
+        socket.on('answerQuestion', function (answer) {
+            console.log("in answerQuestion", answer);
+        });
+
+        socket.on('leaveQuiz', function (msg) {
             console.log("in leaveQuiz", msg);
         });
 
@@ -167,36 +175,32 @@ io.on('connection', function(socket){
             console.log("in isQuizStarted", msg);
         });
 
-        socket.on('getUsers', function (id, msg) {
+        socket.on('getUsers', function (msg) {
             console.log("in getUsers", msg);
         });
 
-        socket.on('getUsersInQuiz', function (id, msg) {
+        socket.on('getUsersInQuiz', function (msg) {
             console.log("in getUsersInQuiz", msg);
         });
 
-        socket.on('logout', function (id, msg) {
+        socket.on('logout', function (msg) {
             console.log("in logout", msg);
         });
 
-        socket.on('getResults', function (id, msg) {
+        socket.on('getResults', function (msg) {
             console.log("in getResults", msg);
         });
 
-        socket.on('getQuiz', function (id, msg) {
+        socket.on('getQuiz', function (msg) {
             console.log("in getQuiz", msg);
         });
 
-        socket.on('savePlaylist', function (id, msg) {
+        socket.on('savePlaylist', function (msg) {
             console.log("in savePlaylist", msg);
         });
 
-        socket.on('getUserResults', function (id, msg) {
+        socket.on('getUserResults', function (msg) {
             console.log("in getUserResults", msg);
-        });
-
-        socket.on('answerQuestion', function (id, msg) {
-            console.log("in answerQuestion", msg);
         });
 
         socket.on('disconnect', function () {
@@ -210,17 +214,45 @@ io.on('connection', function(socket){
     }
 });
 
-function generateUID() {
-    let uid = getUID();
-    while (uids.uid) {
-        uid = getUID();
-    }
-    uids.uid = true;
-    return uid;
+function getQuestions(api, playlistId, ownerId, noTracks) {
+    return api.getPlaylistTracks(playlistId, ownerId).then((data) => {
+        const tracks = data.slice(0, noTracks);
+        const questions = [];
+        tracks.forEach(function(track, i) {
+            const t = track.track;
+            const artist = t.artists[0];
+            questions.push(new Promise((resolve, reject) => {
+                api.getArtistOptions(artist.id).then((relatedArtists) => {
+                    relatedArtists.push(artist.name);
+                    resolve ({
+                        id: t.id,
+                        name: t.name,
+                        album : t.album.name,
+                        correct: artist.name,
+                        track_url : t.preview_url,
+                        artists : relatedArtists,
+                        answer : '',
+                        number: i+1
+                    });
+                }).catch((err) => {
+                    reject(err);
+                });
+            }));
+        });
+        return Promise.all(questions).then((result) => {
+            return result;
+        });
+    }).catch((err) => {
+        console.log(err);
+    });
 }
 
-function getUID() {
-    return ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+function generateUID() {
+    let uid;
+    do {
+        uid = ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+    } while (openRooms.uid);
+    return uid;
 }
 
 module.exports = app;
