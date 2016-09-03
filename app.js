@@ -103,6 +103,8 @@ io.on('connection', function(socket){
                 const quizID = generateUID();
                 const quizDetails = msg.data;
                 socket.join(quizID);
+                storage.quizID = quizID;
+                sessionStore.set(session_id, storage);
                 quizDetails.id = quizID;
                 quizDetails.owner = storage.user;
                 quizDetails.users.push(storage.user);
@@ -141,8 +143,11 @@ io.on('connection', function(socket){
             });
         });
 
-        socket.on('nextQuestion', function (id, msg) {
+        socket.on('nextQuestion', function (msg) {
             console.log("in nextQuestion", msg);
+            sessionStore.load(session_id, function(err, storage) {
+                io.to(storage.quizID).emit('quizStart', {});
+            });
         });
 
         socket.on('getCurrentQuestion', function (msg) {

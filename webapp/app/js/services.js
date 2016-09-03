@@ -235,6 +235,12 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 });
             },
 
+            quizStart : function(callback) {
+                socket.on('quizStart', function(data) {
+                    callback(data);
+                });
+            },
+
             /* action: 
              *      userJoined          --> callback(newUser)
              *      invitedTo           --> callback(quiz)

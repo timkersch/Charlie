@@ -161,19 +161,23 @@ charlieController.controller('lobbyController', ['$scope', '$location', 'charlie
         });
 
         $scope.startQuiz = function () {
-            //$location.path('/question');
             if (charlieProxy.isQuizOwner())
                 charlieProxy.nextQuestion(function (data) {
                 });
         };
 
-        charlieProxy.listenTo("quizStart", function () {
-            console.log("Now started!!");
+        charlieProxy.quizStart(function(data) {
             $scope.$apply(function () {
                 $location.path('/question');
             });
         });
 
+        //charlieProxy.listenTo("quizStart", function () {
+        //    console.log("Now started!!");
+        //    $scope.$apply(function () {
+        //        $location.path('/question');
+        //    });
+        //});
 
     }]);
 
