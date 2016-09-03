@@ -111,7 +111,7 @@ io.on('connection', function(socket){
 
                 quizDetails.id = uid;
                 quizDetails.owner = storage.user;
-                quizDetails.users.push(storage.user);
+                quizDetails.users.push({name: storage.user, points: 0});
                 const obj = {
                     started: false,
                     quiz: quizDetails
@@ -132,7 +132,7 @@ io.on('connection', function(socket){
                 // The user joins a room
                 if (openRooms[room] && openRooms[room].started === false) {
                     // Push the new user to the list of users
-                    openRooms[room].quiz.users.push(storage.user);
+                    openRooms[room].quiz.users.push({name: storage.user, points: 0});
 
                     // Join the room
                     socket.join(room);
@@ -169,8 +169,20 @@ io.on('connection', function(socket){
             io.to(quizID).emit('getCurrentQuestionCallback', openRooms[quizID].questions[openRooms[quizID].current]);
         });
 
-        socket.on('answerQuestion', function (answer) {
-            console.log("in answerQuestion", answer);
+        socket.on('answerQuestion', function (data) {
+            console.log("in answerQuestion", data);
+            const quizID = data.quizID;
+            const answer = data.answer;
+            sessionStore.load(session_id, function (err, storage) {
+                if (answer === openRooms[quizID].questions[openRooms[quizID].current].correct) {
+                    openRooms[data.quizID].quiz.users.forEach(function (user) {
+                        if (user.name === storage.user) {
+                            user.points++;
+                            return io.to(quizID).emit('userPointsUpdate', user);
+                        }
+                    });
+                }
+            });
         });
 
         socket.on('leaveQuiz', function (msg) {

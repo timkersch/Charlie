@@ -7,8 +7,6 @@ let charlieController = angular.module("charlieController", [
 ]);
 
 let charlieApp = angular.module("charlieApp", [
-    //'ngRoute',
-    //'ngMaterial',
     'ngMessages',
     'charlieController'
 ]);

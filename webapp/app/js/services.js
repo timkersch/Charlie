@@ -144,19 +144,14 @@ charlieService.factory('charlieProxy', ['$rootScope',
             getPlaylists: function (callback) {
                 socket.emit('getPlaylists', {});
                 socket.on('getPlaylistsCallback', function(data) {
-                    console.log(data);
                     callback(data);
                     $rootScope.$apply();
                 });
             },
 
             // callback(isCorrect)
-            answerQuestion: function (artistName, callback) {
-                socket.emit('answerQuestion', artistName);
-                socket.on('answerQuestionCallback', function(correct) {
-                    callback(correct);
-                    $rootScope.$apply();
-                });
+            answerQuestion: function (artistName, quizID) {
+                socket.emit('answerQuestion', {quizID: quizID, answer: artistName});
             },
 
             // callback(question)

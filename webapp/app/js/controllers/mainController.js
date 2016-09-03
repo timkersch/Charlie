@@ -2,8 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('mainController', ['$scope', '$routeParams', '$route', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
-    function ($scope, $routeParams, $route, $location, $mdToast, charlieProxy, $mdSidenav) {
+angular.module('charlieController').controller('mainController', ['$scope', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function ($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = '';
         $scope.url = '';
 
@@ -28,7 +28,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
             } else {
                 if (sessionStorage.getItem('code')) {
                     charlieProxy.login(sessionStorage.getItem('code'), function (user) {
-                        console.log('called back');
                         $scope.user = user;
                     });
                 } else {

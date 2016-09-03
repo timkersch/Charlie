@@ -15,6 +15,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         let audioElement = $document[0].createElement('audio');
         let hasAnswered = false;
         let intervalPromise;
+        let correctAnswer = '';
         $scope.players = [];
 
         let play = function (url) {
@@ -28,9 +29,11 @@ angular.module('charlieController').controller('questionController', ['$scope', 
 
         let init = function () {
             $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
+
             charlieProxy.getResults(function (players) {
                 $scope.players = players;
             });
+
             charlieProxy.getCurrentQuestion(charlieProxy.getQuizID(), function (question) {
                 if (question.artists) {
                     if (question.answer !== "") {
@@ -40,6 +43,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                     }
                     $scope.currentQuestion = question.number;
                     $scope.possibleArtists = question.artists;
+                    correctAnswer = question.correct;
                     if (charlieProxy.isQuizOwner())
                         play(question.track_url);
                     startInterval();
@@ -56,7 +60,6 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         });
 
         charlieProxy.userPointsUpdate(function (player) {
-            console.log("Player: " + player.name);
             let found = false;
             for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].name === player.name) {
@@ -70,11 +73,11 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         });
 
         charlieProxy.newQuestion(function (question) {
-            console.log("New Question: " + question);
             $scope.possibleArtists = question.artists;
             if (charlieProxy.isQuizOwner())
                 play(question.track_url);
             $scope.currentQuestion = question.number;
+            correctAnswer = question.correct;
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
@@ -88,10 +91,8 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;
-                charlieProxy.answerQuestion(data, function (artist) {
-                    console.log("Correct answer is: " + artist);
-                    $scope.correctAnswer = artist;
-                });
+                charlieProxy.answerQuestion(data, charlieProxy.getQuizID());
+                $scope.correctAnswer = correctAnswer;
             }
         };
 

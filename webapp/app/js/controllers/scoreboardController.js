@@ -41,7 +41,6 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
                     for (let i = 0; i < users.length; i++) {
                         /*Chart.js need to read data as an array*/
                         let tmpArray = [users[i].points];
-                        console.log(tmpArray);
                         data.datasets.push({
                             fillColor: chartColors[i],
                             data: tmpArray
@@ -52,10 +51,7 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
                             color: classColors[i]
 
                         });
-
                     }
-
-                    console.log(data);
 
                     setTimeout(function () {
                         scoreboardCenter.insertBefore(canvasChart, scoreboardCenter.firstChild);
