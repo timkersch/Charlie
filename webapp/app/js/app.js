@@ -1,8 +1,14 @@
 'use strict';
 
-let charlieApp = angular.module("charlieApp", [
+let charlieController = angular.module("charlieController", [
     'ngRoute',
-    'ngMaterial',
+    'charlieService',
+    'ngMaterial'
+]);
+
+let charlieApp = angular.module("charlieApp", [
+    //'ngRoute',
+    //'ngMaterial',
     'ngMessages',
     'charlieController'
 ]);
