@@ -21,6 +21,7 @@ angular.module('charlieController').controller('homeController', ['$scope', '$lo
                 $location.path('/create');
             }
         };
+
         $scope.isLoggedIn = function () {
             return charlieProxy.isLoggedIn();
         };

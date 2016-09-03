@@ -57,20 +57,20 @@ io.set('authorization', function(data, accept) {
 });
 
 io.on('connection', function(socket){
+    console.log('connection');
     let cookie =  cookParse.parse(socket.handshake.headers.cookie);
     let session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
 
     if (session_id) {
-        socket.on('getLoginURL', function (msg) {
-            console.log("in getURL", msg);
+        socket.on('getLoginURL', function () {
+            console.log("in getURL");
             const url = spotify.getRedirectURL();
-            let obj = {data: url, request_id: msg.request_id};
-            socket.emit('callback', obj);
+            socket.emit('getLoginURLCallback', url);
         });
 
-        socket.on('login', function (msg) {
-            console.log("in login", msg);
-            const tokenPromise = spotify.getTokens(msg.data.code);
+        socket.on('login', function (code) {
+            console.log("in login", code);
+            const tokenPromise = spotify.getTokens(code);
             sessionStore.load(session_id, function (err, storage) {
                 tokenPromise.then((result) => {
                     storage.tokens = {
@@ -78,10 +78,15 @@ io.on('connection', function(socket){
                         refresh_token: result['refresh_token']
                     };
                     new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
-                        msg.data = user.id;
                         storage.user = user.id;
+                        const returnObj = {
+                            id : user.id,
+                            email : user.email,
+                            country : user.country,
+                            product : user.product
+                        };
                         sessionStore.set(session_id, storage);
-                        socket.emit('callback', msg);
+                        socket.emit('loginCallback', returnObj);
                     });
                 });
             });
@@ -198,9 +203,10 @@ io.on('connection', function(socket){
             console.log("in disconnect");
         });
 
-        /*socket.on('setUser', function (id, msg) {
-         socket.broadcast.to(id).emit('setUser', msg);
-         });*/
+        socket.on('setUser', function (msg) {
+            console.log('in set user', msg);
+            socket.emit('setUserCallback');
+        });
     }
 });
 

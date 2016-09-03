@@ -2,6 +2,7 @@
 <html ng-app="charlieApp">
     <head>
         <title>Charlie</title>
+        <base href="/">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <link rel="stylesheet" type="text/css" href="app/style.css">
@@ -26,8 +27,8 @@
         <!-- Internal Angular.js files -->
         <script src="app/js/app.js"></script>
         <script src="app/js/controllers/mainController.js"></script>
-        <script src="app/js/controllers/createController.js"></script>
         <script src="app/js/controllers/homeController.js"></script>
+        <script src="app/js/controllers/createController.js"></script>
         <script src="app/js/controllers/lobbyController.js"></script>
         <script src="app/js/controllers/questionController.js"></script>
         <script src="app/js/controllers/profileController.js"></script>
@@ -48,9 +49,9 @@
                 </md-button>
                 <h2> <a ng-href="#/">Charlie</a></h2>
                 <span flex="" class="flex"></span>
-                <span>{{user.name}}</span>
-                <md-button ng-show="!user.name" ng-click="login()">Login</md-button>
-                <md-button ng-show="user.name" ng-click="logout()">Logout</md-button>
+                <span>{{user}}</span>
+                <md-button ng-show="!user" ng-click="login()">Login</md-button>
+                <md-button ng-show="user" ng-click="logout()">Logout</md-button>
             </md-toolbar>
             <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
                 <md-toolbar ng-click="toggleLeftMenu()">

@@ -13,8 +13,7 @@ let charlieApp = angular.module("charlieApp", [
     'charlieController'
 ]);
 
-charlieApp.config(['$routeProvider',
-    function ($routeProvider) {
+charlieApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
         $routeProvider.
                 when('/', {
                     templateUrl: 'app/partials/home.html',
@@ -44,5 +43,7 @@ charlieApp.config(['$routeProvider',
                     controller: 'questionController'
                 }).
                 otherwise({redirectTo: '/'});
+
+        $locationProvider.html5Mode(true);
 
     }]);

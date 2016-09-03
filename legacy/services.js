@@ -1,7 +1,3 @@
-/**
- * Created by Tim on 03/09/16.
- */
-
 'use strict';
 
 const charlieService = angular.module('charlieService', []);
@@ -9,42 +5,81 @@ const charlieService = angular.module('charlieService', []);
 charlieService.factory('charlieProxy', ['$rootScope',
     function ($rootScope) {
         const socket = io();
+
+        let requestId = 0;
+        const getRequestId = function () {
+            return requestId++;
+        };
         let isReady = false;
+        let callbacks = {};
+        let listenCallbacks = {};
         let readyCallbacks = [];
-        let user = '';
+        let user = {};
         let currentQuiz;
 
         socket.on('connect', function(){
-            console.log('socketio open!');
-            if (localStorage.getItem('user')) {
+            console.log("socketio open!");
+            if (sessionStorage.user) {
                 // User in storage
-                user = localStorage.getItem('user');
-                setReady();
-                // socket.emit('setUser', user.id);
-                // socket.on('setUserCallback', function(data) {
-                //     if(!data) {
-                //         localStorage.user = "";
-                //         setReady();
-                //     } else {
-                //         socket.emit('getQuiz', {});
-                //         socket.on('getQuizCallback', function(quiz) {
-                //             currentQuiz = quiz;
-                //             setReady();
-                //         });
-                //     }
-                // });
+                user = sessionStorage.user;
+                let data = {
+                    id: user.id
+                };
+                invoke("setUser", data, function (success) {
+                    if (!success) {
+                        sessionStorage.user = "";
+                        setReady();
+                    } else {
+                        invoke("getQuiz", {}, function (quiz) {
+                            currentQuiz = quiz;
+                            setReady();
+                        });
+                    }
+                });
             } else {
-                //localStorage.clear();
                 setReady();
             }
         });
 
         socket.on('disconnect', function(){
-            localStorage.setItem('user', user);
             console.log("socketio close!");
         });
 
+        socket.on('callback', function (event) {
+            console.log("Callback event(%o)", event);
+            const action = event.action;
+            const data = event.data;
+            const id = event.request_id;
+            const callback = callbacks[id];
+            delete callbacks[id];
+            console.log("got data", data);
+            callback(data);
+            $rootScope.$apply();
+        });
+
+        socket.on('listen', function (event) {
+            console.log("ListenEvent(%o)", event);
+            const action = event.action;
+            const data = event.data;
+            if (Array.isArray(listenCallbacks[action])) {
+                for (let i = 0; i < listenCallbacks[action].length; i++) {
+                    listenCallbacks[action][i](data);
+                }
+            }
+        });
+
+        let invoke = function (name, data, callback) {
+            console.log("Invoke(" + name + "), data: " + JSON.stringify(data));
+            let request = {
+                request_id: getRequestId(),
+                data: data
+            };
+            callbacks[request.request_id] = callback;
+            socket.emit(name, request);
+        };
+
         let setReady = function () {
+            console.log("service-ready");
             isReady = true;
             for (let i = 0; i < readyCallbacks.length; i++) {
                 readyCallbacks[i]();
@@ -54,6 +89,9 @@ charlieService.factory('charlieProxy', ['$rootScope',
         };
 
         return {
+            call: function (method, data, callback) {
+                invoke(method, data, callback);
+            },
             /**
              * Service
              */
@@ -67,54 +105,44 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 else
                     callback();
             },
-
             /**
-             * Users
+             * User
              */
 
             // callback(url)
             getLoginUrl: function (callback) {
-                socket.emit('getLoginURL');
-                socket.on('getLoginURLCallback', function(data) {
-                    callback(data);
-                });
+                invoke("getLoginURL", {}, callback);
             },
-
             isLoggedIn: function () {
-                return (user !== null && user !== undefined && user !== '');
+                return ('name' in user);
             },
-
             login: function (code, callback) {
-                socket.emit('login', code);
-                socket.on('loginCallback', function(userData) {
-                    user = userData.id;
-                    localStorage.setItem('user', userData.id);
-                    callback(userData.id);
+                let data = {
+                    code: code
+                };
+                invoke("login", data, function (userData) {
+                    user.name = userData;
+                    sessionStorage.user = user;
+                    callback(user);
                 });
             },
-
             logout: function () {
-                //localStorage.clear();
+                sessionStorage.user = "";
                 user = {};
-                socket.emit('logout', {});
+                invoke("logout");
             },
-
             // callback(user)
             getUser: function (callback) {
                 if (this.isLoggedIn())
+                    // No user in storage
                     callback(user);
                 else
-                    callback();
+                    callback({});
             },
-
             // callback(users)
             getUsers: function (callback) {
-                socket.emit('getUsers', {});
-                socket.on('getUsersCallback', function(data) {
-                   callback(data);
-                });
+                invoke("getUsers", {}, callback);
             },
-
             /**
              * Quiz
              */
@@ -129,67 +157,45 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     nbrOfSongs: nbrOfSongs,
                     generated: generated
                 };
-                socket.emit('createQuiz', data);
-                socket.on('createQuizCallback', function(quiz) {
+                invoke("createQuiz", data, function (quiz) {
+                    console.log('QUIZZER', quiz);
                     currentQuiz = quiz;
                     callback(currentQuiz);
                 });
             },
-
             // callback(lists)
             getPlaylists: function (callback) {
-                socket.emit('getPlaylists', {});
-                socket.on('getPlaylistsCallback', function(data) {
-                    callback(data);
-                });
+                invoke("getPlaylists", {}, callback);
             },
-
             // callback(isCorrect)
             answerQuestion: function (artistName, callback) {
                 let data = {
                     artistName: artistName
                 };
-                socket.emit('answerQuestion', data);
-                socket.on('answerQuestionCallback', function(data) {
-                   callback(data);
-                });
+                invoke('answerQuestion', data, callback);
             },
-
             // callback(question)
             getCurrentQuestion: function (callback) {
-                socket.emit('getCurrentQuestion', {});
-                socket.on('getCurrentQuestionCallback', function(data) {
-                    callback(data);
-                });
+                invoke('getCurrentQuestion', {}, callback);
             },
-
             isQuizOwner: function () {
-                return currentQuiz.owner === user.id;
+                return currentQuiz.owner === user.name;
             },
-
             // callback(started)
             isQuizStarted: function (callback) {
-                socket.emit('isQuizStarted', {});
-                socket.on('isQuizStartedCallback', function(data) {
-                    callback(data);
-                });
+                invoke("isQuizStarted", {}, callback);
             },
-
             // callback(users)
             getUsersInQuiz: function (callback) {
-                socket.emit('getUsersInQuiz', {});
-                socket.on('getUsersInQuizCallback', function(data) {
-                    callback(data);
-                });
+                invoke('getUsersInQuiz', {}, callback);
             },
-
             // callback(success)
             joinQuiz: function (quiz, callback) {
                 let data = {
                     id: quiz
                 };
-                socket.emit('joinQuiz', data);
-                socket.on('joinQuizCallback', function(result) {
+                invoke('joinQuiz', data, function (result) {
+                    console.log(result);
                     if (result.quiz) {
                         currentQuiz = result.quiz;
                         callback(result.quiz);
@@ -198,40 +204,27 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     }
                 });
             },
-
             // callback(question)
             nextQuestion: function (callback) {
-                socket.emit('nextQuestion', {});
-                socket.on('nextQuestionCallback', function(data) {
-                    callback(data);
-                });
+                invoke('nextQuestion', {}, callback);
             },
-
             savePlaylist: function () {
-                socket.emit('savePlaylist', {});
+                invoke('savePlaylist');
             },
-
             // callback(users)
             getResults: function (callback) {
-                socket.emit('getResults', {});
-                socket.on('getResultsCallback', function(data) {
-                   callback(data);
-                });
+                invoke('getResults', {}, callback);
             },
-
             // callback(quiz)
             getQuiz: function (callback) {
-                if (currentQuiz) {
+                if (currentQuiz)
                     callback(currentQuiz);
-                } else {
-                    socket.emit('getQuiz', {});
-                    socket.on('getQuizCallback', function (quiz) {
+                else
+                    invoke("getQuiz", {}, function (quiz) {
                         currentQuiz = quiz;
                         callback(quiz);
                     });
-                }
             },
-
             getNumberOfQuestions: function () {
                 return !currentQuiz ? 0 : currentQuiz.questions.length;
             },
@@ -248,23 +241,19 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 });
             },
 
-            gameOver : function(callback) {
-                socket.on('gameOver', function(data) {
-                    callback(data);
-                });
-            },
-
-            newQuestion : function(callback) {
-                socket.on('newQuestion', function(data) {
-                    callback(data);
-                });
-            },
-
-            userPointsUpdate : function(callback) {
-                socket.on('userPointsUpdate', function(data) {
-                    callback(data);
-                });
+            /* action: 
+             *      userJoined          --> callback(newUser)
+             *      invitedTo           --> callback(quiz)
+             *      newQuestion         --> callback(question)
+             *      gameOver            --> callback(players)
+             *      quizStart           --> callback()
+             *      userPointsUpdate   --> callback(user)
+             */
+            listenTo: function (action, callback) {
+                console.log("listenTo(" + action + ")");
+                if (!Array.isArray(listenCallbacks[action]))
+                    listenCallbacks[action] = [];
+                listenCallbacks[action].push(callback);
             }
-
         };
     }]);
