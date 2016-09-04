@@ -212,7 +212,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
             // callback(users)
             getResults: function (callback) {
-                socket.emit('getResults', {});
+                socket.emit('getResults');
                 socket.on('getResultsCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();

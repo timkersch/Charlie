@@ -61,7 +61,7 @@
             <md-list-item ng-repeat="player in players| orderBy:'-points'">
                 <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">
                 <md-icon aria-label="Menu" class="material-icons {{getTextColor($index)}}">person</md-icon>
-                {{player.name}}
+                {{player.userID}}
                 </p>
                 <p>{{player.points}} {{player.points == 1 ? "point" : "points"}}</p>
             </md-list-item>

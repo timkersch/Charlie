@@ -149,7 +149,7 @@ io.on('connection', function(socket){
                     finished: false,
                     players: [{
                         userID: storage.user,
-                        answers: [],
+                        answers: initArr(quizDetails.nbrOfSongs),
                         points: 0,
                     }]
                 });
@@ -186,9 +186,9 @@ io.on('connection', function(socket){
                             storage.quizID = room;
                             sessionStore.set(session_id, storage);
 
-                            quiz.players.push({userID: storage.user, answers: [], points: 0});
+                            quiz.players.push({userID: storage.user, answers: initArr(quiz.nbrOfSongs), points: 0});
                             quiz.save(function (err) {
-                                if(!err) {
+                                if(err) {
                                     console.log('error when saving quiz!', err);
                                 } else {
                                     console.log('saved quiz!');
@@ -233,13 +233,14 @@ io.on('connection', function(socket){
             console.log("in nextQuestion");
             sessionStore.load(session_id, function (err, storage) {
                 Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
+                    console.log(quiz.questions.length);
                     if (quiz.questionIndex + 1 < quiz.questions.length) {
-                        const nextQuestion = quiz.questions[++quiz.currentQuestionsNumber];
+                        const nextQuestion = quiz.questions[++quiz.questionIndex];
                         quiz.save(function (err) {
                             if (err) {
                                 console.log('err', err);
                             } else {
-                                io.to(storage.quizID).emit('newQuestion', nextQuestion);
+                                io.to(storage.quizID).emit('newQuestion', {question: nextQuestion, questionIndex: quiz.questionIndex});
                             }
                         });
                     } else {
@@ -249,7 +250,8 @@ io.on('connection', function(socket){
                                 console.log(err);
                             } else {
                                 console.log('done');
-                            };
+                                io.to(storage.quizID).emit('gameOver');
+                            }
                         });
                     }
                 });
@@ -258,33 +260,46 @@ io.on('connection', function(socket){
 
         socket.on('getCurrentQuestion', function () {
             console.log('in get current question');
+
             sessionStore.load(session_id, function (err, storage) {
                 Quiz.findOne({'quizID': storage.quizID}, 'questionIndex questions', function (err, quiz) {
-                    io.to(storage.quizID).emit('getCurrentQuestionCallback', quiz.questions[quiz.questionIndex]);
+                    io.to(storage.quizID).emit('getCurrentQuestionCallback', {question: quiz.questions[quiz.questionIndex], questionIndex: quiz.questionIndex});
+                });
+            });
+        });
+
+        socket.on('getResults', function () {
+            console.log("in getResults");
+
+            sessionStore.load(session_id, function(err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, 'players', function(err, quiz) {
+                    socket.emit('getResultsCallback', quiz.players);
                 });
             });
         });
 
         socket.on('answerQuestion', function (answer) {
-            console.log("in answerQuestion", data);
+            console.log("in answerQuestion", answer);
 
             sessionStore.load(session_id, function (err, storage) {
-                Quiz.findOne({'quiID': storage.quizID}, function (err, quiz) {
-                    if(answer === quiz.questions[quiz.questionIndex].correctArtist) {
-                        quiz.players.forEach(function (player) {
-                            if (player.userID === storage.user) {
+                Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
+                    quiz.players.forEach(function (player) {
+                        if (player.userID === storage.user) {
+                            console.log(player);
+                            player.answers.set(quiz.questionIndex, answer);
+                            if(answer === quiz.questions[quiz.questionIndex].correctArtist) {
                                 player.points++;
-                                player.answers[quiz.questionIndex] = answer;
-                                return quiz.save(function(err) {
-                                    if(err) {
-                                        console.log('error', err);
-                                    } else {
-                                        return io.to(storage.quizID).emit('userPointsUpdate', player);
-                                    }
-                                });
+                                io.to(storage.quizID).emit('userPointsUpdate', player);
                             }
-                        });
-                    }
+                            return quiz.save(function(err) {
+                                if(err) {
+                                    console.log('error', err);
+                                } else {
+                                    console.log('saved');
+                                }
+                            });
+                        }
+                    });
                 });
             });
         });
@@ -307,10 +322,6 @@ io.on('connection', function(socket){
 
         socket.on('logout', function (msg) {
             console.log("in logout", msg);
-        });
-
-        socket.on('getResults', function (msg) {
-            console.log("in getResults", msg);
         });
 
         socket.on('getQuiz', function (msg) {
@@ -368,12 +379,16 @@ function getQuestions(api, playlistId, ownerId, noTracks) {
 }
 
 function generateUID() {
-    // TODO
-    let uid;
-    do {
-        return uid = ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
-    } while (openRooms.uid);
+    let uid = ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
     return uid;
+}
+
+function initArr(size) {
+    let answersArray = [];
+    for(let i = 0; i < size; i++) {
+        answersArray.push('');
+    }
+    return answersArray;
 }
 
 module.exports = app;

@@ -34,20 +34,13 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                 $scope.players = players;
             });
 
-            charlieProxy.getCurrentQuestion(function (question) {
-                if (question.artists) {
-                    if (question.answer !== "") {
-                        hasAnswered = true;
-                        $scope.myAnswer = question.answer;
-                        $scope.correctAnswer = question.correct;
-                    }
-                    $scope.currentQuestion = question.number;
-                    $scope.possibleArtists = question.artists;
-                    correctAnswer = question.correct;
-                    if (charlieProxy.isQuizOwner())
-                        play(question.track_url);
-                    startInterval();
-                }
+            charlieProxy.getCurrentQuestion(function (result) {
+                $scope.currentQuestion = result.questionIndex+1;
+                $scope.possibleArtists = result.question.artistOptions;
+                correctAnswer = result.question.correctArtist;
+                if (charlieProxy.isQuizOwner())
+                    play(result.question.trackUrl);
+                startInterval();
             });
         };
 
@@ -60,24 +53,20 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         });
 
         charlieProxy.userPointsUpdate(function (player) {
-            let found = false;
             for (let i = 0; i < $scope.players.length; i++) {
-                if ($scope.players[i].name === player.name) {
+                if ($scope.players[i].userID === player.userID) {
                     $scope.players[i].points = player.points;
-                    found = true;
                     break;
                 }
             }
-            if (!found)
-                $scope.players.push(player);
         });
 
-        charlieProxy.newQuestion(function (question) {
-            $scope.possibleArtists = question.artists;
+        charlieProxy.newQuestion(function (result) {
+            $scope.possibleArtists = result.question.artistOptions;
             if (charlieProxy.isQuizOwner())
-                play(question.track_url);
-            $scope.currentQuestion = question.number;
-            correctAnswer = question.correct;
+                play(result.question.trackUrl);
+            $scope.currentQuestion = result.questionIndex+1;
+            correctAnswer = result.question.correctArtist;
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
