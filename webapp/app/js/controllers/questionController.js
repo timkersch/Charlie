@@ -44,6 +44,10 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             });
         };
 
+        charlieProxy.timeLeft(function(time) {
+            console.log(time);
+        });
+
         charlieProxy.onReady(function () {
             init();
         });

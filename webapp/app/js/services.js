@@ -245,6 +245,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
              * Listeners
              */
 
+            timeLeft : function(callback) {
+                socket.on('timeLeft', function(time) {
+                    callback(time);
+                    $rootScope.$apply();
+                });
+            },
+
             userJoined : function(callback) {
                 socket.on('userJoined', function(user) {
                     callback(user);

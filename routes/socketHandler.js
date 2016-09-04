@@ -183,9 +183,7 @@ module.exports = function(server, quizmodel, sessionStore) {
                                         question: nextQuestion,
                                         questionIndex: quiz.questionIndex
                                     });
-                                    setInterval(function(){
-                                        io.to(storage.quizID).emit('update', i--);
-                                    }, 1000, 25);
+                                    countDown(25, io, storage.quizID);
                                 }
                             });
                         } else {
@@ -297,6 +295,15 @@ module.exports = function(server, quizmodel, sessionStore) {
             });
         }
     });
+
+    function countDown(i, io, quizID) {
+        let int = setInterval(function () {
+            io.to(quizID).emit('timeLeft', i--);
+            if(i === 0) {
+                clearInterval(int);
+            }
+        }, 1000);
+    }
 
     function getQuestions(api, playlistId, ownerId, noTracks) {
         return api.getPlaylistTracks(playlistId, ownerId).then((data) => {
