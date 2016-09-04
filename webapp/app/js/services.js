@@ -197,6 +197,10 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 });
             },
 
+            leaveQuiz: function () {
+                socket.emit('leaveQuiz');
+            },
+
             startQuiz : function () {
                 socket.emit('startQuiz');
             },

@@ -71,7 +71,8 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
         });
 
         $scope.changeView = function (view) {
-            $location.path(view); // path not hash
+            charlieProxy.leaveQuiz();
+            $location.path(view);
         };
 
         $scope.savePlaylist = function () {
