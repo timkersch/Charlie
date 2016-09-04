@@ -8,13 +8,6 @@ const cookParse = require('cookie');
 const spotify = require('./core/spotify-service.js');
 const express = require('express');
 
-// const mongoClient = require('mongodb').MongoClient;
-// mongoClient.connect(mongoURL, function(err, db) {
-//     if(err === null) {
-//         console.log('Connected to Mongodb');
-//     }
-// });
-
 const mongoURL = 'mongodb://localhost:27017/charlie';
 const mongoose = require('mongoose');
 mongoose.connect(mongoURL);
@@ -34,10 +27,6 @@ const sessionStore = require('sessionstore').createSessionStore({
     dbName: 'charlie',
     collectionName: 'sessions',
     timeout: 10000
-    // authSource: 'authedicationDatabase',
-    // username: 'technicalDbUser',
-    // password: 'secret'
-    // url: 'mongodb://user:pass@host:port/db?opts
 });
 
 const expressSession = require('express-session');
@@ -160,8 +149,6 @@ io.on('connection', function(socket){
                     newQuiz.save(function(err) {
                         if(err) {
                             console.log('error when saving quiz!', err);
-                        } else {
-                            console.log('saved quiz!');
                         }
                     });
                     quizDetails.quizID = uid;
@@ -190,8 +177,6 @@ io.on('connection', function(socket){
                             quiz.save(function (err) {
                                 if(err) {
                                     console.log('error when saving quiz!', err);
-                                } else {
-                                    console.log('saved quiz!');
                                 }
                             });
 
@@ -233,7 +218,6 @@ io.on('connection', function(socket){
             console.log("in nextQuestion");
             sessionStore.load(session_id, function (err, storage) {
                 Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
-                    console.log(quiz.questions.length);
                     if (quiz.questionIndex + 1 < quiz.questions.length) {
                         const nextQuestion = quiz.questions[++quiz.questionIndex];
                         quiz.save(function (err) {
@@ -249,7 +233,6 @@ io.on('connection', function(socket){
                             if(err) {
                                 console.log(err);
                             } else {
-                                console.log('done');
                                 io.to(storage.quizID).emit('gameOver');
                             }
                         });
@@ -285,7 +268,6 @@ io.on('connection', function(socket){
                 Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
                     quiz.players.forEach(function (player) {
                         if (player.userID === storage.user) {
-                            console.log(player);
                             player.answers.set(quiz.questionIndex, answer);
                             if(answer === quiz.questions[quiz.questionIndex].correctArtist) {
                                 player.points++;
@@ -294,8 +276,6 @@ io.on('connection', function(socket){
                             return quiz.save(function(err) {
                                 if(err) {
                                     console.log('error', err);
-                                } else {
-                                    console.log('saved');
                                 }
                             });
                         }
@@ -304,45 +284,52 @@ io.on('connection', function(socket){
             });
         });
 
-        socket.on('leaveQuiz', function (msg) {
-            console.log("in leaveQuiz", msg);
+        socket.on('isQuizStarted', function () {
+            console.log("in isQuizStarted");
+            sessionStore.load(session_id, function (err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, 'started', function(err, quiz) {
+                    socket.emit('isQuizStartedCallback', quiz.started);
+                });
+            });
         });
 
-        socket.on('isQuizStarted', function (msg) {
-            console.log("in isQuizStarted", msg);
+        socket.on('getQuiz', function () {
+            console.log("in getQuiz");
+            sessionStore.load(session_id, function (err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, '-players -questions', function (err, quiz) {
+                    socket.emit('getQuizCallback', quiz);
+                });
+            });
         });
 
-        socket.on('getUsers', function (msg) {
-            console.log("in getUsers", msg);
+        socket.on('savePlaylist', function () {
+            console.log("in savePlaylist");
+            sessionStore.load(session_id, function(err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, 'name questions', function(err, quiz) {
+                    const api = new spotify.SpotifyApi(storage.tokens);
+                    api.savePlaylist(storage.user, quiz.name, quiz.questions);
+                });
+            });
         });
 
-        socket.on('getUsersInQuiz', function (msg) {
-            console.log("in getUsersInQuiz", msg);
+        socket.on('leaveQuiz', function () {
+            console.log("in leaveQuiz");
+            sessionStore.load(session_id, function (err, storage) {
+                storage.quizID = undefined;
+            })
         });
 
-        socket.on('logout', function (msg) {
-            console.log("in logout", msg);
-        });
-
-        socket.on('getQuiz', function (msg) {
-            console.log("in getQuiz", msg);
-        });
-
-        socket.on('savePlaylist', function (msg) {
-            console.log("in savePlaylist", msg);
-        });
-
-        socket.on('getUserResults', function (msg) {
-            console.log("in getUserResults", msg);
+        socket.on('logout', function () {
+            console.log("in logout");
+            sessionStore.load(session_id, function (err, storage) {
+                storage.quizID = undefined;
+                storage.user = undefined;
+                storage.tokens = undefined;
+            })
         });
 
         socket.on('disconnect', function () {
             console.log("in disconnect");
-        });
-
-        socket.on('setUser', function (msg) {
-            console.log('in set user', msg);
-            socket.emit('setUserCallback');
         });
     }
 });
@@ -392,9 +379,6 @@ function initArr(size) {
 }
 
 module.exports = app;
-
-
-
 
 
 

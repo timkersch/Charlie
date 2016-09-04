@@ -86,6 +86,18 @@ class SpotifyApi {
         });
     }
 
+    savePlaylist(owner, name, questions) {
+        const api = this.api;
+        api.createPlaylist(owner, ('Charliequiz: ' + name), {'public' : false}).then((data) => {
+            console.log(data);
+            questions.forEach(function(question) {
+                api.addTracksToPlaylist(owner, data.body.id, 'spotify:track:' + question.trackID);
+            });
+        }).catch((err) => {
+            console.log('Something went wrong!', err);
+        });
+    }
+
     getSimilarTracks(track, noSimilarTracks, countryCode) {
 
     }
@@ -95,10 +107,6 @@ class SpotifyApi {
     }
 
     similarTrackFromAlbum(track) {
-
-    }
-
-    newPlaylist(trackIDList, playlistName) {
 
     }
 }
