@@ -123,12 +123,10 @@ charlieService.factory('charlieProxy', ['$rootScope',
              */
 
             // callback(quiz)
-            createQuiz: function (name, userIds, playlistId, playlistOwner, nbrOfSongs, generated, callback) {
+            createQuiz: function (name, playlistId, nbrOfSongs, generated, callback) {
                 let data = {
                     name: name,
-                    users: userIds,
                     playlist: playlistId,
-                    playlistOwner: playlistOwner,
                     nbrOfSongs: nbrOfSongs,
                     generated: generated
                 };
@@ -150,13 +148,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
 
             // callback(isCorrect)
-            answerQuestion: function (artistName, quizID) {
-                socket.emit('answerQuestion', {quizID: quizID, answer: artistName});
+            answerQuestion: function (artistName) {
+                socket.emit('answerQuestion', artistName);
             },
 
             // callback(question)
-            getCurrentQuestion: function (quizID, callback) {
-                socket.emit('getCurrentQuestion', quizID);
+            getCurrentQuestion: function (callback) {
+                socket.emit('getCurrentQuestion');
                 socket.on('getCurrentQuestionCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();
@@ -199,13 +197,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 });
             },
 
-            startQuiz : function (quizID) {
-                socket.emit('startQuiz', quizID);
+            startQuiz : function () {
+                socket.emit('startQuiz');
             },
 
             // callback(question)
-            nextQuestion: function (quizID) {
-                socket.emit('nextQuestion', quizID);
+            nextQuestion: function () {
+                socket.emit('nextQuestion');
             },
 
             savePlaylist: function () {
@@ -232,14 +230,6 @@ charlieService.factory('charlieProxy', ['$rootScope',
                         callback(quiz);
                         $rootScope.$apply();
                     });
-                }
-            },
-
-            getQuizID: function() {
-                try {
-                    return currentQuiz.id
-                } catch(err) {
-                    return err;
                 }
             },
 

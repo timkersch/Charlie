@@ -7,7 +7,38 @@ const cookieParser = require('cookie-parser');
 const cookParse = require('cookie');
 const spotify = require('./core/spotify-service.js');
 const express = require('express');
-const sessionStore = require('sessionstore').createSessionStore();
+
+// const mongoClient = require('mongodb').MongoClient;
+// mongoClient.connect(mongoURL, function(err, db) {
+//     if(err === null) {
+//         console.log('Connected to Mongodb');
+//     }
+// });
+
+const mongoURL = 'mongodb://localhost:27017/charlie';
+const mongoose = require('mongoose');
+mongoose.connect(mongoURL);
+const db = mongoose.connection;
+
+const Quiz = mongoose.model('Quiz', require('./core/schemas').Quiz);
+
+db.on('error', console.error.bind(console, 'Mongodb connection error:'));
+db.once('open', function() {
+    console.log('Connected to Mongodb');
+});
+
+const sessionStore = require('sessionstore').createSessionStore({
+    type: 'mongodb',
+    host: 'localhost',
+    port: 27017,
+    dbName: 'charlie',
+    collectionName: 'sessions',
+    timeout: 10000
+    // authSource: 'authedicationDatabase',
+    // username: 'technicalDbUser',
+    // password: 'secret'
+    // url: 'mongodb://user:pass@host:port/db?opts
+});
 
 const expressSession = require('express-session');
 const session = expressSession({
@@ -17,8 +48,6 @@ const session = expressSession({
     resave: false,
     saveUninitialized: true
 });
-
-const openRooms = {};
 
 const app = express();
 
@@ -109,79 +138,154 @@ io.on('connection', function(socket){
                 storage.quizID = uid;
                 sessionStore.set(session_id, storage);
 
-                quizDetails.id = uid;
-                quizDetails.owner = storage.user;
-                quizDetails.users.push({name: storage.user, points: 0});
-                const obj = {
+                const newQuiz = new Quiz({
+                    quizID: uid,
+                    name: quizDetails.name,
+                    generated: quizDetails.generated,
+                    owner: storage.user,
+                    playlist: quizDetails.playlist,
+                    nbrOfSongs: quizDetails.nbrOfSongs,
                     started: false,
-                    quiz: quizDetails
-                };
+                    finished: false,
+                    players: [{
+                        userID: storage.user,
+                        answers: [],
+                        points: 0,
+                    }]
+                });
 
                 const api = new spotify.SpotifyApi(storage.tokens);
                 getQuestions(api, quizDetails.playlist, storage.user, quizDetails.nbrOfSongs).then((result) => {
-                    obj.questions = result;
-                    openRooms[uid] = obj;
-                    socket.emit('createQuizCallback', obj.quiz);
+                    newQuiz.questions = result;
+                    newQuiz.save(function(err) {
+                        if(err) {
+                            console.log('error when saving quiz!', err);
+                        } else {
+                            console.log('saved quiz!');
+                        }
+                    });
+                    quizDetails.quizID = uid;
+                    quizDetails.owner = storage.user;
+                    socket.emit('createQuizCallback', quizDetails);
                 });
             });
         });
 
         socket.on('joinQuiz', function (room) {
+            console.log("in joinQuiz", room);
+
             sessionStore.load(session_id, function (err, storage) {
-                console.log("in joinQuiz", room);
                 // The user joins a room
-                if (openRooms[room] && openRooms[room].started === false) {
-                    // Push the new user to the list of users
-                    openRooms[room].quiz.users.push({name: storage.user, points: 0});
+                Quiz.findOne({'quizID': room}, function(err, quiz) {
+                    if(err) {
+                        console.log('error', err);
+                    } else {
+                        if(quiz.started === false && quiz.finished === false) {
+                            // Join the room
+                            socket.join(room);
+                            storage.quizID = room;
+                            sessionStore.set(session_id, storage);
 
-                    // Join the room
-                    socket.join(room);
+                            quiz.players.push({userID: storage.user, answers: [], points: 0});
+                            quiz.save(function (err) {
+                                if(!err) {
+                                    console.log('error when saving quiz!', err);
+                                } else {
+                                    console.log('saved quiz!');
+                                }
+                            });
 
-                    // Emit result back to client
-                    socket.emit('joinQuizCallback', openRooms[room].quiz);
+                            // Emit result back to client
+                            socket.emit('joinQuizCallback', {
+                                quizID: quiz.quizID,
+                                name: quiz.name,
+                                generated: quiz.generated,
+                                owner: quiz.owner,
+                                playlist: quiz.playlist,
+                                nbrOfSongs: quiz.nbrOfSongs,
+                                players: quiz.players,
+                            });
 
-                    // Emit to room that user with name joined
-                    return io.to(room).emit('userJoined', storage.user);
-                }
-                socket.emit('joinQuizCallback');
+                            // Emit to room that user with name joined
+                            io.to(room).emit('userJoined', storage.user);
+                        } else {
+                            socket.emit('joinQuizCallback');
+                        }
+                    }
+                });
             });
         });
 
-        socket.on('startQuiz', function(quizID) {
-            console.log('in startQuiz', quizID);
-            openRooms[quizID].started = true;
-            openRooms[quizID].current = 0;
-            io.to(quizID).emit('quizStart');
-        });
-
-        socket.on('nextQuestion', function (quizID) {
-            console.log("in nextQuestion", quizID);
-            if (openRooms[quizID].current + 1 < openRooms[quizID].questions.length) {
-                const next = openRooms[quizID].questions[++openRooms[quizID].current];
-                io.to(quizID).emit('newQuestion', next);
-            } else {
-                io.to(quizID).emit('gameOver');
-            }
-        });
-
-        socket.on('getCurrentQuestion', function (quizID) {
-            console.log('in get current question', quizID);
-            io.to(quizID).emit('getCurrentQuestionCallback', openRooms[quizID].questions[openRooms[quizID].current]);
-        });
-
-        socket.on('answerQuestion', function (data) {
-            console.log("in answerQuestion", data);
-            const quizID = data.quizID;
-            const answer = data.answer;
+        socket.on('startQuiz', function() {
+            console.log('in startQuiz');
             sessionStore.load(session_id, function (err, storage) {
-                if (answer === openRooms[quizID].questions[openRooms[quizID].current].correct) {
-                    openRooms[data.quizID].quiz.users.forEach(function (user) {
-                        if (user.name === storage.user) {
-                            user.points++;
-                            return io.to(quizID).emit('userPointsUpdate', user);
-                        }
-                    });
-                }
+                Quiz.update({'quizID': storage.quizID}, {$set: {started: true, questionIndex: 0}}, function (err) {
+                    if (err) {
+                        console.log('error', err);
+                    } else {
+                        io.to(storage.quizID).emit('quizStart');
+                    }
+                });
+            });
+        });
+
+        socket.on('nextQuestion', function () {
+            console.log("in nextQuestion");
+            sessionStore.load(session_id, function (err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
+                    if (quiz.questionIndex + 1 < quiz.questions.length) {
+                        const nextQuestion = quiz.questions[++quiz.currentQuestionsNumber];
+                        quiz.save(function (err) {
+                            if (err) {
+                                console.log('err', err);
+                            } else {
+                                io.to(storage.quizID).emit('newQuestion', nextQuestion);
+                            }
+                        });
+                    } else {
+                        quiz.finished = true;
+                        quiz.save(function(err) {
+                            if(err) {
+                                console.log(err);
+                            } else {
+                                console.log('done');
+                            };
+                        });
+                    }
+                });
+            });
+        });
+
+        socket.on('getCurrentQuestion', function () {
+            console.log('in get current question');
+            sessionStore.load(session_id, function (err, storage) {
+                Quiz.findOne({'quizID': storage.quizID}, 'questionIndex questions', function (err, quiz) {
+                    io.to(storage.quizID).emit('getCurrentQuestionCallback', quiz.questions[quiz.questionIndex]);
+                });
+            });
+        });
+
+        socket.on('answerQuestion', function (answer) {
+            console.log("in answerQuestion", data);
+
+            sessionStore.load(session_id, function (err, storage) {
+                Quiz.findOne({'quiID': storage.quizID}, function (err, quiz) {
+                    if(answer === quiz.questions[quiz.questionIndex].correctArtist) {
+                        quiz.players.forEach(function (player) {
+                            if (player.userID === storage.user) {
+                                player.points++;
+                                player.answers[quiz.questionIndex] = answer;
+                                return quiz.save(function(err) {
+                                    if(err) {
+                                        console.log('error', err);
+                                    } else {
+                                        return io.to(storage.quizID).emit('userPointsUpdate', player);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             });
         });
 
@@ -236,21 +340,19 @@ function getQuestions(api, playlistId, ownerId, noTracks) {
     return api.getPlaylistTracks(playlistId, ownerId).then((data) => {
         const tracks = data.slice(0, noTracks);
         const questions = [];
-        tracks.forEach(function(track, i) {
+        tracks.forEach(function(track) {
             const t = track.track;
             const artist = t.artists[0];
             questions.push(new Promise((resolve, reject) => {
                 api.getArtistOptions(artist.id).then((relatedArtists) => {
                     relatedArtists.push(artist.name);
                     resolve ({
-                        id: t.id,
-                        name: t.name,
-                        album : t.album.name,
-                        correct: artist.name,
-                        track_url : t.preview_url,
-                        artists : relatedArtists,
-                        answer : '',
-                        number: i+1
+                        trackID: t.id,
+                        trackName: t.name,
+                        albumName : t.album.name,
+                        correctArtist: artist.name,
+                        trackUrl : t.preview_url,
+                        artistOptions : relatedArtists
                     });
                 }).catch((err) => {
                     reject(err);
@@ -266,9 +368,10 @@ function getQuestions(api, playlistId, ownerId, noTracks) {
 }
 
 function generateUID() {
+    // TODO
     let uid;
     do {
-        uid = ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
+        return uid = ("0000" + (Math.random()*Math.pow(36,4) << 0).toString(36)).slice(-4);
     } while (openRooms.uid);
     return uid;
 }

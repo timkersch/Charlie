@@ -15,7 +15,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
             charlieProxy.getQuiz(function (quiz) {
                 $scope.quizname = quiz.name;
                 $scope.owner = quiz.owner;
-                $scope.id = quiz.id;
+                $scope.id = quiz.quizID;
                 $scope.isOwner = charlieProxy.isQuizOwner();
             });
         };
@@ -32,7 +32,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
 
         $scope.startQuiz = function () {
             if (charlieProxy.isQuizOwner()) {
-                charlieProxy.startQuiz($scope.id);
+                charlieProxy.startQuiz();
             }
         };
 

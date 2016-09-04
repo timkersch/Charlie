@@ -34,7 +34,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                 $scope.players = players;
             });
 
-            charlieProxy.getCurrentQuestion(charlieProxy.getQuizID(), function (question) {
+            charlieProxy.getCurrentQuestion(function (question) {
                 if (question.artists) {
                     if (question.answer !== "") {
                         hasAnswered = true;
@@ -91,7 +91,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;
-                charlieProxy.answerQuestion(data, charlieProxy.getQuizID());
+                charlieProxy.answerQuestion(data);
                 $scope.correctAnswer = correctAnswer;
             }
         };
@@ -147,7 +147,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                     // Question over
                     if (charlieProxy.isQuizOwner()) {
                         $timeout(function () {
-                            charlieProxy.nextQuestion(charlieProxy.getQuizID());
+                            charlieProxy.nextQuestion();
                         }, 5000);
 
                     }
