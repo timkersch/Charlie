@@ -5,6 +5,11 @@
 angular.module('charlieController').controller('questionController', ['$scope', '$location', '$interval', 'charlieProxy', '$document', '$timeout',
     function ($scope, $location, $interval, charlieProxy, $document, $timeout) {
         console.log("Inside questionController");
+
+        let audioElement = $document[0].createElement('audio');
+        let hasAnswered = false;
+        let correctAnswer = '';
+
         $scope.timeLeft = 20;
         $scope.activated = true;
         $scope.showScores = false;
@@ -12,10 +17,6 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         $scope.myAnswer = "";
         $scope.currentQuestion = 1;
         $scope.lastQuestion = 1;
-        let audioElement = $document[0].createElement('audio');
-        let hasAnswered = false;
-        let intervalPromise;
-        let correctAnswer = '';
         $scope.players = [];
 
         let play = function (url) {
@@ -40,13 +41,8 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                 correctAnswer = result.question.correctArtist;
                 if (charlieProxy.isQuizOwner())
                     play(result.question.trackUrl);
-                startInterval();
             });
         };
-
-        charlieProxy.timeLeft(function(time) {
-            console.log(time);
-        });
 
         charlieProxy.onReady(function () {
             init();
@@ -74,6 +70,22 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
+        });
+
+        charlieProxy.timeLeft(function(time) {
+            if(time > 5) {
+                $scope.timeLeft = time-5;
+            } else if(time <= 5 && time > 0) {
+                if (!hasAnswered) {
+                    $scope.selectedAnswer("", "");
+                }
+                $scope.showScores = true;
+                $scope.timeLeft = time;
+            } else {
+                if (charlieProxy.isQuizOwner()) {
+                    charlieProxy.nextQuestion();
+                }
+            }
         });
 
         $scope.isDisabled = function (artist) {
@@ -123,37 +135,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             }
         };
 
-        let startInterval = function () {
-            if (angular.isDefined(intervalPromise)) {
-                $interval.cancel(intervalPromise);
-                intervalPromise = undefined;
-            }
-            intervalPromise = $interval(function () {
-                if ($scope.timeLeft > 0)
-                    $scope.timeLeft--;
-                if ($scope.timeLeft === 0 && !$scope.showScores) {
-                    if (!hasAnswered) {
-                        $scope.selectedAnswer("", "");
-                    }
-                    $scope.showScores = true;
-                    $scope.timeLeft = 5;
-                    // Question over
-                    if (charlieProxy.isQuizOwner()) {
-                        $timeout(function () {
-                            charlieProxy.nextQuestion();
-                        }, 5000);
-
-                    }
-                }
-            }, 1000, 0, true);
-        };
-
         $scope.$on('$destroy', function () {
-            if (angular.isDefined(intervalPromise)) {
-                $interval.cancel(intervalPromise);
-                intervalPromise = undefined;
-            }
-            // Stop previous
             audioElement.pause();
             audioElement.currentTime = 0;
         });

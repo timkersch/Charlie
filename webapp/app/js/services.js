@@ -201,10 +201,6 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('leaveQuiz');
             },
 
-            startQuiz : function () {
-                socket.emit('startQuiz');
-            },
-
             // callback(question)
             nextQuestion: function () {
                 socket.emit('nextQuestion');

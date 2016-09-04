@@ -156,34 +156,27 @@ module.exports = function(server, quizmodel, sessionStore) {
                 });
             });
 
-            socket.on('startQuiz', function () {
-                console.log('in startQuiz');
-                sessionStore.load(session_id, function (err, storage) {
-                    Quiz.update({'quizID': storage.quizID}, {$set: {started: true, questionIndex: 0}}, function (err) {
-                        if (err) {
-                            console.log('error in startQuiz', err);
-                        } else {
-                            io.to(storage.quizID).emit('quizStart');
-                        }
-                    });
-                });
-            });
-
             socket.on('nextQuestion', function () {
                 console.log("in nextQuestion");
                 sessionStore.load(session_id, function (err, storage) {
                     Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
-                        if (quiz.questionIndex + 1 < quiz.questions.length) {
-                            const nextQuestion = quiz.questions[++quiz.questionIndex];
+                        if(quiz.started === false) {
+                            quiz.questionIndex = 0;
+                            quiz.started = true;
+                            io.to(storage.quizID).emit('quizStart');
+                        } else {
+                            quiz.questionIndex++;
+                        }
+                        if (quiz.questionIndex < quiz.questions.length) {
+                            const nextQuestion = quiz.questions[quiz.questionIndex];
+                            io.to(storage.quizID).emit('newQuestion', {
+                                question: nextQuestion,
+                                questionIndex: quiz.questionIndex
+                            });
+                            countDown(25, io, storage.quizID);
                             quiz.save(function (err) {
                                 if (err) {
                                     console.log('error in nextQuestion', err);
-                                } else {
-                                    io.to(storage.quizID).emit('newQuestion', {
-                                        question: nextQuestion,
-                                        questionIndex: quiz.questionIndex
-                                    });
-                                    countDown(25, io, storage.quizID);
                                 }
                             });
                         } else {
@@ -205,7 +198,7 @@ module.exports = function(server, quizmodel, sessionStore) {
 
                 sessionStore.load(session_id, function (err, storage) {
                     Quiz.findOne({'quizID': storage.quizID}, 'questionIndex questions', function (err, quiz) {
-                        io.to(storage.quizID).emit('getCurrentQuestionCallback', {
+                        socket.emit('getCurrentQuestionCallback', {
                             question: quiz.questions[quiz.questionIndex],
                             questionIndex: quiz.questionIndex
                         });
@@ -298,7 +291,7 @@ module.exports = function(server, quizmodel, sessionStore) {
 
     function countDown(i, io, quizID) {
         let int = setInterval(function () {
-            io.to(quizID).emit('timeLeft', i--);
+            io.to(quizID).emit('timeLeft', --i);
             if(i === 0) {
                 clearInterval(int);
             }

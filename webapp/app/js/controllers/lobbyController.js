@@ -32,7 +32,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
 
         $scope.startQuiz = function () {
             if (charlieProxy.isQuizOwner()) {
-                charlieProxy.startQuiz();
+                charlieProxy.nextQuestion();
             }
         };
 
