@@ -11,10 +11,10 @@ angular.module('charlieController').controller('homeController', ['$scope', '$lo
         $scope.changeView = function () {
             if($scope.joinText && $scope.joinText.length > 0) {
                 charlieProxy.joinQuiz($scope.joinText, function(result) {
-                    if(result) {
+                    if(result && !result.error) {
                         $location.path('/lobby');
                     } else {
-                        alert('Could not find quiz!');
+                        alert(result.error);
                     }
                 });
             } else {

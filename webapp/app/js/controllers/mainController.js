@@ -2,13 +2,13 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('mainController', ['$scope', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
-    function ($scope, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
+angular.module('charlieController').controller('mainController', ['$scope', '$route', '$routeParams', '$location', '$mdToast', 'charlieProxy', '$mdSidenav',
+    function ($scope, $route, $routeParams, $location, $mdToast, charlieProxy, $mdSidenav) {
         $scope.user = '';
         $scope.url = '';
 
         $scope.changeView = function (view) {
-            $location.path(view); // path not hash
+            $location.path(view);
             $scope.toggleLeftMenu();
         };
 
@@ -28,7 +28,11 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
             } else {
                 if (sessionStorage.getItem('code')) {
                     charlieProxy.login(sessionStorage.getItem('code'), function (user) {
-                        $scope.user = user;
+                        if(user) {
+                            $scope.user = user;
+                        } else {
+                            alert('User already logged in!');
+                        }
                     });
                 } else {
                     charlieProxy.getLoginUrl(function (url) {
@@ -50,11 +54,13 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
         };
 
         $scope.logout = function () {
-            $scope.user = {};
+            $scope.user = '';
             charlieProxy.logout();
-            charlieProxy.getLoginUrl(function (url) {
-                $scope.url = url;
-            });
+            if($location.path() === '/') {
+                $route.reload();
+            } else {
+                $location.path('/');
+            }
         };
 
     }]);

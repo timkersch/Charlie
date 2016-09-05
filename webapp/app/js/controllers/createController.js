@@ -26,9 +26,12 @@ angular.module('charlieController').controller('createController', ['$scope', '$
         $scope.submit = function () {
             $scope.loading = true;
             charlieProxy.createQuiz($scope.name, $scope.playlistSelected.id, $scope.nbrOfQuestions, $scope.toggleSwitch, function (quiz) {
-                $location.path('/lobby');
+                if(!quiz || quiz.error) {
+                    alert(quiz.error)
+                } else {
+                    $location.path('/lobby');
+                }
             });
-
         };
 
     }]);

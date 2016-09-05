@@ -2,7 +2,6 @@
 
 const dotenv = require('dotenv').config({path: '.env'});
 const path = require('path');
-const favicon = require('serve-favicon');
 const express = require('express');
 const logger = require('morgan');
 
@@ -39,6 +38,10 @@ app.set('port', port);
 app.use(session);
 app.use(express.static('webapp'));
 app.use(logger('dev'));
+
+app.get('/favicon.ico', function(req, res) {
+    res.sendStatus(200);
+});
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {
