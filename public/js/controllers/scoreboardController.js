@@ -47,7 +47,7 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
                         });
                         $scope.scores.push({
                             value: users[i].points,
-                            userName: users[i].name,
+                            userName: users[i].userID,
                             color: classColors[i]
 
                         });

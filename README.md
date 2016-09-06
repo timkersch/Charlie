@@ -22,7 +22,7 @@ and selects one of four artist choices for the questions.
 ## Technical design
 The application is built with AngularJS as the frontend application and Node.js as the backend solution.
 
-### Setup and run (Updated guide with DB to come)
+## Setup and run
 To run this project follow the instructions below.
 ```
 git clone https://github.com/timkersch/Charlie.git
@@ -31,25 +31,38 @@ Then in the Charlie directory install the dependencies with npm
 ```
 npm install
 ```
-Fire up the server locally with
-```
-npm start
-```
-
-You must also create a file for connecting with the Spotify API.
+Create a file for the environment variables
 ```
 Charlie/.env
 ```
-The credentials can be obtained from Spotifys website.
 The structure of the file should be the following:
 ```
 CLIENT_ID=123id123
 CLIENT_SECRET=123secret123
-COOKIE_SECRET=321secret321
 CALLBACK=http://localhost:8080/callback.html
+
+COOKIE_SECRET=321secret321
+
+MONGO_URL=mongodb://localhost:27017/charlie
+```
+The first three entries are Spotify API credentials that can be created from Spotifys website.
+```
+https://developer.spotify.com/my-applications/#!/applications
+```
+The forth entry is the secret to sign the session cookie with.
+
+The fifth entry is the url to your local mongodb server.
+
+Then make sure you have a MongoDB server installed and fire it up from the command line using
+```
+mongod
+```
+Finally fire up the server locally and visit localhost
+```
+npm start
 ```
 
-### Graphical interface (Updated pics to come)
+## Graphical interface (Updated pics to come)
 
 #### Home
 ![Home](docs/images/home.png)

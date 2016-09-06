@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 const logger = require('morgan');
 
-const mongoURL = require('./config/db').url;
+const mongoURL = process.env.MONGO_URL;
 const mongoose = require('mongoose').connect(mongoURL);
 const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
 const db = mongoose.connection;
