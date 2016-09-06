@@ -12,14 +12,14 @@ const babel = require('gulp-babel');
 
 // JS hint task
 gulp.task('jshint', () => {
-    gulp.src(['./app.js', './webapp/*.js', './core/*.js', './routes/*.js'])
+    gulp.src(['./app.js', './public/*.js', './core/*.js', './routes/*.js'])
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
 // minify new or changed HTML pages
 gulp.task('htmlpage', () => {
-    var htmlSrc = './webapp/*.html',
+    var htmlSrc = './public/*.html',
         htmlDst = './build/html';
 
     gulp.src(htmlSrc)
@@ -30,7 +30,7 @@ gulp.task('htmlpage', () => {
 
 // JS concat, strip debugging and minify
 gulp.task('scripts', () => {
-    gulp.src(['./webapp/*.js','./routes/*.js', './app.js', './core/*.js'])
+    gulp.src(['./public/*.js','./routes/*.js', './app.js', './core/*.js'])
         .pipe(concat('script.js'))
         .pipe(stripDebug())
         .pipe(uglify())

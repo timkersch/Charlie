@@ -8,37 +8,41 @@ let charlieController = angular.module("charlieController", [
 
 let charlieApp = angular.module("charlieApp", [
     'ngMessages',
-    'charlieController'
+    'charlieController',
+    'routeStyles'
 ]);
 
 charlieApp.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
         $routeProvider.
                 when('/', {
-                    templateUrl: 'app/partials/home.html',
-                    controller: 'homeController'
+                    templateUrl: '../views/home.html',
+                    controller: 'homeController',
+                    css: '../css/partials/home.css'
                 }).
                 when('/lobby', {
-                    templateUrl: 'app/partials/lobby.html',
+                    templateUrl: '../views/lobby.html',
                     controller: 'lobbyController',
-                    css: 'app/css/partials/lobby.css'
+                    css: '../css/partials/lobby.css'
                 }).
                 when('/create', {
-                    templateUrl: 'app/partials/create.html',
+                    templateUrl: '../views/create.html',
                     controller: 'createController',
-                    css: 'app/css/partials/create.css'
+                    css: '../css/partials/create.css'
                 }).
                 when('/profile', {
-                    templateUrl: 'app/partials/profile.html',
+                    templateUrl: '../views/profile.html',
                     controller: 'profileController',
-                    css: 'app/css/partials/profile.css'
+                    css: '../css/partials/profile.css'
                 }).
                 when('/scoreboard', {
-                    templateUrl: 'app/partials/scoreboard.html',
-                    controller: 'scoreboardController'
+                    templateUrl: '../views/scoreboard.html',
+                    controller: 'scoreboardController',
+                    css: '../css/partials/scoreboard.css'
                 }).
                 when('/question', {
-                    templateUrl: 'app/partials/question.html',
-                    controller: 'questionController'
+                    templateUrl: '../views/question.html',
+                    controller: 'questionController',
+                    css: '../css/partials/question.css'
                 }).
                 otherwise({redirectTo: '/'});
 

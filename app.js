@@ -5,9 +5,9 @@ const path = require('path');
 const express = require('express');
 const logger = require('morgan');
 
-const mongoURL = 'mongodb://localhost:27017/charlie';
+const mongoURL = require('./config/db').url;
 const mongoose = require('mongoose').connect(mongoURL);
-const quizmodel = mongoose.model('Quiz', require('./core/schemas').Quiz);
+const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
 const db = mongoose.connection;
 
 const app = express();
@@ -34,13 +34,12 @@ const session = require('express-session')({
 
 const socketHandler = require('./routes/socketHandler')(server, quizmodel, sessionStore);
 
-app.set('port', port);
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(session);
-app.use(express.static('webapp'));
 app.use(logger('dev'));
 
-app.get('/favicon.ico', function(req, res) {
-    res.sendStatus(200);
+app.get('*', function(req, res) {
+    res.sendFile('./public/index.html');
 });
 
 // Catch 404 and forward to error handler

@@ -1,0 +1,32 @@
+md-grid-list {
+    margin: 8px;
+}
+
+md-grid-tile {
+    font-size: 18px;
+    color: #343434;
+}
+
+md-grid-tile:focus {
+    outline: none;
+}
+
+md-grid-tile[disabled] {
+    background-color:#eee;
+    color:#888;
+}
+
+#selected:hover {
+    cursor: default;
+}
+
+#notSelected:hover {
+    cursor: pointer;
+}
+
+.detValue {
+    margin: 0 auto;
+    text-align: center;
+    font-size: 2em;
+    padding: 0.4em 0 0.28em 0;
+}

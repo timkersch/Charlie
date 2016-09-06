@@ -1,0 +1,35 @@
+<md-content class="autoScroll" ng-cloak>
+    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>Create quiz</span></div>
+    </md-toolbar>
+    <form ng-submit="submit()">
+        <md-input-container class="md-block">
+            <label>Quiz name</label>
+            <input ng-model="name" aria-label="name">
+        </md-input-container>
+        <md-input-container class="md-block">
+            <label>Number of questions</label>
+            <input ng-model="nbrOfQuestions" aria-label="number of questions">
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <md-switch ng-model="toggleSwitch" aria-label="Generated quiz">
+                Generated songs
+            </md-switch>
+        </md-input-container>
+        <md-input-container class="md-block">
+            <h5>Choose playlist</h5>
+
+            <md-radio-group ng-model="playlistSelected" id="playlists">
+                <md-radio-button ng-repeat="playlist in playlists" ng-value="playlist" class="md-primary">{{playlist.name}}</md-radio-button>
+            </md-radio-group>
+
+        </md-input-container>
+        <div class="end">
+            <md-button type="submit" class="md-primary md-raised">
+                <span ng-hide="loading">CREATE</span>
+                <div class="spinner" ng-show="loading"></div>
+            </md-button>
+        </div>
+    </form>
+</md-content>
