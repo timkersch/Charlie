@@ -8,7 +8,7 @@ const charlieService = angular.module('charlieService', []);
 
 charlieService.factory('charlieProxy', ['$rootScope',
     function ($rootScope) {
-        const socket = io();
+        const socket = io.connect();
         let isReady = false;
         let readyCallbacks = [];
         let user = '';

@@ -34,12 +34,11 @@ const session = require('express-session')({
 
 const socketHandler = require('./routes/socketHandler')(server, quizmodel, sessionStore);
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session);
 app.use(logger('dev'));
-
+app.use(session);
+app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', function(req, res) {
-    res.sendFile('./public/index.html');
+    res.sendFile('/public/index.html');
 });
 
 // Catch 404 and forward to error handler
