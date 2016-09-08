@@ -7,13 +7,17 @@ const Schema = require('mongoose').Schema;
 const Quiz = Schema({
     quizID: String,
     name: String,
-    generated: Boolean,
     owner: String,
-    playlist: String,
     nbrOfSongs: Number,
     questionIndex: Number,
     started: Boolean,
     finished: Boolean,
+    playlist: {
+        id: String,
+        owner: String,
+        generated: Boolean,
+        country: Boolean
+    },
     players: [{
         userID: String,
         answers: [String],

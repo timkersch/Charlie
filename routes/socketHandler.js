@@ -3,13 +3,14 @@
  * Created by Tim on 04/09/16.
  */
 
-module.exports = function(server, quizmodel, sessionStore) {
+module.exports = function(server, quizmodel, usermode, sessionStore) {
     const utils = require('../core/helpers');
     const io = require('socket.io')(server);
     const cookieParser = require('cookie-parser');
     const cookParse = require('cookie');
-    const spotify = require('../core/spotify-service.js');
+    const spotify = require('../core/spotifyService.js');
     const Quiz = quizmodel;
+    const User = usermodel;
 
     io.set('authorization', function (data, accept) {
         if (data.headers.cookie) {
@@ -50,16 +51,9 @@ module.exports = function(server, quizmodel, sessionStore) {
                             refresh_token: result['refresh_token']
                         };
                         new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
-                            storage.user = user.id;
+                            storage.user = user.userID;
                             sessionStore.set(session_id, storage);
-
-                            const returnObj = {
-                                id: user.id,
-                                email: user.email,
-                                country: user.country,
-                                product: user.product
-                            };
-                            socket.emit('loginCallback', returnObj);
+                            socket.emit('loginCallback', user);
                         });
                     });
                 });
@@ -81,7 +75,7 @@ module.exports = function(server, quizmodel, sessionStore) {
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.user) {
                         const api = new spotify.SpotifyApi(storage.tokens);
-                        api.getQuestions(quizDetails.playlist, storage.user, quizDetails.nbrOfSongs).then((result) => {
+                        api.getQuestions(quizDetails.playlist, quizDetails.playlistOwner, quizDetails.nbrOfSongs).then((result) => {
                             const uid = utils.generateUID();
                             socket.join(uid);
 
@@ -93,10 +87,16 @@ module.exports = function(server, quizmodel, sessionStore) {
                                 name: quizDetails.name,
                                 generated: quizDetails.generated,
                                 owner: storage.user,
-                                playlist: quizDetails.playlist,
+                                playlistOwner: quizDetails.playlistOwner,
                                 nbrOfSongs: quizDetails.nbrOfSongs,
                                 started: false,
                                 finished: false,
+                                playlist: {
+                                    id: quizDetails.playlist,
+                                    owner: quizDetails.playlistOwner,
+                                    generated: quizDetails.generated,
+                                    country: quizDetails.country,
+                                },
                                 players: [{
                                     userID: storage.user,
                                     answers: utils.initArr(quizDetails.nbrOfSongs),

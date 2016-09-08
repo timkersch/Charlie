@@ -8,6 +8,7 @@ const logger = require('morgan');
 const mongoURL = process.env.MONGO_URL;
 const mongoose = require('mongoose').connect(mongoURL);
 const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
+const usermodel = mongoose.model('User', require('./models/user').Quiz);
 const db = mongoose.connection;
 
 const app = express();
@@ -32,7 +33,7 @@ const session = require('express-session')({
     saveUninitialized: true
 });
 
-const socketHandler = require('./routes/socketHandler')(server, quizmodel, sessionStore);
+const socketHandler = require('./routes/socketHandler')(server, quizmodel, usermodel, sessionStore);
 
 app.use(logger('dev'));
 app.use(session);

@@ -44,6 +44,10 @@ function shuffle(arr) {
     return arr;
 }
 
+function randomIndex(length) {
+    return Math.floor(Math.random() * length);
+}
+
 class SpotifyApi {
     constructor(tokens) {
         this.api = new SpotifyWebApi(credentials);
@@ -53,8 +57,15 @@ class SpotifyApi {
 
     getUser() {
         return this.api.getMe().then((data) => {
-            this.userID = data.body.id;
-            return data.body;
+            this.user = data.body.id;
+            return {
+                userID : data.body.id,
+                birthdate : data.body.birthdate,
+                country: data.body.country,
+                dispName: data.body.display_name,
+                email: data.body.email,
+                product: data.body.product
+            };
         },(err) => {
             console.log('Something went wrong!', err);
         });
@@ -65,7 +76,7 @@ class SpotifyApi {
             const items = data.body.items;
             const obj = [];
             for(let i = 0; i < items.length; i++) {
-                obj.push({name: items[i].name, id: items[i].id});
+                obj.push({name: items[i].name, id: items[i].id, playlistOwner: items[i].owner.id, noTracks: items[i].tracks.total});
             }
             return obj;
         },(err) => {
@@ -171,15 +182,26 @@ class SpotifyApi {
     }
 
     getSimilarTracks(track, noSimilarTracks, countryCode) {
-
+        // TODO
     }
 
-    similarTrackFromRelatedArtist(track) {
-
+    similarTrackFromRelatedArtist(track, countryCode) {
+        const api = this.api;
+        const artistId = track.artists[0].id;
+        return api.getArtistRelatedArtists(artistId).then((data) => {
+            const relatedArtistId = data.body.artists[randomIndex(data.body.artists.length)].id;
+            return api.getArtistTopTracks(relatedArtistId, countryCode).then((result) => {
+                return result.body.tracks[randomIndex(result.body.tracks.length)];
+            });
+        });
     }
 
     similarTrackFromAlbum(track) {
-
+        const api = this.api;
+        const albumId = track.albums[0].id;
+        return api.getAlbumTracks(track.albumId, {limit: 5, offset: 1}).then((data) => {
+            return data.body.tracks[randomIndex(data.body.tracks.length)];
+        });
     }
 }
 

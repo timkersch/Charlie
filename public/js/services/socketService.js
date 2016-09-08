@@ -91,9 +91,9 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 socket.emit('login', code);
                 socket.on('loginCallback', function(userData) {
                     if(userData) {
-                        user = userData.id;
-                        sessionStorage.setItem('user', userData.id);
-                        callback(userData.id);
+                        user = userData.userID;
+                        sessionStorage.setItem('user', userData.userID);
+                        callback(userData.userID);
                     } else {
                         callback();
                     }
@@ -121,12 +121,13 @@ charlieService.factory('charlieProxy', ['$rootScope',
              */
 
             // callback(quiz)
-            createQuiz: function (name, playlistId, nbrOfSongs, generated, callback) {
+            createQuiz: function (name, playlistId, owner, nbrOfSongs, generated, callback) {
                 let data = {
                     name: name,
                     playlist: playlistId,
                     nbrOfSongs: parseInt(nbrOfSongs),
-                    generated: generated
+                    generated: generated,
+                    playlistOwner: owner
                 };
                 socket.emit('createQuiz', data);
                 socket.on('createQuizCallback', function(quiz) {
