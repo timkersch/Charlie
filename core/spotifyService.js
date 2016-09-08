@@ -29,6 +29,18 @@ function getTokens(code) {
     });
 }
 
+function testUrl(track) {
+    return new Promise((resolve, reject) => {
+        request(track.preview_url, function (error, response, body) {
+            if (!error && response.statusCode === 200) {
+                resolve(track);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
 function shuffle(arr) {
     let n = arr.length;
     let t;
@@ -42,10 +54,6 @@ function shuffle(arr) {
         arr[i] = t;
     }
     return arr;
-}
-
-function randomIndex(length) {
-    return Math.floor(Math.random() * length);
 }
 
 class SpotifyApi {
@@ -84,47 +92,82 @@ class SpotifyApi {
         });
     }
 
-    getQuestions(playlistId, ownerId, noTracks) {
-        const api = this;
-        return api.getPlaylistTracks(playlistId, ownerId).then((data) => {
-            if (data.length >= noTracks) {
-                let validityPromises = [];
-                data = shuffle(data);
-                data.forEach(function (obj) {
-                    let track = obj.track;
-                    let valProm = new Promise((resolve, reject) => {
-                        request(track.preview_url, function (error, response, body) {
-                            if (!error && response.statusCode === 200) {
-                                resolve(track);
-                            } else {
-                                resolve();
-                            }
-                        });
-                    });
-                    validityPromises.push(valProm);
-                });
+    getQuestions(tracks, noTracks) {
+        let validityPromises = [];
+        tracks.forEach(function (obj) {
+            let track = obj.track;
+            let valProm = testUrl(track);
+            validityPromises.push(valProm);
+        });
+        return this.getOptionsForValidTracks(validityPromises, noTracks);
+    }
 
-                return Promise.all(validityPromises).then((result) => {
-                    let dataPromises = [];
-                    for(let i = 0; i < result.length; i++) {
-                        if(dataPromises.length < noTracks) {
-                            if(result[i]) {
-                                dataPromises.push(api.getArtistOptions(result[i]));
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    if(dataPromises.length === noTracks) {
-                        return Promise.all(dataPromises).then((questions) => {
-                            return questions;
-                        });
-                    } else {
-                        throw new Error('Not enough valid songs in playlist');
-                    }
-                });
+    getQuestionsGenerated(tracks, noTracks) {
+        const ref = this;
+        let similarTracksPromise = [];
+        tracks.forEach(function (track) {
+            similarTracksPromise.push(ref.getSimilarTrack(track));
+        });
+        return this.getOptionsForValidTracks(similarTracksPromise, noTracks);
+    }
+
+    getQuizQuestions(playlistId, noTracks, generated, ownerId) {
+        return this.getPlaylistTracks(playlistId, ownerId).then((tracks) => {
+            if(tracks.length >= noTracks) {
+                if(generated === true) {
+                    return this.getQuestionsGenerated(shuffle(tracks), noTracks);
+                } else {
+                    return this.getQuestions(shuffle(tracks), noTracks);
+                }
             } else {
                 throw new Error('Not enough songs in playlist');
+            }
+        });
+    }
+
+    getSimilarTrack(track) {
+        const api = this.api;
+        return new Promise((resolve, reject) => {
+            const url = 'https://api.spotify.com/v1/recommendations';
+            const auth = {
+                bearer: api.getAccessToken()
+            };
+            const qs = {
+                limit: 1,
+                seed_tracks : track.track.id,
+                seed_artists : track.track.artists[0].id
+            };
+
+            request.get({url: url, auth: auth, qs: qs, json: true}, function (error, response, body) {
+                if(!error && response.statusCode === 200) {
+                    testUrl(body.tracks[0]).then((data) => {
+                        resolve(data);
+                    });
+                } else {
+                    reject();
+                }
+            });
+        });
+    }
+
+    getOptionsForValidTracks(tracksPromises, noTracks) {
+        return Promise.all(tracksPromises).then((result) => {
+            let dataPromises = [];
+            for (let i = 0; i < result.length; i++) {
+                if (dataPromises.length < noTracks) {
+                    if (result[i]) {
+                        dataPromises.push(this.getArtistOptions(result[i]));
+                    }
+                } else {
+                    break;
+                }
+            }
+            if (dataPromises.length === noTracks) {
+                return Promise.all(dataPromises).then((questions) => {
+                    return questions;
+                });
+            } else {
+                throw new Error('Not enough valid songs in playlist');
             }
         });
     }
@@ -178,29 +221,6 @@ class SpotifyApi {
             });
         }).catch((err) => {
             console.log('Something went wrong!', err);
-        });
-    }
-
-    getSimilarTracks(track, noSimilarTracks, countryCode) {
-        // TODO
-    }
-
-    similarTrackFromRelatedArtist(track, countryCode) {
-        const api = this.api;
-        const artistId = track.artists[0].id;
-        return api.getArtistRelatedArtists(artistId).then((data) => {
-            const relatedArtistId = data.body.artists[randomIndex(data.body.artists.length)].id;
-            return api.getArtistTopTracks(relatedArtistId, countryCode).then((result) => {
-                return result.body.tracks[randomIndex(result.body.tracks.length)];
-            });
-        });
-    }
-
-    similarTrackFromAlbum(track) {
-        const api = this.api;
-        const albumId = track.albums[0].id;
-        return api.getAlbumTracks(track.albumId, {limit: 5, offset: 1}).then((data) => {
-            return data.body.tracks[randomIndex(data.body.tracks.length)];
         });
     }
 }

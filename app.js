@@ -8,7 +8,7 @@ const logger = require('morgan');
 const mongoURL = process.env.MONGO_URL;
 const mongoose = require('mongoose').connect(mongoURL);
 const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
-const usermodel = mongoose.model('User', require('./models/user').Quiz);
+const usermodel = mongoose.model('User', require('./models/user').User);
 const db = mongoose.connection;
 
 const app = express();

@@ -16,7 +16,6 @@ const Quiz = Schema({
         id: String,
         owner: String,
         generated: Boolean,
-        country: Boolean
     },
     players: [{
         userID: String,

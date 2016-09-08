@@ -27,7 +27,8 @@ angular.module('charlieController').controller('createController', ['$scope', '$
             $scope.loading = true;
             charlieProxy.createQuiz($scope.name, $scope.playlistSelected.id, $scope.playlistSelected.playlistOwner, $scope.nbrOfQuestions, $scope.toggleSwitch, function (quiz) {
                 if(!quiz || quiz.error) {
-                    alert(quiz.error)
+                    $scope.loading = false
+                    alert(quiz.error);
                 } else {
                     $location.path('/lobby');
                 }

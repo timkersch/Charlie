@@ -3,7 +3,7 @@
  * Created by Tim on 04/09/16.
  */
 
-module.exports = function(server, quizmodel, usermode, sessionStore) {
+module.exports = function(server, quizmodel, usermodel, sessionStore) {
     const utils = require('../core/helpers');
     const io = require('socket.io')(server);
     const cookieParser = require('cookie-parser');
@@ -75,7 +75,7 @@ module.exports = function(server, quizmodel, usermode, sessionStore) {
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.user) {
                         const api = new spotify.SpotifyApi(storage.tokens);
-                        api.getQuestions(quizDetails.playlist, quizDetails.playlistOwner, quizDetails.nbrOfSongs).then((result) => {
+                        api.getQuizQuestions(quizDetails.playlist, quizDetails.nbrOfSongs, quizDetails.generated, quizDetails.playlistOwner).then((result) => {
                             const uid = utils.generateUID();
                             socket.join(uid);
 
@@ -95,7 +95,6 @@ module.exports = function(server, quizmodel, usermode, sessionStore) {
                                     id: quizDetails.playlist,
                                     owner: quizDetails.playlistOwner,
                                     generated: quizDetails.generated,
-                                    country: quizDetails.country,
                                 },
                                 players: [{
                                     userID: storage.user,
