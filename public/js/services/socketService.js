@@ -184,10 +184,10 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     if (quiz && !quiz.error) {
                         currentQuiz = quiz;
                         callback(quiz);
-                        $rootScope.$apply();
                     } else {
                         callback(quiz);
                     }
+                    $rootScope.$apply();
                 });
             },
 

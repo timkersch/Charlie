@@ -125,13 +125,13 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                     // The user joins a room
                     Quiz.findOne({'quizID': room}, function (err, quiz) {
                         if (err || !quiz) {
-                            socket.emit('joinQuizCallback', {error: 'Quiz is not available!'});
+                            socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
                         } else {
                             if (quiz.started === false && quiz.finished === false) {
                                 if(data.username) {
                                     for(let i = 0; i < quiz.players.length; i++) {
-                                        if(quiz.players.userID === data.username) {
-                                            return socket.emit('joinQuizCallback', {error: 'Username not available!'});
+                                        if(quiz.players[i].userID === data.username) {
+                                            return socket.emit('joinQuizCallback', {error: {nameExists: 'Username already taken!'}});
                                         }
                                     }
                                     storage.user = data.username;
@@ -162,7 +162,11 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 // Emit to room that user with name joined
                                 io.to(room).emit('userJoined', storage.user);
                             } else {
-                                socket.emit('joinQuizCallback', {error: 'Quiz is not available!'});
+                                if(quiz.started === true) {
+                                    socket.emit('joinQuizCallback', {error: {invalid: 'Quiz already started!'}});
+                                } else {
+                                    socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
+                                }
                             }
                         }
                     });

@@ -7,26 +7,22 @@ angular.module('charlieController').controller('joinController', ['$scope', '$lo
         console.log("Joincontroller");
 
         $scope.fetching = false;
-        $scope.errorMessage = '';
+        $scope.serverErrors = {};
 
         $scope.changeView = function () {
             $scope.fetching = true;
-            if($scope.joinCode && $scope.joinCode.length > 0) {
-                charlieProxy.joinQuiz($scope.joinCode, function(result) {
-                    if(result && !result.error) {
-                        $location.path('/lobby');
-                    } else {
-                        $scope.errorMessage = result.error;
-                    }
-                    $scope.fetching = false;
-                });
-            } else {
+            charlieProxy.joinQuiz({username: $scope.displayName, room: $scope.joinCode}, function(result) {
+                if(result && !result.error) {
+                    $location.path('/lobby');
+                } else {
+                    $scope.serverErrors = result.error;
+                }
                 $scope.fetching = false;
-            }
-        };
+            });
+    };
 
-        $scope.isLoggedIn = function () {
-            // TODO
-        };
+$scope.isLoggedIn = function () {
+    // TODO
+};
 
-    }]);
+}]);
