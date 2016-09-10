@@ -5,33 +5,34 @@
         <h3>Enter your code below to join a quiz</h3>
     </hgroup>
 
-    <form name="codeForm">
+    <form name="form">
         <div class="group">
             <md-input-container md-no-float class="md-block">
-                <input type="text" ng-model="displayName" placeholder="Name" ng-minlength="4" ng-maxlength="10" required>
+                <input type="text" ng-model="displayName" name="displayName" placeholder="Name" ng-minlength="4" ng-maxlength="10" required>
+
+                <div ng-messages="form.displayName.$error">
+                    <div ng-message="required">Required</div>
+                    <div ng-message="minlength">Your display name needs to be at least 3 characters</div>
+                    <div ng-message="maxlength">Your display name can be at most 10 characters</div>
+                </div>
             </md-input-container>
 
             <md-input-container md-no-float class="md-block">
-                <input type="text" ng-model="joinCode" placeholder="Code"  ng-minlength="5" ng-maxlength="10" required>
+                <input type="text" ng-model="joinCode" name="joinCode" placeholder="Code" ng-minlength="5" ng-maxlength="10" required>
+
+                <div ng-messages="form.joinCode.$error">
+                    <div ng-message="required">Required</div>
+                    <div ng-message="minlength">The code needs to be at least 5 characters</div>
+                    <div ng-message="maxlength">The code can be at most 10 characters</div>
+                </div>
             </md-input-container>
+
         </div>
 
         <div class="buttonHolder">
             <md-button class="md-fab md-primary" ng-click="changeView()">
                 <md-icon class="material-icons">navigate_next</md-icon>
             </md-button>
-        </div>
-
-        <div ng-messages="codeForm.displayName.$error" role="alert">
-            <div ng-message="required">Please enter a value for this field.</div>
-            <div ng-message="minlength">This field needs to be at least 4 characters long.</div>
-            <div ng-message="maxlength">This field can be at most 10 characters long.</div>
-        </div>
-
-        <div ng-messages="codeForm.joinCode.$error" role="alert">
-            <div ng-message="required">Please enter a value for this field.</div>
-            <div ng-message="minlength">This field needs to be at least 5 characters long.</div>
-            <div ng-message="maxlength">This field can be at most 10 characters long.</div>
         </div>
 
         <md-progress-linear ng-show="fetching" md-mode="indeterminate"></md-progress-linear>
