@@ -124,8 +124,8 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 sessionStore.load(session_id, function (err, storage) {
                     // The user joins a room
                     Quiz.findOne({'quizID': room}, function (err, quiz) {
-                        if (err) {
-                            console.log('error', err);
+                        if (err || !quiz) {
+                            socket.emit('joinQuizCallback', {error: 'Quiz is not available!'});
                         } else {
                             if (quiz.started === false && quiz.finished === false) {
                                 if(data.username) {

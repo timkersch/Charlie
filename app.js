@@ -39,7 +39,7 @@ app.use(logger('dev'));
 app.use(session);
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', function(req, res) {
-    res.sendFile('/public/index.html');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Catch 404 and forward to error handler
@@ -53,7 +53,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.json({
             message: err.message,
             error: err
         });
@@ -63,7 +63,7 @@ if (app.get('env') === 'development') {
 // Production error handler - no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.json({
         message: err.message,
         error: {}
     });

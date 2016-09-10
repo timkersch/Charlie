@@ -24,6 +24,11 @@ charlieApp.config(['$routeProvider', '$locationProvider', function ($routeProvid
                     controller: 'lobbyController',
                     css: '../css/partials/lobby.css'
                 }).
+                when('/join', {
+                    templateUrl: '../views/join.html',
+                    controller: 'joinController',
+                    css: '../css/partials/join.css'
+                }).
                 when('/create', {
                     templateUrl: '../views/create.html',
                     controller: 'createController',
