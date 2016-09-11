@@ -1,43 +1,57 @@
-<hgroup>
-    <h1>Create Quiz</h1>
-    <h3>Create Quiz from your Spotify playlists</h3>
-</hgroup>
+<md-content class="autoScroll" ng-cloak>
+    <hgroup>
+        <h1>Create Quiz</h1>
+        <h3>Create Quiz from your Spotify playlists</h3>
+    </hgroup>
 
-<form name="form" ng-submit="changeView()">
-    <div class="group">
-        <md-input-container md-no-float class="md-block">
-            <input type="text" ng-keyup="submitted=false"  ng-model="displayName" name="displayName" placeholder="Name" ng-minlength="3" ng-maxlength="10" required>
+    <form name="form">
+        <div class="group">
+            <h3 style="text-align: center; margin-bottom: 20px">Pick playlist</h3>
+            <md-list flex>
+                <md-list-item class="md-3-line" md-ink-ripple="#1ED760" ng-repeat="playlist in playlists" ng-click="choosePlaylist(playlist)">
+                    <div class="md-list-item-text" layout="column">
+                        <div class="item">
+                            <h3>{{ playlist.name }}</h3>
+                            <h4>Created by {{ playlist.playlistOwner }}</h4>
+                            <p ng-if="playlist.noTracks==1">{{ playlist.noTracks }} track</p>
+                            <p ng-if="playlist.noTracks!==1">{{ playlist.noTracks }} tracks</p>
+                        </div>
+                    </div>
+                    <md-icon class="material-icons">navigate_next</md-icon>
+                </md-list-item>
+            </md-list>
+        </div>
+    </form>
+</md-content>
 
-            <div ng-messages="form.displayName.$error" ng-if="form.displayName.$dirty">
-                <div ng-message="required">Required</div>
-                <div ng-message="minlength">Your display name needs to be at least 3 characters</div>
-                <div ng-message="maxlength">Your display name can be at most 10 characters</div>
-                <div ng-messages="serverErrors" ng-if="submitted">
-                    <div ng-message="nameExists">{{serverErrors.nameExists}}</div>
-                </div>
-            </div>
-        </md-input-container>
 
-        <md-input-container md-no-float class="md-block">
-            <input type="text" ng-keyup="submitted=false" ng-model="joinCode" name="joinCode" placeholder="Code" ng-minlength="4" ng-maxlength="10" required>
+<!--<md-input-container md-no-float class="md-block">-->
+<!--<input type="text" ng-keyup="submitted=false"  ng-model="name" name="name" placeholder="Quiz name" ng-minlength="3" ng-maxlength="15" required>-->
+<!--</md-input-container>-->
 
-            <div ng-messages="form.joinCode.$error" ng-if="form.joinCode.$dirty">
-                <div ng-message="required">Required</div>
-                <div ng-message="minlength">The code needs to be at least 4 characters</div>
-                <div ng-message="maxlength">The code can be at most 10 characters</div>
-            </div>
-            <div ng-messages="serverErrors" ng-if="submitted">
-                <div ng-message="invalid">{{serverErrors.invalid}}</div>
-            </div>
-        </md-input-container>
+<!--<md-input-container md-no-float class="md-block">-->
+<!--<input type="number" ng-keyup="submitted=false" ng-model="nbrOfQuestions" name="nbrOfQuestions" placeholder="No. Questions" required>-->
+<!--</md-input-container>-->
 
-    </div>
+<!--<md-switch ng-model="toggleSwitch" aria-label="Shuffle songs">-->
+<!--Shuffle songs-->
+<!--</md-switch>-->
 
-    <div class="buttonHolder">
-        <md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">
-            <md-icon class="material-icons">navigate_next</md-icon>
-        </md-button>
-    </div>
+<!--<md-input-container class="md-block">-->
+<!--<h5>Choose playlist</h5>-->
 
-    <md-progress-linear ng-show="fetching" md-mode="indeterminate"></md-progress-linear>
-</form>
+<!--<md-radio-group ng-model="playlistSelected" id="playlists">-->
+<!--<md-radio-button ng-repeat="playlist in playlists" ng-value="playlist" class="md-primary">{{playlist.name}}</md-radio-button>-->
+<!--</md-radio-group>-->
+
+<!--</md-input-container>-->
+
+<!--</div>-->
+
+<!--<div class="buttonHolder">-->
+<!--<md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">-->
+<!--<md-icon class="material-icons">navigate_next</md-icon>-->
+<!--</md-button>-->
+<!--</div>-->
+
+<!--<md-progress-linear ng-show="fetching" md-mode="indeterminate"></md-progress-linear>-->

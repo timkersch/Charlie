@@ -82,45 +82,37 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
 
         .state('create', {
             url: '/create',
-            templateUrl: '../views/create.html',
-            controller: 'createController',
+            templateUrl: '../views/createNavBar.html',
+            controller: 'createNavController',
             data: {
                 css: ['../css/partials/create.css']
-            }
-        })
-
-        .state('create2', {
-            url: '/create2',
-            templateUrl: '../views/createNavBar.html',
-            controller: 'createNavigationController',
-            data: {
-                css: ['../css/partials/create2.css']
             },
             abstract: true
         })
 
-        .state('create2.createFromPlaylist', {
+        .state('create.createFromPlaylist', {
             url: '/simple',
+            controller: 'createFromPlaylistController',
             templateUrl: '../views/createFromPlaylist.html',
         })
 
-        .state('create2.generateFromPlaylist', {
+        .state('create.generateFromPlaylist', {
             url: '/generate',
             templateUrl: '../views/generateFromPlaylist.html',
         })
 
-        .state('create2.createFromFeatured', {
+        .state('create.createFromFeatured', {
             url: '/featured',
             templateUrl: '../views/createFromFeatured.html',
         })
 
-        .state('create2.createFromPopular', {
+        .state('create.createFromPopular', {
             url: '/popular',
             templateUrl: '../views/createFromPopular.html',
         });
 
 
-    $urlRouterProvider.when("/create2", "/create2/simple");
+    $urlRouterProvider.when("/create", "/create/simple");
     $urlRouterProvider.otherwise('/');
     $locationProvider.html5Mode(true);
 

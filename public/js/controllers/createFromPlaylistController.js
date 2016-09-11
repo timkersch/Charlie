@@ -2,9 +2,9 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('createController', ['$scope', '$state', 'charlieProxy',
+angular.module('charlieController').controller('createFromPlaylistController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {
-        console.log("Inside createController");
+        console.log("Inside createFromPlaylistController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
         $scope.playlistSelected = null;
@@ -22,6 +22,10 @@ angular.module('charlieController').controller('createController', ['$scope', '$
         charlieProxy.onReady(function () {
             init();
         });
+
+        $scope.choosePlaylist = function(playlist) {
+            console.log(playlist);
+        };
 
         $scope.submit = function () {
             $scope.loading = true;
