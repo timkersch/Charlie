@@ -34,6 +34,11 @@ charlieApp.config(['$routeProvider', '$locationProvider', function ($routeProvid
                     controller: 'createController',
                     css: '../css/partials/create.css'
                 }).
+                when('/create2', {
+                    templateUrl: '../views/createNavigation.html',
+                    controller: 'createNavigationController',
+                    css: '../css/partials/createNav.css'
+                }).
                 when('/profile', {
                     templateUrl: '../views/profile.html',
                     controller: 'profileController',

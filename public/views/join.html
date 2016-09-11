@@ -36,7 +36,7 @@
         </div>
 
         <div class="buttonHolder">
-            <md-button type="submit" ng-click="submitted=true" class="md-fab md-primary">
+            <md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">
                 <md-icon class="material-icons">navigate_next</md-icon>
             </md-button>
         </div>
