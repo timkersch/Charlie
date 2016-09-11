@@ -26,6 +26,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 
+    <!-- Angular Material-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.1/angular-material.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.1/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Bower -->
+    <script src="./dependencies/ui-router-styles.js"></script>
+
     <!-- Internal Angular.js files -->
     <script src="js/app.js"></script>
     <script src="js/controllers/mainController.js"></script>
@@ -38,15 +46,9 @@
     <script src="js/controllers/profileController.js"></script>
     <script src="js/controllers/scoreboardController.js"></script>
     <script src="js/services/socketService.js"></script>
-    <script src="js/dependencies/route-styles.js"></script>
-
-    <!-- Angular Material-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.1/angular-material.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.1/angular-material.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 </head>
-<body ng-app="charlieApp">
+<body ng-app="charlieApp" ui-router-styles>
 <div layout="row" ng-controller="mainController">
     <md-toolbar class="md-toolbar-tools">
         <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
