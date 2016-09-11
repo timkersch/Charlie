@@ -1,0 +1,48 @@
+<hgroup>
+        <h1>Join Quiz</h1>
+        <h3>Enter your code below to join a quiz</h3>
+    </hgroup>
+
+    <form name="form" ng-submit="changeView()">
+        <div class="group">
+            <md-input-container md-no-float class="md-block">
+                <input type="text" ng-keyup="submitted=false"  ng-model="displayName" name="displayName" placeholder="Name" ng-minlength="3" ng-maxlength="10" required>
+
+                <div ng-messages="form.displayName.$error" ng-if="form.displayName.$dirty">
+                    <div ng-message="required">Required</div>
+                    <div ng-message="minlength">Your display name needs to be at least 3 characters</div>
+                    <div ng-message="maxlength">Your display name can be at most 10 characters</div>
+                    <div ng-messages="serverErrors" ng-if="submitted">
+                        <div ng-message="nameExists">{{serverErrors.nameExists}}</div>
+                    </div>
+                </div>
+            </md-input-container>
+
+            <md-input-container md-no-float class="md-block">
+                <input type="text" ng-keyup="submitted=false" ng-model="joinCode" name="joinCode" placeholder="Code" ng-minlength="4" ng-maxlength="10" required>
+
+                <div ng-messages="form.joinCode.$error" ng-if="form.joinCode.$dirty">
+                    <div ng-message="required">Required</div>
+                    <div ng-message="minlength">The code needs to be at least 4 characters</div>
+                    <div ng-message="maxlength">The code can be at most 10 characters</div>
+                </div>
+                <div ng-messages="serverErrors" ng-if="submitted">
+                    <div ng-message="invalid">{{serverErrors.invalid}}</div>
+                </div>
+            </md-input-container>
+
+        </div>
+
+        <div class="buttonHolder">
+            <md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">
+                <md-icon class="material-icons">navigate_next</md-icon>
+            </md-button>
+        </div>
+
+        <md-progress-linear ng-show="fetching" md-mode="indeterminate"></md-progress-linear>
+    </form>
+
+    <footer>
+        <p>Powered by</p>
+        <a href="http://spotify.com" target="_blank"><img src="../img/Spotify_Icon_RGB_Green.png" height="42" width="42"></a>
+    </footer>

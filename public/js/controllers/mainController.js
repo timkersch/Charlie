@@ -7,11 +7,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
         $scope.user = '';
         $scope.url = '';
 
-        $scope.changeView = function (view) {
-            $location.path(view);
-            $scope.toggleLeftMenu();
-        };
-
         $scope.toggleLeftMenu = function () {
             $mdSidenav('left').toggle();
         };
@@ -42,7 +37,7 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
             }
         };
 
-        $scope.$on('$routeChangeSuccess', function () {
+        $scope.$on("$stateChangeSuccess", function () {
             // Initialize when service is ready
             charlieProxy.onReady(function () {
                 init();
@@ -50,17 +45,12 @@ angular.module('charlieController').controller('mainController', ['$scope', '$ro
         });
 
         $scope.login = function () {
-            window.location.href = $scope.url;
+            window.open($scope.url, '_self');
         };
 
         $scope.logout = function () {
             $scope.user = '';
             charlieProxy.logout();
-            if($location.path() === '/') {
-                $route.reload();
-            } else {
-                $location.path('/');
-            }
         };
 
     }]);

@@ -1,11 +1,11 @@
 <div layout="row" layout-align="center">
     <md-content class="autoScroll" ng-cloak>
         <md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
-            <md-nav-item md-nav-href="/1" name="standard">Playlist</md-nav-item>
-            <md-nav-item md-nav-href="/2" name="generate">Generate</md-nav-item>
-            <md-nav-item md-nav-href="/3" name="featured">Featured</md-nav-item>
-            <md-nav-item md-nav-href="/4" name="popular">Popular</md-nav-item>
+            <md-nav-item md-nav-sref="/1" name="standard">Playlist</md-nav-item>
+            <md-nav-item md-nav-sref="create2.createPlaylist" name="generate">Generate</md-nav-item>
+            <md-nav-item md-nav-sref="/3" name="featured">Featured</md-nav-item>
+            <md-nav-item md-nav-sref="/4" name="popular">Popular</md-nav-item>
         </md-nav-bar>
-        <div ng-view></div>
+        <div ui-view></div>
     </md-content>
 </div>
