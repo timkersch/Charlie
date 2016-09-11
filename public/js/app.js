@@ -17,10 +17,19 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
 
     $stateProvider
 
-        .state('home', {
+        .state('homeLoggedOut', {
             url: '/',
-            templateUrl: '../views/home.html',
-            controller: 'homeController',
+            templateUrl: '../views/homeLoggedOut.html',
+            controller: 'mainController',
+            data: {
+                css: ['../css/partials/home.css']
+            }
+        })
+
+        .state('homeLoggedIn', {
+            url: '/',
+            templateUrl: '../views/homeLoggedIn.html',
+            controller: 'mainController',
             data: {
                 css: ['../css/partials/home.css']
             }
@@ -42,44 +51,6 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             data: {
                 css: ['../css/partials/join.css']
             }
-        })
-
-        .state('create', {
-            url: '/create',
-            templateUrl: '../views/create.html',
-            controller: 'createController',
-            data: {
-                css: ['../css/partials/create.css']
-            }
-        })
-
-        .state('create2', {
-            url: '/create2',
-            templateUrl: '../views/create2.html',
-            controller: 'createNavigationController',
-            data: {
-                css: ['../css/partials/create2.css']
-            }
-        })
-
-        .state('create2.createFromPlaylist', {
-            url: '/simple',
-            templateUrl: '../views/createFromPlaylist.html',
-        })
-
-        .state('create2.generateFromPlaylist', {
-            url: '/generate',
-            templateUrl: '../views/generateFromPlaylist.html',
-        })
-
-        .state('create2.createFromFeatured', {
-            url: '/featured',
-            templateUrl: '../views/createFromFeatured.html',
-        })
-
-        .state('create2.createFromPopular', {
-            url: '/popular',
-            templateUrl: '../views/createFromPopular.html',
         })
 
         .state('profile', {
@@ -107,8 +78,49 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             data: {
                 css: ['../css/partials/question.css']
             }
+        })
+
+        .state('create', {
+            url: '/create',
+            templateUrl: '../views/create.html',
+            controller: 'createController',
+            data: {
+                css: ['../css/partials/create.css']
+            }
+        })
+
+        .state('create2', {
+            url: '/create2',
+            templateUrl: '../views/createNavBar.html',
+            controller: 'createNavigationController',
+            data: {
+                css: ['../css/partials/create2.css']
+            },
+            abstract: true
+        })
+
+        .state('create2.createFromPlaylist', {
+            url: '/simple',
+            templateUrl: '../views/createFromPlaylist.html',
+        })
+
+        .state('create2.generateFromPlaylist', {
+            url: '/generate',
+            templateUrl: '../views/generateFromPlaylist.html',
+        })
+
+        .state('create2.createFromFeatured', {
+            url: '/featured',
+            templateUrl: '../views/createFromFeatured.html',
+        })
+
+        .state('create2.createFromPopular', {
+            url: '/popular',
+            templateUrl: '../views/createFromPopular.html',
         });
 
+
+    $urlRouterProvider.when("/create2", "/create2/simple");
     $urlRouterProvider.otherwise('/');
     $locationProvider.html5Mode(true);
 

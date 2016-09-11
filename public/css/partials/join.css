@@ -1,4 +1,6 @@
-* { box-sizing:border-box; }
+* { 
+    box-sizing:border-box;
+}
 
 body {
     font-family: Helvetica;
@@ -11,11 +13,25 @@ hgroup {
     margin-top: 4em;
 }
 
+md-content {
+    background: #ffffff;
+}
+
 h1, h3, input { font-weight: 300; }
 
 h1 { color: #636363; }
 
 h3 { color: #4a89dc; }
+
+div .end {
+    width: 100%;
+    min-width: 100%;
+    min-height: 4em;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    bottom: 0px;
+}
 
 form {
     width: 380px;

@@ -2,9 +2,10 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('lobbyController', ['$scope', '$location', 'charlieProxy',
-    function ($scope, $location, charlieProxy) {
+angular.module('charlieController').controller('lobbyController', ['$scope', '$state', 'charlieProxy',
+    function ($scope, $state, charlieProxy) {
         console.log("LobbyController!");
+
         $scope.quizname = "Quiz";
         $scope.id = "Id";
         $scope.users = [];
@@ -38,7 +39,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$l
 
         charlieProxy.quizStart(function() {
             $scope.$apply(function () {
-                $location.path('/question');
+                $state.go('question');
             });
         });
 

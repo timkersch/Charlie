@@ -1,0 +1,19 @@
+<div layout="row" layout-align="center" id="centerContainer">
+    <md-content class="autoScroll" ng-cloak>
+        <md-nav-bar md-selected-nav-item="currentNavItem" nav-bar-aria-label="navigation links">
+            <md-nav-item md-nav-sref="create2.createFromPlaylist" name="standard">Playlist</md-nav-item>
+            <md-nav-item md-nav-sref="create2.generateFromPlaylist" name="generate">Generate</md-nav-item>
+            <md-nav-item md-nav-sref="create2.createFromFeatured" name="featured">Featured</md-nav-item>
+            <md-nav-item md-nav-sref="create2.createFromPopular" name="popular">Popular</md-nav-item>
+        </md-nav-bar>
+    </md-content>
+</div>
+
+<md-content class="autoScroll" ng-cloak>
+    <div ui-view></div>
+
+    <footer>
+        <p>Powered by</p>
+        <a href="http://spotify.com" target="_blank"><img src="../img/Spotify_Icon_RGB_Green.png" height="42" width="42"></a>
+    </footer>
+</md-content>

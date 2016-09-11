@@ -9,5 +9,4 @@ angular.module('charlieController').controller('profileController', ['$scope', '
         charlieProxy.getUser(function (user) {
             $scope.user = user;
         });
-
     }]);

@@ -2,8 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('scoreboardController', ['$scope', '$document', '$location', 'charlieProxy',
-    function ($scope, $document, $location, charlieProxy) {
+angular.module('charlieController').controller('scoreboardController', ['$scope', '$document', '$state', 'charlieProxy',
+    function ($scope, $document, $state, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
         let canvasChart = $document[0].createElement('canvas');
@@ -70,9 +70,9 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
             init();
         });
 
-        $scope.changeView = function (view) {
+        $scope.changeView = function () {
             charlieProxy.leaveQuiz();
-            $location.path(view);
+            $state.go('homeLoggedIn');
         };
 
         $scope.savePlaylist = function () {

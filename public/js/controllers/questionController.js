@@ -2,8 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('questionController', ['$scope', '$location', '$interval', 'charlieProxy', '$document', '$timeout',
-    function ($scope, $location, $interval, charlieProxy, $document, $timeout) {
+angular.module('charlieController').controller('questionController', ['$scope', '$state', '$interval', 'charlieProxy', '$document',
+    function ($scope, $state, $interval, charlieProxy, $document) {
         console.log("Inside questionController");
 
         let audioElement = $document[0].createElement('audio');
@@ -49,7 +49,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         });
 
         charlieProxy.gameOver(function() {
-            $location.path("/scoreboard");
+            $state.go('scoreboard');
         });
 
         charlieProxy.userPointsUpdate(function (player) {

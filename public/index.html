@@ -37,7 +37,6 @@
     <!-- Internal Angular.js files -->
     <script src="js/app.js"></script>
     <script src="js/controllers/mainController.js"></script>
-    <script src="js/controllers/homeController.js"></script>
     <script src="js/controllers/joinController.js"></script>
     <script src="js/controllers/createController.js"></script>
     <script src="js/controllers/createNavigationController.js"></script>
@@ -50,16 +49,18 @@
 </head>
 <body ng-app="charlieApp" ui-router-styles>
 <div layout="row" ng-controller="mainController">
+
     <md-toolbar class="md-toolbar-tools">
         <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
             <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
         </md-button>
-        <h2> <a ui-sref="home">Charlie</a></h2>
+        <h2>Charlie</h2>
         <span flex="" class="flex"></span>
         <span>{{user}}</span>
         <md-button ng-show="!user" ng-click="login()">Login</md-button>
         <md-button ng-show="user" ng-click="logout()">Logout</md-button>
     </md-toolbar>
+
     <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
         <md-toolbar ng-click="toggleLeftMenu()">
             <div layout="row" layout-padding>
@@ -68,15 +69,13 @@
         </md-toolbar>
 
         <md-list>
-            <a ui-sref="home">
-                <md-list-item class="ng-scope" layout="row" layout-align="start center">
+                <md-list-item ng-click="home()" class="ng-scope" layout="row" layout-align="start center">
                     <div class="inset">
                         <md-icon aria-label="Menu" class="material-icons">home</md-icon>
                     </div>
                     <div class="inset ng-binding">Home</div>
                     <div class="md-ripple-container"></div>
                 </md-list-item>
-            </a>
 
             <a ui-sref="create">
                 <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
@@ -100,6 +99,7 @@
 
         </md-list>
     </md-sidenav>
+
 </div>
 
 <div ui-view>

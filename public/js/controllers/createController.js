@@ -2,8 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('createController', ['$scope', '$location', 'charlieProxy',
-    function ($scope, $location, charlieProxy) {
+angular.module('charlieController').controller('createController', ['$scope', '$state', 'charlieProxy',
+    function ($scope, $state, charlieProxy) {
         console.log("Inside createController");
         $scope.name = null;
         $scope.nbrOfQuestions = "";
@@ -30,7 +30,7 @@ angular.module('charlieController').controller('createController', ['$scope', '$
                     $scope.loading = false
                     alert(quiz.error);
                 } else {
-                    $location.path('/lobby');
+                    $state.go('lobby');
                 }
             });
         };
