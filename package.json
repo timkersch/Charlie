@@ -6,31 +6,39 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "angular": "^1.5.8",
+    "angular-animate": "^1.5.8",
+    "angular-aria": "^1.5.8",
+    "angular-material": "^1.1.1",
+    "angular-messages": "^1.5.8",
+    "angular-route": "^1.5.8",
+    "angular-ui-router": "^1.0.0-beta.2",
     "body-parser": "~1.15.1",
+    "chart.js": "^2.2.2",
     "cookie": "^0.3.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
     "dotenv": "^2.0.0",
     "express": "~4.13.4",
     "express-session": "^1.14.0",
+    "material-design-icons": "^3.0.1",
     "mongodb": "^2.2.9",
     "mongoose": "^4.6.0",
     "morgan": "~1.7.0",
     "request": "^2.74.0",
     "sessionstore": "^1.2.16",
     "socket.io": "^1.4.8",
+    "socket.io-client": "^1.4.8",
     "spotify-web-api-node": "^2.3.5"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-polyfill": "^6.13.0",
     "babel-preset-es2015": "^6.14.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-concat": "^2.6.0",
-    "gulp-jshint": "^2.0.1",
-    "gulp-minify-html": "^1.0.6",
-    "gulp-strip-debug": "^1.1.0",
-    "gulp-uglify": "^2.0.0",
-    "jshint": "^2.9.3"
+    "install": "^0.8.1",
+    "npm": "^3.10.7",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.1"
   }
 }

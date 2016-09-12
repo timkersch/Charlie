@@ -1,5 +1,12 @@
 'use strict';
 
+const angular = require('angular');
+require('angular-messages');
+require('angular-ui-router');
+require('angular-material');
+require('angular-route');
+require('./services/socketService');
+
 let charlieController = angular.module('charlieController', [
     'ngRoute',
     'charlieService',
@@ -10,11 +17,9 @@ let charlieApp = angular.module('charlieApp', [
     'ngMessages',
     'charlieController',
     'ui.router',
-    'uiRouterStyles'
 ]);
 
 charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-
     $stateProvider
 
         .state('homeLoggedOut', {

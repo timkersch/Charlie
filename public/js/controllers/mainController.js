@@ -2,6 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
+const angular = require('angular');
+
 angular.module('charlieController').controller('mainController', ['$scope', '$state', '$mdSidenav', 'charlieProxy',
     function ($scope, $state, $mdSidenav, charlieProxy) {
         $scope.user = '';

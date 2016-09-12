@@ -3,6 +3,7 @@
  */
 
 'use strict';
+const angular = require('angular');
 
 const charlieService = angular.module('charlieService', []);
 
@@ -26,7 +27,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                     if(!data) {
                         sessionStorage.user = "";
                         setReady();
-                    // Found user
+                        // Found user
                     } else {
                         // Get the users quiz
                         socket.emit('getQuiz');
@@ -279,3 +280,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
         };
     }]);
+
+module.exports = {
+    charlieService : charlieService
+};
