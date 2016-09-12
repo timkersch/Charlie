@@ -43,7 +43,7 @@ h3 { color: #4a89dc; }
 form {
     width: 380px;
     margin: 4em auto;
-    padding: 1em 2em 2em 2em;
+    padding: 2em 2em 2em 2em;
     background: #fafafa;
     border: 1px solid #ebebeb;
     box-shadow: rgba(0,0,0,0.14902) 0px 1px 1px 0px,rgba(0,0,0,0.09804) 0px 1px 2px 0px;
@@ -132,3 +132,68 @@ footer img {
 footer img:hover { opacity: .83; }
 
 footer img:focus , footer a:focus { outline: none; }
+
+
+
+/* OLD
+
+@keyframes rotate360 {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@-webkit-keyframes rotate360 {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+
+.spinner {
+    display:inline-block;
+    border-radius: 50px;
+    border-style: solid;
+    border-bottom-color: #3b5641;
+    border-top-color: #67b3a9;
+    border-left-color: #df7950;
+    border-right-color: #decb3f;
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    animation: rotate360 1s linear infinite;
+    -webkit-animation: rotate360 1s linear infinite;
+
+    border-width: 4px;
+    width: 24px;
+    height: 24px;
+}
+
+form {
+    padding: 1em;
+    margin-bottom: 5em;
+}
+
+.end {
+    margin: -1em;
+}
+
+md-input-container h5 {
+    color: rgba(0,0,0,0.26);
+    font-weight: 900;
+    margin-left: 2px;
+    font-size: 104%;
+}
+
+.md-chips {
+    color: rgba(0,0,0,0.26);
+    font-weight: 900;
+    margin-left: -8px;
+    font-size: 104%;
+}
+
+.md-chips .md-chip .md-chip-remove md-icon {
+    position: absolute;
+    top: 43%;
+    left: 50%;
+
+}
+
+*/

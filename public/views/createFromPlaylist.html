@@ -1,57 +1,39 @@
 <md-content class="autoScroll" ng-cloak>
     <hgroup>
         <h1>Create Quiz</h1>
-        <h3>Create Quiz from your Spotify playlists</h3>
+        <h3>Enter quiz details</h3>
     </hgroup>
 
-    <form name="form">
+    <form name="form" ng-submit="createQuiz()">
         <div class="group">
-            <h3 style="text-align: center; margin-bottom: 20px">Pick playlist</h3>
-            <md-list flex>
-                <md-list-item class="md-3-line" md-ink-ripple="#1ED760" ng-repeat="playlist in playlists" ng-click="choosePlaylist(playlist)">
-                    <div class="md-list-item-text" layout="column">
-                        <div class="item">
-                            <h3>{{ playlist.name }}</h3>
-                            <h4>Created by {{ playlist.playlistOwner }}</h4>
-                            <p ng-if="playlist.noTracks==1">{{ playlist.noTracks }} track</p>
-                            <p ng-if="playlist.noTracks!==1">{{ playlist.noTracks }} tracks</p>
-                        </div>
-                    </div>
-                    <md-icon class="material-icons">navigate_next</md-icon>
-                </md-list-item>
-            </md-list>
+            <md-input-container md-no-float class="md-block">
+                <input type="text" ng-model="name" name="name" placeholder="Quiz name" ng-minlength="3" ng-maxlength="15" required>
+                <div ng-messages="form.name.$error" ng-if="form.name.$dirty">
+                    <div ng-message="required">Required</div>
+                    <div ng-message="minlength">The Quiz name need to be at least 3 characters</div>
+                    <div ng-message="maxlength">The Quiz name can be at most 15 characters</div>
+                </div>
+            </md-input-container>
+
+            <md-input-container md-no-float class="md-block">
+                <input type="number" ng-model="nbrOfQuestions" name="nbrOfQuestions" placeholder="No. Questions" required>
+                <div ng-messages="form.nbrOfQuestions.$error" ng-if="form.nbrOfQuestions.$dirty">
+                    <div ng-message="required">Required</div>
+                </div>
+            </md-input-container>
+
+            <md-switch ng-model="shuffle" aria-label="Shuffle tracks">
+                Shuffle tracks
+            </md-switch>
+
         </div>
+
+        <div class="buttonHolder">
+            <md-button type="submit" ng-disabled="loading || !form.name.$valid || !form.nbrOfQuestions.$valid" class="md-fab md-primary">
+                <md-icon class="material-icons">navigate_next</md-icon>
+            </md-button>
+        </div>
+
+        <md-progress-linear ng-show="loading" md-mode="indeterminate"></md-progress-linear>
     </form>
 </md-content>
-
-
-<!--<md-input-container md-no-float class="md-block">-->
-<!--<input type="text" ng-keyup="submitted=false"  ng-model="name" name="name" placeholder="Quiz name" ng-minlength="3" ng-maxlength="15" required>-->
-<!--</md-input-container>-->
-
-<!--<md-input-container md-no-float class="md-block">-->
-<!--<input type="number" ng-keyup="submitted=false" ng-model="nbrOfQuestions" name="nbrOfQuestions" placeholder="No. Questions" required>-->
-<!--</md-input-container>-->
-
-<!--<md-switch ng-model="toggleSwitch" aria-label="Shuffle songs">-->
-<!--Shuffle songs-->
-<!--</md-switch>-->
-
-<!--<md-input-container class="md-block">-->
-<!--<h5>Choose playlist</h5>-->
-
-<!--<md-radio-group ng-model="playlistSelected" id="playlists">-->
-<!--<md-radio-button ng-repeat="playlist in playlists" ng-value="playlist" class="md-primary">{{playlist.name}}</md-radio-button>-->
-<!--</md-radio-group>-->
-
-<!--</md-input-container>-->
-
-<!--</div>-->
-
-<!--<div class="buttonHolder">-->
-<!--<md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">-->
-<!--<md-icon class="material-icons">navigate_next</md-icon>-->
-<!--</md-button>-->
-<!--</div>-->
-
-<!--<md-progress-linear ng-show="fetching" md-mode="indeterminate"></md-progress-linear>-->

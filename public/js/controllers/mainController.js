@@ -47,7 +47,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
         };
 
         $scope.$on("$stateChangeSuccess", function () {
-            // Initialize when service is ready
             charlieProxy.onReady(function () {
                 init();
             });

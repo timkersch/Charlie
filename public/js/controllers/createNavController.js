@@ -2,8 +2,8 @@
  * Created by Tim on 11/09/16.
  */
 
-angular.module('charlieController').controller('createNavController', ['$scope', '$state',
-    function ($scope, $state) {
+angular.module('charlieController').controller('createNavController', ['$scope',
+    function ($scope) {
         console.log("Inside createController");
         $scope.currentNavItem = 'standard';
     }]);

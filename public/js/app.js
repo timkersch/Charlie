@@ -90,8 +90,14 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             abstract: true
         })
 
-        .state('create.createFromPlaylist', {
+        .state('create.choosePlaylist', {
             url: '/simple',
+            controller: 'choosePlaylistController',
+            templateUrl: '../views/choosePlaylist.html',
+        })
+
+        .state('create.fromPlaylist', {
+            url: '/simple/:owner/:id',
             controller: 'createFromPlaylistController',
             templateUrl: '../views/createFromPlaylist.html',
         })

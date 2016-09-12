@@ -2,42 +2,25 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('createFromPlaylistController', ['$scope', '$state', 'charlieProxy',
-    function ($scope, $state, charlieProxy) {
+angular.module('charlieController').controller('createFromPlaylistController', ['$scope', '$state', '$stateParams', 'charlieProxy',
+    function ($scope, $state, $stateParams, charlieProxy) {
         console.log("Inside createFromPlaylistController");
+
         $scope.name = null;
         $scope.nbrOfQuestions = "";
-        $scope.playlistSelected = null;
-        $scope.readonly = false;
-        $scope.tags = [];
-        $scope.toggleSwitch = true;
+        $scope.shuffle = true;
         $scope.loading = false;
 
-        let init = function () {
-            charlieProxy.getPlaylists(function (lists) {
-                $scope.playlists = lists;
-            });
-        };
-
-        charlieProxy.onReady(function () {
-            init();
-        });
-
-        $scope.choosePlaylist = function(playlist) {
-            console.log(playlist);
-        };
-
-        $scope.submit = function () {
+        $scope.createQuiz = function () {
             $scope.loading = true;
-            charlieProxy.createQuiz($scope.name, $scope.playlistSelected.id, $scope.playlistSelected.playlistOwner, $scope.nbrOfQuestions, $scope.toggleSwitch, function (quiz) {
+            charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
+                $scope.loading = false;
                 if(!quiz || quiz.error) {
-                    $scope.loading = false
                     alert(quiz.error);
                 } else {
                     $state.go('lobby');
                 }
             });
         };
-
 
     }]);

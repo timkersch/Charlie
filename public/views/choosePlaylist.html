@@ -1,0 +1,24 @@
+<md-content class="autoScroll" ng-cloak>
+    <hgroup>
+        <h1>Create Quiz</h1>
+        <h3>Pick playlist</h3>
+    </hgroup>
+
+    <form name="form">
+        <div class="group">
+            <md-list flex>
+                <md-list-item class="md-3-line" md-ink-ripple="#1ED760" ng-repeat="playlist in playlists" ng-click="choosePlaylist(playlist)">
+                    <div class="md-list-item-text" layout="column">
+                        <div class="item">
+                            <h3>{{ playlist.name }}</h3>
+                            <h4>Created by {{ playlist.playlistOwner }}</h4>
+                            <p ng-if="playlist.noTracks==1">{{ playlist.noTracks }} track</p>
+                            <p ng-if="playlist.noTracks!==1">{{ playlist.noTracks }} tracks</p>
+                        </div>
+                    </div>
+                    <md-icon class="material-icons">navigate_next</md-icon>
+                </md-list-item>
+            </md-list>
+        </div>
+    </form>
+</md-content>
