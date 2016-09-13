@@ -2,6 +2,8 @@
  * Created by Tim on 09/09/16.
  */
 
+require('../../css/partials/join.css');
+
 angular.module('charlieController').controller('joinController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $location, charlieProxy) {
         console.log("Joincontroller");

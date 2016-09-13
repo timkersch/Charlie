@@ -2,6 +2,9 @@
  * Created by Tim on 03/09/16.
  */
 
+require('../../css/partials/scoreboard.css');
+require('chart.js');
+
 angular.module('charlieController').controller('scoreboardController', ['$scope', '$document', '$state', 'charlieProxy',
     function ($scope, $document, $state, charlieProxy) {
         console.log("Inside scoreboardController");

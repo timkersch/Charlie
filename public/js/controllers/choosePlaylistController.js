@@ -2,6 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
+require('../../css/partials/create.css');
+
 angular.module('charlieController').controller('choosePlaylistController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {
         console.log("Inside choosePlaylistController");

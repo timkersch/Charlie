@@ -2,10 +2,11 @@
  * Created by Tim on 03/09/16.
  */
 
-const angular = require('angular');
+require('../../css/partials/home.css');
 
 angular.module('charlieController').controller('mainController', ['$scope', '$state', '$mdSidenav', 'charlieProxy',
     function ($scope, $state, $mdSidenav, charlieProxy) {
+        console.log('in controller');
         $scope.user = '';
         $scope.url = '';
 
@@ -48,10 +49,8 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             }
         };
 
-        $scope.$on("$stateChangeSuccess", function () {
-            charlieProxy.onReady(function () {
-                init();
-            });
+        charlieProxy.onReady(function () {
+            init();
         });
 
         $scope.login = function () {

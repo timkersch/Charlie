@@ -1,23 +1,33 @@
 'use strict';
 
 const angular = require('angular');
+require('../css/style.css');
+require('angular-material/angular-material.css');
 require('angular-messages');
 require('angular-ui-router');
 require('angular-material');
-require('angular-route');
 require('./services/socketService');
 
 let charlieController = angular.module('charlieController', [
-    'ngRoute',
     'charlieService',
-    'ngMaterial'
+    'ngMaterial',
+    'ngMessages',
 ]);
 
 let charlieApp = angular.module('charlieApp', [
-    'ngMessages',
     'charlieController',
     'ui.router',
 ]);
+
+require('./controllers/choosePlaylistController');
+require('./controllers/createFromPlaylistController');
+require('./controllers/createNavController');
+require('./controllers/joinController');
+require('./controllers/lobbyController');
+require('./controllers/mainController');
+require('./controllers/profileController');
+require('./controllers/questionController');
+require('./controllers/scoreboardController');
 
 charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $stateProvider
@@ -26,72 +36,48 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             url: '/',
             templateUrl: '../views/homeLoggedOut.html',
             controller: 'mainController',
-            data: {
-                css: ['../css/partials/home.css']
-            }
         })
 
         .state('homeLoggedIn', {
             url: '/',
             templateUrl: '../views/homeLoggedIn.html',
             controller: 'mainController',
-            data: {
-                css: ['../css/partials/home.css']
-            }
         })
 
         .state('lobby', {
             url: '/lobby',
             templateUrl: '../views/lobby.html',
             controller: 'lobbyController',
-            data: {
-                css: ['../css/partials/lobby.css']
-            }
         })
 
         .state('join', {
             url: '/join',
             templateUrl: '../views/join.html',
             controller: 'joinController',
-            data: {
-                css: ['../css/partials/join.css']
-            }
         })
 
         .state('profile', {
             url: '/profile',
             templateUrl: '../views/profile.html',
             controller: 'profileController',
-            data: {
-                css: ['../css/partials/profile.css']
-            }
         })
 
         .state('scoreboard', {
             url: '/scoreboard',
             templateUrl: '../views/scoreboard.html',
             controller: 'scoreboardController',
-            data: {
-                css: ['../css/partials/scoreboard.css']
-            }
         })
 
         .state('question', {
             url: '/question',
             templateUrl: '../views/question.html',
             controller: 'questionController',
-            data: {
-                css: ['../css/partials/question.css']
-            }
         })
 
         .state('create', {
             url: '/create',
             templateUrl: '../views/createNavBar.html',
             controller: 'createNavController',
-            data: {
-                css: ['../css/partials/create.css']
-            },
             abstract: true
         })
 

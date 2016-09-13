@@ -2,6 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
+require('../../css/partials/lobby.css');
+
 angular.module('charlieController').controller('lobbyController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {
         console.log("LobbyController!");

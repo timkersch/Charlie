@@ -2,6 +2,8 @@
  * Created by Tim on 03/09/16.
  */
 
+require('../../css/partials/profile.css');
+
 angular.module('charlieController').controller('profileController', ['$scope', 'charlieProxy',
     function ($scope, charlieProxy) {
         console.log("Inside profileController");

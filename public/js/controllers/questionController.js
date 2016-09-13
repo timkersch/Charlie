@@ -2,8 +2,10 @@
  * Created by Tim on 03/09/16.
  */
 
-angular.module('charlieController').controller('questionController', ['$scope', '$state', '$interval', 'charlieProxy', '$document',
-    function ($scope, $state, $interval, charlieProxy, $document) {
+require('../../css/partials/question.css');
+
+angular.module('charlieController').controller('questionController', ['$scope', '$state', 'charlieProxy', '$document',
+    function ($scope, $state, charlieProxy, $document) {
         console.log("Inside questionController");
 
         let audioElement = $document[0].createElement('audio');

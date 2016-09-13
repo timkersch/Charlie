@@ -3,7 +3,6 @@
 }
 
 body {
-    font-family: Helvetica;
     -webkit-font-smoothing: antialiased;
     padding-bottom: 70px;
 }
@@ -25,17 +24,6 @@ hgroup {
 
 md-content {
     background: #ffffff;
-}
-
-h1, h3, input { font-weight: 300; }
-
-h1 {
-    color: #636363;
-}
-
-h3 {
-    color: #4a89dc;
-    margin: 0.7em 5px;
 }
 
 form {

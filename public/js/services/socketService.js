@@ -4,6 +4,7 @@
 
 'use strict';
 const angular = require('angular');
+const io = require('socket.io-client');
 
 const charlieService = angular.module('charlieService', []);
 
