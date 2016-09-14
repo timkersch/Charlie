@@ -7,6 +7,7 @@
 const dotenv = require('dotenv').config({path: '.env'});
 const SpotifyWebApi = require('spotify-web-api-node');
 const request = require('request');
+const utils = require('./helpers');
 
 const credentials = {
     clientId : process.env.CLIENT_ID,
@@ -39,21 +40,6 @@ function testUrl(track) {
             }
         });
     });
-}
-
-function shuffle(arr) {
-    let n = arr.length;
-    let t;
-    let i;
-
-    while (n) {
-        i = Math.floor(Math.random() * n--);
-
-        t = arr[n];
-        arr[n] = arr[i];
-        arr[i] = t;
-    }
-    return arr;
 }
 
 class SpotifyApi {
@@ -115,9 +101,9 @@ class SpotifyApi {
         return this.getPlaylistTracks(playlistId, ownerId).then((tracks) => {
             if(tracks.length >= noTracks) {
                 if(generated === true) {
-                    return this.getQuestionsGenerated(shuffle(tracks), noTracks);
+                    return this.getQuestionsGenerated(utils.shuffle(tracks), noTracks);
                 } else {
-                    return this.getQuestions(shuffle(tracks), noTracks);
+                    return this.getQuestions(utils.shuffle(tracks), noTracks);
                 }
             } else {
                 throw new Error('Not enough songs in playlist');
@@ -197,7 +183,7 @@ class SpotifyApi {
                     }
                 }
                 artists.push(artistName);
-                artists = shuffle(artists);
+                artists = utils.shuffle(artists);
                 const question = {
                     trackID: track.id,
                     trackName: track.name,

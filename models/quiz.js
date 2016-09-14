@@ -10,6 +10,7 @@ const Quiz = Schema({
     owner: String,
     nbrOfSongs: Number,
     questionIndex: Number,
+    availableColors: [String],
     started: Boolean,
     finished: Boolean,
     playlist: {
@@ -19,6 +20,8 @@ const Quiz = Schema({
     },
     players: [{
         userID: String,
+        color: String,
+        spotify: Boolean,
         answers: [String],
         points: Number
     }],

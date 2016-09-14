@@ -172,20 +172,27 @@ span md-icon {
 .red {
     background: #FF8A80; 
 }
-.gray-text {
+
+.gray-avatar {
     color: #f5f5f5; 
 }
-.green-text {
-    color: #009688;
+.green-avatar {
+    color: #4CAF50;
 }
-.yellow-text {
-    color: #FFEB3B;
+.orange-avatar {
+    color: #FFC107;
 }
-.blue-text {
+.blue-avatar {
     color: #3F51B5; 
 }
-.red-text {
-    color: #F44336; 
+.red-avatar {
+    color: #F44336;
+}
+.purple-avatar {
+    color: #9C27B0;
+}
+.teal-avatar {
+    color: #009688;
 }
 
 footer {

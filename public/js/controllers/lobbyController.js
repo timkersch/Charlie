@@ -20,6 +20,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
                 $scope.owner = quiz.owner;
                 $scope.id = quiz.quizID;
                 $scope.isOwner = charlieProxy.isQuizOwner();
+                $scope.users = quiz.players;
             });
         };
 

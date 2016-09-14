@@ -2,10 +2,26 @@ span {
     margin-left: 7px;
 }
 
+.lobby md-progress-linear .md-container {
+    width: 380px;
+    color: #1ED760;
+}
+
+.lobby md-progress-linear .md-bar {
+    background-color: #1ED760;
+}
+
+.lobby form {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
 span md-icon {
     margin-top: -0.12em;
     margin-right: 0.5em;
 }
+
 
 .dialogdemoBasicUsage #popupContainer {
     position: relative; }

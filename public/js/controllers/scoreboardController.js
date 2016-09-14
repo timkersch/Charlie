@@ -9,57 +9,39 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
     function ($scope, $document, $state, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
-        let canvasChart = $document[0].createElement('canvas');
-        $scope.chart = {
-            values: [],
-            labels: [],
-            colors: ["#F44336", "#9C27B0", "#00BCD4", "#4CAF50", "#FFC107", "#795548"],
-            options: {
-                responsive: false,
-                maintainAspectRatio: false
-            }
-        };
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
         let chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
-        let classColors = ['green-text', 'red-text', 'blue-text', 'yellow-text'];
 
         let init = function () {
-            canvasChart.id = "scoreboardChart";
-            canvasChart.width = "200";
-            canvasChart.height = "200";
-            canvasChart.style = "margin-top: 20px;";
-            let scoreboardCenter = document.getElementById("centerScoreboard");
             charlieProxy.getResults(function (users) {
                 if (users) {
-                    let data = {
-                        labels: [""],
-                        datasets: []
+                    let chartObj = {
+                        type: 'bar',
+                        data: {
+                            labels: [""],
+                            datasets: []
+                        },
+                        options: {}
                     };
 
-
                     $scope.scores = [];
-                    $scope.chart.values = [];
-                    $scope.chart.labels = [];
                     for (let i = 0; i < users.length; i++) {
-                        /*Chart.js need to read data as an array*/
                         let tmpArray = [users[i].points];
-                        data.datasets.push({
+                        chartObj.data.datasets.push({
                             fillColor: chartColors[i],
                             data: tmpArray
                         });
                         $scope.scores.push({
                             value: users[i].points,
                             userName: users[i].userID,
-                            color: classColors[i]
-
+                            color: users[i].color
                         });
                     }
 
                     setTimeout(function () {
-                        scoreboardCenter.insertBefore(canvasChart, scoreboardCenter.firstChild);
-                        let context = canvasChart.getContext("2d");
-                        let scoreboardChart = new Chart(context).Bar(data);
+                        const ctx = document.getElementById("scoreboardChart").getContext("2d");
+                        const scoreboardChart = new Chart(ctx, chartObj);
                         $scope.$apply();
                     }, 50);
 
@@ -84,18 +66,4 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
             $scope.playlistText = "Playlist added";
         };
 
-        $scope.getTextColor = function (index) {
-            switch (index) {
-                case 0:
-                    return 'green-text';
-                case 1:
-                    return 'red-text';
-                case 2:
-                    return 'blue-text';
-                case 3:
-                    return 'yellow-text';
-                default:
-                    return 'grey-text';
-            }
-        };
     }]);

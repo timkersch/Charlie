@@ -3,6 +3,7 @@
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">poll</md-icon>Scoreboard</span></div>
     </md-toolbar>
     <div id="centerScoreboard" ng-cloak style="text-align: center;">
+        <canvas id="scoreboardChart" width="200" height="200"></canvas>
         <br>
         <md-list>
             <md-list-item ng-repeat="person in scores| orderBy:'-value'">

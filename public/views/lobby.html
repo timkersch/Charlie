@@ -1,17 +1,43 @@
 <md-content ng-cloak>
-    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
-        <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">people</md-icon>{{quizname}}</span></div>
-    </md-toolbar>
 
-    <md-label ng-show="isOwner" style="display: block;text-align: center;font-size:2.5em;margin-top: 1em">Your friends can now join {{quizname}} with code <br> <b>{{id}}</b></md-label>
-    <md-label ng-show="!isOwner" style="display: block;text-align: center;font-size:2.5em;margin-top: 1em">Welcome to {{owner}} quiz!</md-label>
+    <hgroup>
+        <h1>Charliequiz - {{quizname}}</h1>
+        <h3 ng-show="isOwner">Users can now join with {{id}}</h3>
+        <h3 ng-show="!isOwner">Welcome to {{owner}} quiz!</h3>
+    </hgroup>
 
     <br>
-    <md-list layout="column" layout-align="center center">
-        <md-list-item ng-repeat="user in users" style="font-size:1.8em;margin-top:10px;">
-            {{user}}
-        </md-list-item>
-    </md-list>
+
+    <div align="center">
+        <h1>Quiz details</h1>
+        <h3>Blah blah</h3>
+    </div>
+
+    <br>
+
+    <div class="lobby">
+        <div align="center">
+            <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
+        <form name="form">
+            <div class="group">
+                <md-list flex>
+                    <md-list-item class="md-3-line" ng-repeat="user in users" ng-disabled="true">
+                        <div class="md-list-item-text" layout="column">
+                            <div class="item">
+                                <h3>{{ user.userID }}</h3>
+                                <p ng-if="user.spotify===true">Joined with Spotify account</p>
+                                <p ng-if="user.spotify===false">Joined with username</p>
+                            </div>
+                            <md-divider ></md-divider>
+                        </div>
+                        <md-icon class="material-icons {{user.color}}">person</md-icon>
+                    </md-list-item>
+                </md-list>
+            </div>
+        </form>
+    </div>
+
     <div class="end" ng-show="isOwner">
         <md-button class="md-primary md-raised" ng-click="startQuiz()">START QUIZ</md-button>
     </div>

@@ -40,8 +40,29 @@ function initArr(size) {
     return answersArray;
 }
 
+function shuffle(arr) {
+    let n = arr.length;
+    let t;
+    let i;
+
+    while (n) {
+        i = Math.floor(Math.random() * n--);
+
+        t = arr[n];
+        arr[n] = arr[i];
+        arr[i] = t;
+    }
+    return arr;
+}
+
+function getColors() {
+    return shuffle(['green-avatar', 'orange-avatar', 'blue-avatar', 'red-avatar', 'purple-avatar', 'teal-avatar'])
+}
+
 module.exports = {
     countDown: countDown,
     generateUID: generateUID,
-    initArr: initArr
+    initArr: initArr,
+    getColors: getColors,
+    shuffle: shuffle
 };

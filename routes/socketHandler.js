@@ -82,6 +82,8 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             storage.quizID = uid;
                             sessionStore.set(session_id, storage);
 
+                            const colors = utils.getColors();
+
                             const newQuiz = new Quiz({
                                 quizID: uid,
                                 name: quizDetails.name,
@@ -89,6 +91,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 owner: storage.user,
                                 playlistOwner: quizDetails.playlistOwner,
                                 nbrOfSongs: quizDetails.nbrOfSongs,
+                                availableColors: colors.splice(1, colors.length),
                                 started: false,
                                 finished: false,
                                 playlist: {
@@ -100,6 +103,8 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                     userID: storage.user,
                                     answers: utils.initArr(quizDetails.nbrOfSongs),
                                     points: 0,
+                                    color: colors[0],
+                                    spotify: true
                                 }]
                             });
                             newQuiz.questions = result;
@@ -110,6 +115,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             });
                             quizDetails.quizID = uid;
                             quizDetails.owner = storage.user;
+                            quizDetails.players = newQuiz.players;
                             socket.emit('createQuizCallback', quizDetails);
                         }).catch((err) => {
                             socket.emit('createQuizCallback', {error: 'Could not create quiz. Try reducing the number of questions'});
@@ -141,7 +147,16 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 storage.quizID = room;
                                 sessionStore.set(session_id, storage);
 
-                                quiz.players.push({userID: storage.user, answers: utils.initArr(quiz.nbrOfSongs), points: 0});
+                                const userColor = quiz.availableColors[0];
+                                quiz.availableColors = quiz.availableColors.splice(1, quiz.availableColors.length);
+                                const player = {
+                                    userID: storage.user,
+                                    color: userColor,
+                                    spotify: data.username ? false : true,
+                                    answers: utils.initArr(quiz.nbrOfSongs),
+                                    points: 0
+                                };
+                                quiz.players.push(player);
                                 quiz.save(function (err) {
                                     if (err) {
                                         console.log('error when saving quiz!', err);
@@ -160,7 +175,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 });
 
                                 // Emit to room that user with name joined
-                                io.to(room).emit('userJoined', storage.user);
+                                io.to(room).emit('userJoined', player);
                             } else {
                                 if(quiz.started === true) {
                                     socket.emit('joinQuizCallback', {error: {invalid: 'Quiz already started!'}});
@@ -182,6 +197,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 if (quiz.started === false) {
                                     quiz.questionIndex = 0;
                                     quiz.started = true;
+                                    console.log('emitted start');
                                     io.to(storage.quizID).emit('quizStart');
                                 } else {
                                     quiz.questionIndex++;

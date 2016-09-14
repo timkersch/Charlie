@@ -5,7 +5,7 @@
 require('../../css/partials/join.css');
 
 angular.module('charlieController').controller('joinController', ['$scope', '$state', 'charlieProxy',
-    function ($scope, $location, charlieProxy) {
+    function ($scope, $state, charlieProxy) {
         console.log("Joincontroller");
 
         $scope.fetching = false;
