@@ -1,0 +1,50 @@
+<div layout="row">
+    <md-toolbar class="md-toolbar-tools md-primary md-hue-1">
+        <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
+            <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
+        </md-button>
+        <h2>Charlie</h2>
+        <span flex="" class="flex"></span>
+        <span>{{user}}</span>
+        <md-button ng-show="!user" ng-click="login()">Login</md-button>
+        <md-button ng-show="user" ng-click="logout()">Logout</md-button>
+    </md-toolbar>
+
+    <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
+        <md-toolbar ng-click="toggleLeftMenu()">
+            <div layout="row" layout-padding>
+                <h2 class="md-toolbar-tools">Menu</h2>
+            </div>
+        </md-toolbar>
+
+        <md-list>
+            <md-list-item ng-click="changeView('home')" class="ng-scope" layout="row" layout-align="start center">
+                <div class="inset">
+                    <md-icon class="material-icons">home</md-icon>
+                </div>
+                <div class="inset ng-binding">Home</div>
+                <div class="md-ripple-container"></div>
+            </md-list-item>
+
+            <md-list-item ng-click="changeView('create')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
+                <div class="inset">
+                    <md-icon class="material-icons">fiber_new</md-icon>
+                </div>
+                <div class="inset ng-binding">New Quiz</div>
+                <div class="md-ripple-container"></div>
+            </md-list-item>
+
+            <md-list-item ng-click="changeView('profile')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
+                <div class="inset">
+                    <md-icon class="material-icons">person</md-icon>
+                </div>
+                <div class="inset ng-binding">Profile</div>
+                <div class="md-ripple-container"></div>
+            </md-list-item>
+
+        </md-list>
+    </md-sidenav>
+
+    <div ui-view></div>
+
+</div>

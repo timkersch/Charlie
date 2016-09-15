@@ -25,7 +25,6 @@ require('./controllers/createNavController');
 require('./controllers/joinController');
 require('./controllers/lobbyController');
 require('./controllers/mainController');
-require('./controllers/homeController')
 require('./controllers/profileController');
 require('./controllers/questionController');
 require('./controllers/scoreboardController');
@@ -45,16 +44,20 @@ charlieApp.config(function($mdThemingProvider) {
 charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $stateProvider
 
-        .state('homeLoggedOut', {
+        .state('main', {
             url: '/',
-            templateUrl: '../views/homeLoggedOut.html',
+            templateUrl: '../views/main.html',
             controller: 'mainController',
+            abstract: true,
         })
 
-        .state('homeLoggedIn', {
+        .state('main.loggedOut', {
+            templateUrl: '../views/homeLoggedOut.html',
+        })
+
+        .state('main.loggedIn', {
             url: '/home',
             templateUrl: '../views/homeLoggedIn.html',
-            controller: 'homeController',
         })
 
         .state('lobby', {
@@ -123,6 +126,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
 
 
     $urlRouterProvider.when("/create", "/create/simple");
+    $urlRouterProvider.when("", "/");
     $urlRouterProvider.otherwise('/');
     $locationProvider.html5Mode(true);
 

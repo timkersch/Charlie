@@ -8,11 +8,15 @@
     <br>
 
     <div id="center">
-        <md-button class="md-raised md-primary" ng-click="changeView('create.choosePlaylist')">Create quiz</md-button>
+        <a ui-sref="create.choosePlaylist">
+            <md-button class="md-raised md-primary">Create quiz</md-button>
+        </a>
 
         <h3>or</h3>
 
-        <md-button class="md-raised md-primary" ng-click="changeView('join')">Join quiz</md-button>
+        <a ui-sref="join">
+            <md-button class="md-raised md-primary">Join quiz</md-button>
+        </a>
     </div>
 
     <footer>
