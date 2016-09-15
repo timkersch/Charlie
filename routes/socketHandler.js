@@ -282,6 +282,17 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 });
             });
 
+            socket.on('getUser', function (userId) {
+               console.log('in getUser', userId);
+                sessionStore.load(session_id, function (err, storage) {
+                    if(userId === storage.user) {
+                        socket.emit('getUserCallback', userId);
+                    } else {
+                        socket.emit('getUserCallback', {error: 'No such user!'});
+                    }
+                })
+            });
+
             socket.on('isQuizStarted', function () {
                 console.log("in isQuizStarted");
                 sessionStore.load(session_id, function (err, storage) {

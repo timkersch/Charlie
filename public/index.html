@@ -26,38 +26,34 @@
     <md-sidenav layout="column" md-component-id="left" class="md-sidenav-left">
         <md-toolbar ng-click="toggleLeftMenu()">
             <div layout="row" layout-padding>
-                <h1 class="md-toolbar-tools">Menu</h1>
+                <h2 class="md-toolbar-tools">Menu</h2>
             </div>
         </md-toolbar>
 
         <md-list>
                 <md-list-item ng-click="changeView('home')" class="ng-scope" layout="row" layout-align="start center">
                     <div class="inset">
-                        <md-icon aria-label="Menu" class="material-icons">home</md-icon>
+                        <md-icon class="material-icons">home</md-icon>
                     </div>
                     <div class="inset ng-binding">Home</div>
                     <div class="md-ripple-container"></div>
                 </md-list-item>
 
-            <a ui-sref="create">
                 <md-list-item ng-click="changeView('create')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
                     <div class="inset">
-                        <md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>
+                        <md-icon class="material-icons">fiber_new</md-icon>
                     </div>
                     <div class="inset ng-binding">New Quiz</div>
                     <div class="md-ripple-container"></div>
                 </md-list-item>
-            </a>
 
-            <a ui-sref="profile">
                 <md-list-item ng-click="changeView('profile')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
                     <div class="inset">
-                        <md-icon aria-label="Menu" class="material-icons">person</md-icon>
+                        <md-icon class="material-icons">person</md-icon>
                     </div>
                     <div class="inset ng-binding">Profile</div>
                     <div class="md-ripple-container"></div>
                 </md-list-item>
-            </a>
 
         </md-list>
     </md-sidenav>

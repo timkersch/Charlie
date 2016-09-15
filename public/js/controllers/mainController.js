@@ -28,7 +28,7 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             } else if(viewString === 'profile') {
                 $state.go('profile');
             } else if(viewString === 'create') {
-                $state.go('create');
+                $state.go('create.choosePlaylist');
             }
         };
 

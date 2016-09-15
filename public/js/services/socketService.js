@@ -21,22 +21,17 @@ charlieService.factory('charlieProxy', ['$rootScope',
             if (sessionStorage.getItem('user')) {
                 // User in storage
                 user = sessionStorage.getItem('user');
+                console.log('have a user!', user);
                 // Get the user data
-                socket.emit('setUser', user.id);
-                socket.on('setUserCallback', function(data) {
-                    // If we got no such user
-                    if(!data) {
-                        sessionStorage.user = "";
-                        setReady();
-                        // Found user
+                socket.emit('getUser', user);
+                socket.on('getUserCallback', function(data) {
+
+                    if(!data || data.error) {
+                        sessionStorage.clear();
                     } else {
-                        // Get the users quiz
-                        socket.emit('getQuiz');
-                        socket.on('getQuizCallback', function(quiz) {
-                            currentQuiz = quiz;
-                            setReady();
-                        });
+                        // TODO Check current quiz and get relevant data
                     }
+                    setReady();
                 });
             } else {
                 setReady();
@@ -49,6 +44,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
         });
 
         let setReady = function () {
+            console.log('set as ready!');
             isReady = true;
             for (let i = 0; i < readyCallbacks.length; i++) {
                 readyCallbacks[i]();
@@ -66,6 +62,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 return isReady;
             },
             onReady: function (callback) {
+                console.log('in here', isReady);
                 if (!isReady)
                     readyCallbacks.push(callback);
                 else
@@ -145,8 +142,10 @@ charlieService.factory('charlieProxy', ['$rootScope',
 
             // callback(lists)
             getPlaylists: function (callback) {
+                console.log('emitted get playlist');
                 socket.emit('getPlaylists');
                 socket.on('getPlaylistsCallback', function(data) {
+                    console.log('got', data);
                     callback(data);
                     $rootScope.$apply();
                 });

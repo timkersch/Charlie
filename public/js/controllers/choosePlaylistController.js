@@ -15,6 +15,7 @@ angular.module('charlieController').controller('choosePlaylistController', ['$sc
         };
 
         charlieProxy.onReady(function () {
+            console.log('is ready');
             init();
         });
 

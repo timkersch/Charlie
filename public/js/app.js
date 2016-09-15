@@ -25,6 +25,7 @@ require('./controllers/createNavController');
 require('./controllers/joinController');
 require('./controllers/lobbyController');
 require('./controllers/mainController');
+require('./controllers/homeController')
 require('./controllers/profileController');
 require('./controllers/questionController');
 require('./controllers/scoreboardController');
@@ -51,9 +52,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
         })
 
         .state('homeLoggedIn', {
-            url: '/',
+            url: '/home',
             templateUrl: '../views/homeLoggedIn.html',
-            controller: 'mainController',
+            controller: 'homeController',
         })
 
         .state('lobby', {
