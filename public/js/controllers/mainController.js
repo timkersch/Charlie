@@ -21,9 +21,9 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
         $scope.changeView = function (viewString) {
             if(viewString === 'home') {
                 if(charlieProxy.isLoggedIn()) {
-                    $state.go('homeLoggedIn');
+                    $state.go('main.loggedIn');
                 } else {
-                    $state.go('homeLoggedOut');
+                    $state.go('main.loggedOut');
                 }
             } else if(viewString === 'profile') {
                 $state.go('profile');
@@ -42,7 +42,7 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
                     charlieProxy.login(sessionStorage.getItem('code'), function (user) {
                         if(user) {
                             $scope.user = user;
-                            $state.go('homeLoggedIn');
+                            $state.go('main.loggedIn');
                         } else {
                             alert('User already logged in!');
                         }
@@ -66,7 +66,7 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
         $scope.logout = function () {
             $scope.user = '';
             charlieProxy.logout();
-            $state.go('homeLoggedOut');
+            $state.go('main.loggedOut');
         };
 
     }]);

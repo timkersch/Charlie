@@ -45,19 +45,33 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
     $stateProvider
 
         .state('main', {
-            url: '/',
-            templateUrl: '../views/main.html',
-            controller: 'mainController',
+            url: '',
+            views: {
+                'header': {
+                    templateUrl: '../views/main.html',
+                    controller: 'mainController'
+                },
+            },
             abstract: true,
         })
 
         .state('main.loggedOut', {
-            templateUrl: '../views/homeLoggedOut.html',
+            url: '/',
+            views: {
+                'container@': {
+                    templateUrl: '../views/homeLoggedOut.html',
+                    controller: 'mainController'
+                }
+            },
         })
 
         .state('main.loggedIn', {
             url: '/home',
-            templateUrl: '../views/homeLoggedIn.html',
+            views: {
+                'container@': {
+                    templateUrl: '../views/homeLoggedIn.html'
+                }
+            },
         })
 
         .state('lobby', {
@@ -126,7 +140,6 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
 
 
     $urlRouterProvider.when("/create", "/create/simple");
-    $urlRouterProvider.when("", "/");
     $urlRouterProvider.otherwise('/');
     $locationProvider.html5Mode(true);
 
