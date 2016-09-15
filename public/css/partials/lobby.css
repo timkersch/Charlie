@@ -4,11 +4,6 @@ span {
 
 .lobby md-progress-linear .md-container {
     width: 380px;
-    color: #1ED760;
-}
-
-.lobby md-progress-linear .md-bar {
-    background-color: #1ED760;
 }
 
 .lobby form {

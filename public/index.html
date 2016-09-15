@@ -12,7 +12,7 @@
 <body ng-app="charlieApp">
 <div layout="row" ng-controller="mainController">
     <script type="text/javascript" src="./dist/bundle.js" charset="utf-8"></script>
-    <md-toolbar class="md-toolbar-tools">
+    <md-toolbar class="md-toolbar-tools md-primary md-hue-1">
         <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleLeftMenu()">
             <md-icon aria-label="Menu" class="material-icons">menu</md-icon>
         </md-button>
@@ -31,7 +31,7 @@
         </md-toolbar>
 
         <md-list>
-                <md-list-item ng-click="home()" class="ng-scope" layout="row" layout-align="start center">
+                <md-list-item ng-click="changeView('home')" class="ng-scope" layout="row" layout-align="start center">
                     <div class="inset">
                         <md-icon aria-label="Menu" class="material-icons">home</md-icon>
                     </div>
@@ -40,7 +40,7 @@
                 </md-list-item>
 
             <a ui-sref="create">
-                <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
+                <md-list-item ng-click="changeView('create')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
                     <div class="inset">
                         <md-icon aria-label="Menu" class="material-icons">fiber_new</md-icon>
                     </div>
@@ -50,7 +50,7 @@
             </a>
 
             <a ui-sref="profile">
-                <md-list-item class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
+                <md-list-item ng-click="changeView('profile')" class="ng-scope" layout="row" layout-align="start center" ng-show="isLoggedIn()">
                     <div class="inset">
                         <md-icon aria-label="Menu" class="material-icons">person</md-icon>
                     </div>

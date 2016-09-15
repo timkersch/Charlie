@@ -1,12 +1,17 @@
 <md-content ng-cloak>
-    <md-toolbar md-scroll-shrink id="lobby" class="md-accent md-hue-2">
+
+    <md-toolbar md-scroll-shrink id="lobby" class="md-primary">
         <div class="md-toolbar-tools"><span><md-icon aria-label="Menu" class="material-icons">hearing</md-icon>Who's the artist?</span></div>
     </md-toolbar>
+
+    <br />
+
     <div ng-cloak>
         <h3 class="detValue"><span ng-show="showScores && currentQuestion < lastQuestion">Next question in </span>{{timeLeft}}</h3>
-        <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        <md-progress-linear class="md-accent" md-mode="indeterminate"></md-progress-linear>
         <br />
     </div>
+
     <md-grid-list md-cols="2" md-row-height="50px" ng-show="showScores">
         <md-grid-tile>
             <h3>Your guess is</h3>
@@ -15,23 +20,32 @@
             <h3>Correct answer is</h3>
         </md-grid-tile>
         <md-grid-tile>
-            <h4 class="blue-text">{{myAnswer}}</h4>
+            <h4>{{myAnswer}}</h4>
         </md-grid-tile>
         <md-grid-tile>
-            <h4 class="green-text">{{correctAnswer}}</h4>
+            <h4>{{correctAnswer}}</h4>
         </md-grid-tile>
     </md-grid-list>
-    <center ng-show="showScores">
-        <md-list>
-            <md-list-item ng-repeat="player in players| orderBy:'-points'">
-                <p style="font-weight: 900;text-align:right;padding-right:40px;" class="{{getTextColor($index)}}">
-                <md-icon aria-label="Menu" class="material-icons {{player.color}}">person</md-icon>
-                {{player.userID}}
-                </p>
-                <p>{{player.points}} {{player.points == 1 ? "point" : "points"}}</p>
-            </md-list-item>
-        </md-list>
-    </center>
+
+    <div class="question" ng-show="showScores">
+        <form name="form">
+            <div class="group">
+                <md-list flex>
+                    <md-list-item class="md-3-line" ng-repeat="player in players | orderBy:'-points'" ng-disabled="true">
+                        <div class="md-list-item-text" layout="column">
+                            <div class="item">
+                                <h3>{{player.points}} - {{ player.userID }}</h3>
+                                <p> Some information</p>
+                            </div>
+                            <md-divider ></md-divider>
+                        </div>
+                        <md-icon class="material-icons {{player.color}}">person</md-icon>
+                    </md-list-item>
+                </md-list>
+            </div>
+        </form>
+    </div>
+
     <md-grid-list md-cols-xs="2" md-cols-sm="2" md-cols-md="4" md-cols-gt-md="4" ng-show="!showScores"
                   md-row-height-gt-md="4:4" md-row-height="2:2" md-gutter="0" md-gutter-gt-sm="0">
         <md-grid-tile ng-repeat="artist in possibleArtists" class="{{getColor($index)}}" id={{retriveCursor()}}

@@ -33,8 +33,8 @@ charlieApp.config(function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('indigo', {
             'default': '500',
-            'hue-1': '700', // use shade 100 for the <code>md-hue-1</code> class
-            'hue-2': '300', // use shade 600 for the <code>md-hue-2</code> class
+            'hue-1': '800',
+            'hue-2': '300',
         })
         .accentPalette('green', {
             'default': 'A400'

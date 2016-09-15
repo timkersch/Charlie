@@ -18,11 +18,17 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             return charlieProxy.isLoggedIn();
         };
 
-        $scope.home = function () {
-            if(charlieProxy.isLoggedIn()) {
-                $state.go('homeLoggedIn');
-            } else {
-                $state.go('homeLoggedOut');
+        $scope.changeView = function (viewString) {
+            if(viewString === 'home') {
+                if(charlieProxy.isLoggedIn()) {
+                    $state.go('homeLoggedIn');
+                } else {
+                    $state.go('homeLoggedOut');
+                }
+            } else if(viewString === 'profile') {
+                $state.go('profile');
+            } else if(viewString === 'create') {
+                $state.go('create');
             }
         };
 

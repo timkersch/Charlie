@@ -80,10 +80,6 @@ input {
     border-bottom: 1px solid #757575;
 }
 
-/*md-toolbar .md-toolbar-tools {*/
-    /*background-color: #1ED760;*/
-/*}*/
-
 input:focus::-webkit-input-placeholder { color:transparent; }
 input:focus:-moz-placeholder { color:transparent; }
 input:focus::-moz-placeholder { color:transparent; }
