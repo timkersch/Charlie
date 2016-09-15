@@ -29,6 +29,18 @@ require('./controllers/profileController');
 require('./controllers/questionController');
 require('./controllers/scoreboardController');
 
+charlieApp.config(function($mdThemingProvider) {
+    $mdThemingProvider.theme('default')
+        .primaryPalette('indigo', {
+            'default': '500',
+            'hue-1': '700', // use shade 100 for the <code>md-hue-1</code> class
+            'hue-2': '300', // use shade 600 for the <code>md-hue-2</code> class
+        })
+        .accentPalette('green', {
+            'default': 'A400'
+        });
+});
+
 charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $stateProvider
 

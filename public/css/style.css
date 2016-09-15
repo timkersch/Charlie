@@ -80,6 +80,10 @@ input {
     border-bottom: 1px solid #757575;
 }
 
+/*md-toolbar .md-toolbar-tools {*/
+    /*background-color: #1ED760;*/
+/*}*/
+
 input:focus::-webkit-input-placeholder { color:transparent; }
 input:focus:-moz-placeholder { color:transparent; }
 input:focus::-moz-placeholder { color:transparent; }
@@ -95,25 +99,6 @@ md-list {
 
 .menu {
     cursor: pointer;
-}
-
-md-toast {
-    min-width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    z-index: 100;
-}
-
-.md-toast-content {
-    min-width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 1em;
-    min-height: 100px;
-    max-height: 100px;
-    height: 100px;
-    z-index: 100;
 }
 
 md-content {
@@ -158,19 +143,19 @@ span md-icon {
 }
 
 .gray {
-    background: #f5f5f5; 
+    background: #E0E0E0;
 }
 .green {
-    background: #80CBC4; 
+    background: #66BB6A;
 }
 .yellow {
-    background: #FFEB3B;
+    background: #FFEE58;
 }
 .blue {
-    background: #8C9EFF; 
+    background: #42A5F5;
 }
 .red {
-    background: #FF8A80; 
+    background: #EF5350;
 }
 
 .gray-avatar {
