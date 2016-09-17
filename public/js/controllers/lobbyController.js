@@ -16,6 +16,7 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
 
         let init = function () {
             charlieProxy.getQuiz(function (quiz) {
+                console.log(quiz.players);
                 $scope.quizname = quiz.name;
                 $scope.owner = quiz.owner;
                 $scope.id = quiz.quizID;
@@ -41,8 +42,9 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
         };
 
         charlieProxy.quizStart(function() {
+            console.log('in here');
             $scope.$apply(function () {
-                $state.go('question');
+                $state.go('main.question');
             });
         });
 

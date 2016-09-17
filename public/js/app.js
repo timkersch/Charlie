@@ -24,6 +24,7 @@ require('./controllers/createFromPlaylistController');
 require('./controllers/createNavController');
 require('./controllers/joinController');
 require('./controllers/lobbyController');
+require('./controllers/homeController');
 require('./controllers/mainController');
 require('./controllers/profileController');
 require('./controllers/questionController');
@@ -60,7 +61,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             views: {
                 'container@': {
                     templateUrl: '../views/homeLoggedOut.html',
-                    controller: 'mainController'
+                    controller: 'homeController'
                 }
             },
         })
@@ -74,68 +75,112 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             },
         })
 
-        .state('lobby', {
+        .state('main.lobby', {
             url: '/lobby',
-            templateUrl: '../views/lobby.html',
-            controller: 'lobbyController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/lobby.html',
+                    controller: 'lobbyController'
+                }
+            },
         })
 
-        .state('join', {
+        .state('main.join', {
             url: '/join',
-            templateUrl: '../views/join.html',
-            controller: 'joinController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/join.html',
+                    controller: 'joinController'
+                }
+            },
         })
 
-        .state('profile', {
+        .state('main.profile', {
             url: '/profile',
-            templateUrl: '../views/profile.html',
-            controller: 'profileController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/profile.html',
+                    controller: 'profileController'
+                }
+            },
         })
 
-        .state('scoreboard', {
+        .state('main.scoreboard', {
             url: '/scoreboard',
-            templateUrl: '../views/scoreboard.html',
-            controller: 'scoreboardController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/scoreboard.html',
+                    controller: 'scoreboardController'
+                }
+            },
         })
 
-        .state('question', {
+        .state('main.question', {
             url: '/question',
-            templateUrl: '../views/question.html',
-            controller: 'questionController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/question.html',
+                    controller: 'questionController'
+                }
+            },
         })
 
-        .state('create', {
+        .state('main.create', {
             url: '/create',
-            templateUrl: '../views/createNavBar.html',
-            controller: 'createNavController',
+            views: {
+                'container@': {
+                    templateUrl: '../views/createNavBar.html',
+                    controller: 'createNavController'
+                }
+            },
             abstract: true
         })
 
-        .state('create.choosePlaylist', {
+        .state('main.create.choosePlaylist', {
             url: '/simple',
-            controller: 'choosePlaylistController',
-            templateUrl: '../views/choosePlaylist.html',
+            views: {
+                'container@main.create': {
+                    templateUrl: '../views/choosePlaylist.html',
+                    controller: 'choosePlaylistController'
+                }
+            },
         })
 
-        .state('create.fromPlaylist', {
+        .state('main.create.fromPlaylist', {
             url: '/simple/:owner/:id',
-            controller: 'createFromPlaylistController',
-            templateUrl: '../views/createFromPlaylist.html',
+            views: {
+                'container@main.create': {
+                    templateUrl: '../views/createFromPlaylist.html',
+                    controller: 'createFromPlaylistController'
+                }
+            }
         })
 
-        .state('create.generateFromPlaylist', {
+        .state('main.create.generateFromPlaylist', {
             url: '/generate',
-            templateUrl: '../views/generateFromPlaylist.html',
+            views: {
+                'container@main.create': {
+                    templateUrl: '../views/generateFromPlaylist.html'
+                }
+            }
         })
 
-        .state('create.createFromFeatured', {
+        .state('main.create.createFromFeatured', {
             url: '/featured',
-            templateUrl: '../views/createFromFeatured.html',
+            views: {
+                'container@main.create': {
+                    templateUrl: '../views/createFromFeatured.html'
+                }
+            }
         })
 
-        .state('create.createFromPopular', {
+        .state('main.create.createFromPopular', {
             url: '/popular',
-            templateUrl: '../views/createFromPopular.html',
+            views: {
+                'container@main.create': {
+                    templateUrl: '../views/createFromPopular.html'
+                }
+            }
         });
 
 

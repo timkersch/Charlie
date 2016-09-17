@@ -20,7 +20,7 @@ angular.module('charlieController').controller('createFromPlaylistController', [
                 if(!quiz || quiz.error) {
                     alert(quiz.error);
                 } else {
-                    $state.go('lobby');
+                    $state.go('main.lobby');
                 }
             });
         };

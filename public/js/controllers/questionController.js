@@ -51,7 +51,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
         });
 
         charlieProxy.gameOver(function() {
-            $state.go('scoreboard');
+            $state.go('main.scoreboard');
         });
 
         charlieProxy.userPointsUpdate(function (player) {

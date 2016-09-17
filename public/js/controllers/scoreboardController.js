@@ -56,8 +56,13 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
         });
 
         $scope.changeView = function () {
-            charlieProxy.leaveQuiz();
-            $state.go('homeLoggedIn');
+            // TODO
+            //charlieProxy.leaveQuiz();
+            if(charlieProxy.isLoggedIn()) {
+                $state.go('main.loggedIn');
+            } else {
+                $state.go('main.loggedOut');
+            }
         };
 
         $scope.savePlaylist = function () {

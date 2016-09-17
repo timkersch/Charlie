@@ -15,12 +15,11 @@ angular.module('charlieController').controller('choosePlaylistController', ['$sc
         };
 
         charlieProxy.onReady(function () {
-            console.log('is ready');
             init();
         });
 
         $scope.choosePlaylist = function(playlist) {
-            $state.go('create.fromPlaylist', {id: playlist.id, owner: playlist.playlistOwner});
+            $state.go('main.create.fromPlaylist', {id: playlist.id, owner: playlist.playlistOwner});
         };
 
     }]);

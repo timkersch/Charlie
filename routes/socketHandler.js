@@ -35,6 +35,13 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
         let session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
 
         if (session_id) {
+
+            sessionStore.load(session_id, function(err, storage) {
+                if(storage.quizID) {
+                    socket.join(storage.quizID);
+                }
+            });
+
             socket.on('getLoginURL', function () {
                 console.log("in getURL");
                 const url = spotify.getRedirectURL();
@@ -197,7 +204,6 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 if (quiz.started === false) {
                                     quiz.questionIndex = 0;
                                     quiz.started = true;
-                                    console.log('emitted start');
                                     io.to(storage.quizID).emit('quizStart');
                                 } else {
                                     quiz.questionIndex++;
@@ -305,7 +311,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             socket.on('getQuiz', function () {
                 console.log("in getQuiz");
                 sessionStore.load(session_id, function (err, storage) {
-                    Quiz.findOne({'quizID': storage.quizID}, '-players -questions', function (err, quiz) {
+                    Quiz.findOne({'quizID': storage.quizID}, '-questions', function (err, quiz) {
                         socket.emit('getQuizCallback', quiz);
                     });
                 });

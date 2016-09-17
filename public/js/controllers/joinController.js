@@ -16,7 +16,7 @@ angular.module('charlieController').controller('joinController', ['$scope', '$st
             charlieProxy.joinQuiz({username: $scope.displayName, room: $scope.joinCode}, function(result) {
                 $scope.fetching = false;
                 if(result && !result.error) {
-                    $state.go('lobby');
+                    $state.go('main.lobby');
                 } else {
                     $scope.serverErrors = result.error;
                 }

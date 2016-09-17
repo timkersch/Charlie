@@ -6,9 +6,8 @@ require('../../css/partials/home.css');
 
 angular.module('charlieController').controller('mainController', ['$scope', '$state', '$mdSidenav', 'charlieProxy',
     function ($scope, $state, $mdSidenav, charlieProxy) {
-        console.log('in controller');
+        console.log('in mainController');
         $scope.user = '';
-        $scope.url = '';
 
         $scope.toggleLeftMenu = function () {
             $mdSidenav('left').toggle();
@@ -26,9 +25,9 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
                     $state.go('main.loggedOut');
                 }
             } else if(viewString === 'profile') {
-                $state.go('profile');
+                $state.go('main.profile');
             } else if(viewString === 'create') {
-                $state.go('create.choosePlaylist');
+                $state.go('main.create.choosePlaylist');
             }
         };
 
@@ -37,21 +36,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
                 charlieProxy.getUser(function (user) {
                     $scope.user = user;
                 });
-            } else {
-                if (sessionStorage.getItem('code')) {
-                    charlieProxy.login(sessionStorage.getItem('code'), function (user) {
-                        if(user) {
-                            $scope.user = user;
-                            $state.go('main.loggedIn');
-                        } else {
-                            alert('User already logged in!');
-                        }
-                    });
-                } else {
-                    charlieProxy.getLoginUrl(function (url) {
-                        $scope.url = url;
-                    });
-                }
             }
         };
 
@@ -59,14 +43,17 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             init();
         });
 
-        $scope.login = function () {
-            window.open($scope.url, '_self');
-        };
-
         $scope.logout = function () {
             $scope.user = '';
             charlieProxy.logout();
+            sessionStorage.clear();
             $state.go('main.loggedOut');
         };
+
+        $scope.$on('loggedIn', function(event, args) {
+            $state.user = charlieProxy.getUser(function (user) {
+                $scope.user = user;
+            });
+        });
 
     }]);
