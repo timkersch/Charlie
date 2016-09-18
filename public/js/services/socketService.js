@@ -6,7 +6,7 @@ const io = require('socket.io-client');
 
 module.exports =
     function ($rootScope) {
-        const socket = io.connect();
+        const socket = io();
         let isReady = false;
         let readyCallbacks = [];
         let user = '';

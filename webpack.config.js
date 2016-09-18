@@ -2,7 +2,6 @@
  * Created by Tim on 12/09/16.
  */
 
-var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
@@ -23,24 +22,18 @@ module.exports = {
 
         loaders: [
             {
+                test: /\.js$/,
+                loader: 'babel',
+                exclude: /node_modules/,
+                query: {
+                    presets: ['es2015']
+                }
+            },
+
+            {
                 test: /\.css$/,
                 loader: "style-loader!css-loader"
             },
-
-            {
-                test: /\.(jpe?g|png|gif|svg)$/i,
-                loader:'file'
-            },
-
-            {
-                test: /\.(jpe?g|png|gif|svg|eot|woff|ttf|svg|woff2)$/,
-                loader: "file?name=[name].[ext]"
-            },
-
-            {
-                test: /\.html$/,
-                loader: "html-loader"
-            }
         ]
     },
     jshint: {
@@ -50,7 +43,7 @@ module.exports = {
         undef: true,
         unused: true,
         browser: true,
-        predef: [ "console", "alert"]
+        predef: [ "console", "angular", "alert"]
     },
     debug: true,
     devtool: 'eval',

@@ -1,11 +1,16 @@
-const angular = require('angular');
+require('angular');
 require('../css/style.css');
 require('angular-material/angular-material.css');
+require('angular-material');
 require('angular-messages');
 require('angular-ui-router');
 require('angular-material');
 
 const charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial', 'ngMessages']);
+
+const charlieProxy = require('./services/socketService');
+charlieApp.service('charlieProxy', charlieProxy);
+charlieProxy.$inject = ['$rootScope'];
 
 const choosePlaylistController = require('./controllers/choosePlaylistController');
 const createFromPlaylistController = require('./controllers/createFromPlaylistController');
@@ -17,10 +22,6 @@ const mainController = require('./controllers/mainController');
 const profileController = require('./controllers/profileController');
 const questionController = require('./controllers/questionController');
 const scoreboardController = require('./controllers/scoreboardController');
-const charlieProxy = require('./services/socketService');
-
-charlieApp.service('charlieProxy', charlieProxy);
-charlieProxy.$inject = ['$rootScope'];
 
 charlieApp.controller('choosePlaylistController', choosePlaylistController);
 charlieApp.controller('createFromPlaylistController', createFromPlaylistController);

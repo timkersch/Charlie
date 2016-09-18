@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node app.js",
-    "build": "webpack -p --config ./webpack.prod.config.js --progress --colors",
+    "prod": "webpack -p --config ./webpack.prod.config.js --progress --colors",
     "dev": "webpack --config ./webpack.config.js --progress --colors"
   },
   "dependencies": {

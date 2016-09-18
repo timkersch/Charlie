@@ -2,7 +2,6 @@
  * Created by Tim on 18/09/16.
  */
 
-var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
@@ -15,10 +14,19 @@ module.exports = {
     plugins: [
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin({
+            beautify: false,
+            comments: false,
             minimize: true,
+
+            mangle: {
+                screw_ie8: true,
+                keep_fnames: false,
+            },
+
             compress: {
-                warnings: false
-            }
+                warnings: false,
+                drop_console: true
+            },
         }),
         new webpack.DefinePlugin({
             'process.env': {
@@ -28,22 +36,7 @@ module.exports = {
     ],
 
     module: {
-        preLoaders: [
-            {
-                test: /\.(js|css|html)$/,
-                exclude: /node_modules/,
-                loader: "stripcomment"
-            },
-
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: "webpack-strip?strip[]=debug,strip[]=console.log"
-            }
-        ],
-
         loaders: [
-
             {
                 test: /\.js$/,
                 loader: 'babel',
@@ -52,26 +45,10 @@ module.exports = {
                     presets: ['es2015']
                 }
             },
-
-            {
-                test: /\.html$/,
-                loader: "html-loader"
-            },
-
             {
                 test: /\.css$/,
                 loader: "style-loader!css-loader"
             },
-
-            {
-                test: /\.(jpe?g|png|gif|svg)$/i,
-                loader:'file'
-            },
-
-            {
-                test: /\.(jpe?g|png|gif|svg|eot|woff|ttf|svg|woff2)$/,
-                loader: "file?name=[name].[ext]"
-            }
         ]
     },
     devtool: 'source-map'
