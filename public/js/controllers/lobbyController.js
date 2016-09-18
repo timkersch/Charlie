@@ -8,20 +8,27 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
     function ($scope, $state, charlieProxy) {
         console.log("LobbyController!");
 
-        $scope.quizname = "Quiz";
-        $scope.id = "Id";
-        $scope.users = [];
-        $scope.isOwner = false;
+        $scope.quizname = '';
         $scope.owner = '';
+        $scope.id = '';
+        $scope.isOwner = false;
+        $scope.players = [];
+        $scope.nbrOfSongs = 0;
+        $scope.generated = false;
+        $scope.playlistName = '';
+        $scope.playlisOwner = '';
 
         let init = function () {
             charlieProxy.getQuiz(function (quiz) {
-                console.log(quiz.players);
                 $scope.quizname = quiz.name;
                 $scope.owner = quiz.owner;
                 $scope.id = quiz.quizID;
                 $scope.isOwner = charlieProxy.isQuizOwner();
-                $scope.users = quiz.players;
+                $scope.players = quiz.players;
+                $scope.nbrOfSongs = quiz.nbrOfSongs;
+                $scope.generated = quiz.playlist.generated;
+                $scope.playlistName = quiz.playlist.name;
+                $scope.playlisOwner = quiz.playlist.owner;
             });
         };
 
@@ -31,7 +38,18 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
 
         charlieProxy.userJoined(function(user) {
             $scope.$apply(function () {
-                $scope.users.push(user);
+                $scope.players.push(user);
+            });
+        });
+
+        charlieProxy.userLeft(function(user) {
+            $scope.$apply(function() {
+                for(let i = 0; i < $scope.players.length; i++) {
+                    if($scope.players[i].userID === user) {
+                        $scope.players.splice(i, 1);
+                        break;
+                    }
+                }
             });
         });
 

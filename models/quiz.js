@@ -15,6 +15,7 @@ const Quiz = Schema({
     finished: Boolean,
     playlist: {
         id: String,
+        name: String,
         owner: String,
         generated: Boolean,
     },

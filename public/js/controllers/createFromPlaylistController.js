@@ -15,7 +15,7 @@ angular.module('charlieController').controller('createFromPlaylistController', [
 
         $scope.createQuiz = function () {
             $scope.loading = true;
-            charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
+            charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
                 $scope.loading = false;
                 if(!quiz || quiz.error) {
                     alert(quiz.error);

@@ -147,7 +147,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
         })
 
         .state('main.create.fromPlaylist', {
-            url: '/simple/:owner/:id',
+            url: '/simple/:owner/:name/:id',
             views: {
                 'container@main.create': {
                     templateUrl: '../views/createFromPlaylist.html',

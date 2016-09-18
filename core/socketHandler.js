@@ -4,13 +4,12 @@
  */
 
 module.exports = function(server, quizmodel, usermodel, sessionStore) {
-    const utils = require('../core/helpers');
+    const utils = require('./helpers');
     const io = require('socket.io')(server);
     const cookieParser = require('cookie-parser');
     const cookParse = require('cookie');
-    const spotify = require('../core/spotifyService.js');
+    const spotify = require('./spotifyService.js');
     const Quiz = quizmodel;
-    const User = usermodel;
 
     io.set('authorization', function (data, accept) {
         if (data.headers.cookie) {
@@ -39,6 +38,14 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             sessionStore.load(session_id, function(err, storage) {
                 if(storage.quizID) {
                     socket.join(storage.quizID);
+                    Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
+                        for(let i = 0; i < quiz.players.length; i++) {
+                            if(quiz.players[i].userID === storage.user) {
+                                io.to(storage.quizID).emit('userJoined', quiz.players[i]);
+                                break;
+                            }
+                        }
+                    });
                 }
             });
 
@@ -82,7 +89,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.user) {
                         const api = new spotify.SpotifyApi(storage.tokens);
-                        api.getQuizQuestions(quizDetails.playlist, quizDetails.nbrOfSongs, quizDetails.generated, quizDetails.playlistOwner).then((result) => {
+                        api.getQuizQuestions(quizDetails.playlistID, quizDetails.nbrOfSongs, quizDetails.generated, quizDetails.playlistOwner).then((result) => {
                             const uid = utils.generateUID();
                             socket.join(uid);
 
@@ -102,7 +109,8 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 started: false,
                                 finished: false,
                                 playlist: {
-                                    id: quizDetails.playlist,
+                                    id: quizDetails.playlistID,
+                                    name: quizDetails.playlistName,
                                     owner: quizDetails.playlistOwner,
                                     generated: quizDetails.generated,
                                 },
@@ -120,10 +128,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                     console.log('error when saving quiz!', err);
                                 }
                             });
-                            quizDetails.quizID = uid;
-                            quizDetails.owner = storage.user;
-                            quizDetails.players = newQuiz.players;
-                            socket.emit('createQuizCallback', quizDetails);
+                            socket.emit('createQuizCallback', newQuiz);
                         }).catch((err) => {
                             socket.emit('createQuizCallback', {error: 'Could not create quiz. Try reducing the number of questions'});
                         });
@@ -164,25 +169,19 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                     points: 0
                                 };
                                 quiz.players.push(player);
+
+                                // Emit result back to client
+                                socket.emit('joinQuizCallback', quiz);
+
+                                // Emit to room that user with name joined
+                                io.to(room).emit('userJoined', player);
+
                                 quiz.save(function (err) {
                                     if (err) {
                                         console.log('error when saving quiz!', err);
                                     }
                                 });
 
-                                // Emit result back to client
-                                socket.emit('joinQuizCallback', {
-                                    quizID: quiz.quizID,
-                                    name: quiz.name,
-                                    generated: quiz.generated,
-                                    owner: quiz.owner,
-                                    playlist: quiz.playlist,
-                                    nbrOfSongs: quiz.nbrOfSongs,
-                                    players: quiz.players,
-                                });
-
-                                // Emit to room that user with name joined
-                                io.to(room).emit('userJoined', player);
                             } else {
                                 if(quiz.started === true) {
                                     socket.emit('joinQuizCallback', {error: {invalid: 'Quiz already started!'}});
@@ -289,7 +288,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             });
 
             socket.on('getUser', function (userId) {
-               console.log('in getUser', userId);
+                console.log('in getUser', userId);
                 sessionStore.load(session_id, function (err, storage) {
                     if(userId === storage.user) {
                         socket.emit('getUserCallback', userId);
@@ -330,22 +329,37 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             socket.on('leaveQuiz', function () {
                 console.log("in leaveQuiz");
                 sessionStore.load(session_id, function (err, storage) {
-                    storage.quizID = undefined;
-                })
+                    if(storage.quizID) {
+                        delete storage.quizID;
+                    }
+                    sessionStore.set(session_id, storage);
+
+                });
             });
 
             socket.on('logout', function () {
                 console.log("in logout");
                 sessionStore.load(session_id, function (err, storage) {
-                    storage.quizID = undefined;
-                    storage.user = undefined;
-                    storage.tokens = undefined;
+                    if(storage.quizID) {
+                        delete storage.quizID;
+                    }
+                    if(storage.user) {
+                        delete storage.user;
+                    }
+                    if(storage.tokens) {
+                        delete storage.tokens;
+                    }
                     sessionStore.set(session_id, storage);
                 });
             });
 
             socket.on('disconnect', function () {
                 console.log("Client disconnected");
+                sessionStore.load(session_id, function (err, storage) {
+                    if(storage.quizID) {
+                        io.to(storage.quizID).emit('userLeft', storage.user);
+                    }
+                });
             });
         }
     });

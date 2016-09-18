@@ -9,8 +9,10 @@
     <br>
 
     <div align="center">
-        <h1>Quiz details</h1>
-        <h3>Blah blah</h3>
+        <h3 ng-if="nbrOfSongs !== 1">{{nbrOfSongs}} Questions</h3>
+        <h3 ng-if="nbrOfSongs === 1">{{nbrOfSongs}} Question</h3>
+        <h3 ng-if="generated === true">Generated songs based on playlist {{playlistName}}</h3>
+        <h3 ng-if="generated === false">Songs from playlist {{playlistName}}</h3>
     </div>
 
     <br>
@@ -23,16 +25,16 @@
         <form name="form">
             <div class="group">
                 <md-list flex>
-                    <md-list-item class="md-3-line" ng-repeat="user in users" ng-disabled="true">
+                    <md-list-item class="md-3-line" ng-repeat="player in players" ng-disabled="true">
                         <div class="md-list-item-text" layout="column">
                             <div class="item">
-                                <h3>{{ user.userID }}</h3>
-                                <p ng-if="user.spotify===true">Joined with Spotify account</p>
-                                <p ng-if="user.spotify===false">Joined with username</p>
+                                <h3>{{ player.userID }}</h3>
+                                <p ng-if="player.spotify===true">Joined with Spotify account</p>
+                                <p ng-if="player.spotify===false">Joined with username</p>
                             </div>
                             <md-divider ></md-divider>
                         </div>
-                        <md-icon class="material-icons {{user.color}}">person</md-icon>
+                        <md-icon class="material-icons {{player.color}}">person</md-icon>
                     </md-list-item>
                 </md-list>
             </div>

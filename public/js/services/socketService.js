@@ -16,7 +16,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
         let user = '';
         let currentQuiz;
 
-        socket.on('connect', function(){
+        socket.once('connect', function(){
             console.log('socketio open!');
             if (sessionStorage.getItem('user')) {
                 // User in storage
@@ -119,10 +119,11 @@ charlieService.factory('charlieProxy', ['$rootScope',
              */
 
             // callback(quiz)
-            createQuiz: function (name, playlistId, owner, nbrOfSongs, generated, callback) {
+            createQuiz: function (name, playlistId, playlistName, owner, nbrOfSongs, generated, callback) {
                 let data = {
                     name: name,
-                    playlist: playlistId,
+                    playlistID: playlistId,
+                    playlistName: playlistName,
                     nbrOfSongs: parseInt(nbrOfSongs),
                     generated: generated,
                     playlistOwner: owner
@@ -186,6 +187,12 @@ charlieService.factory('charlieProxy', ['$rootScope',
                         callback(quiz);
                     }
                     $rootScope.$apply();
+                });
+            },
+
+            userLeft: function(callback) {
+                socket.on('userLeft', function(player) {
+                    callback(player);
                 });
             },
 

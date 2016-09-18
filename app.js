@@ -33,7 +33,7 @@ const session = require('express-session')({
     saveUninitialized: true
 });
 
-const socketHandler = require('./routes/socketHandler')(server, quizmodel, usermodel, sessionStore);
+const socketHandler = require('./core/socketHandler')(server, quizmodel, usermodel, sessionStore);
 
 app.use(logger('dev'));
 app.use(session);

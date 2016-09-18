@@ -46,7 +46,6 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
         $scope.logout = function () {
             $scope.user = '';
             charlieProxy.logout();
-            sessionStorage.clear();
             $state.go('main.loggedOut');
         };
 

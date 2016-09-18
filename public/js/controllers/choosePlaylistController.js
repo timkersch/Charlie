@@ -19,7 +19,8 @@ angular.module('charlieController').controller('choosePlaylistController', ['$sc
         });
 
         $scope.choosePlaylist = function(playlist) {
-            $state.go('main.create.fromPlaylist', {id: playlist.id, owner: playlist.playlistOwner});
+            console.log(playlist.name);
+            $state.go('main.create.fromPlaylist', {id: playlist.id, name: playlist.name, owner: playlist.playlistOwner});
         };
 
     }]);
