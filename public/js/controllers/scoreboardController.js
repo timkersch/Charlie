@@ -4,9 +4,8 @@
 
 require('../../css/partials/scoreboard.css');
 const chartjs = require('chart.js');
-const angular = require('angular');
 
-angular.module('charlieController').controller('scoreboardController', ['$scope', '$document', '$state', 'charlieProxy',
+module.exports =
     function ($scope, $document, $state, charlieProxy) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
@@ -58,7 +57,7 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
 
         $scope.changeView = function () {
             charlieProxy.leaveQuiz();
-            if(charlieProxy.isLoggedIn()) {
+            if (charlieProxy.isLoggedIn()) {
                 $state.go('main.loggedIn');
             } else {
                 $state.go('main.loggedOut');
@@ -71,4 +70,4 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
             $scope.playlistText = "Playlist added";
         };
 
-    }]);
+    };

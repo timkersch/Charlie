@@ -3,10 +3,9 @@
  */
 
 require('../../css/partials/create.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('createNavController', ['$scope',
+module.exports =
     function ($scope) {
         console.log("Inside createController");
         $scope.currentNavItem = 'standard';
-    }]);
+    };

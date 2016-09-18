@@ -4,23 +4,45 @@ require('angular-material/angular-material.css');
 require('angular-messages');
 require('angular-ui-router');
 require('angular-material');
-require('./services/socketService');
 
-let charlieController = angular.module('charlieController', []);
-charlieController.$inject = ['charlieService', 'ngMaterial', 'ngMessages'];
-let charlieApp = angular.module('charlieApp', []);
-charlieApp.$inject = ['charlieController', 'ui.router', '$mdThemingProvider'];
+let charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial']);
 
-require('./controllers/choosePlaylistController');
-require('./controllers/createFromPlaylistController');
-require('./controllers/createNavController');
-require('./controllers/joinController');
-require('./controllers/lobbyController');
-require('./controllers/homeController');
-require('./controllers/mainController');
-require('./controllers/profileController');
-require('./controllers/questionController');
-require('./controllers/scoreboardController');
+const choosePlaylistController = require('./controllers/choosePlaylistController');
+const createFromPlaylistController = require('./controllers/createFromPlaylistController');
+const createNavController = require('./controllers/createNavController');
+const joinController = require('./controllers/joinController');
+const lobbyController = require('./controllers/lobbyController');
+const homeController = require('./controllers/homeController');
+const mainController = require('./controllers/mainController');
+const profileController = require('./controllers/profileController');
+const questionController = require('./controllers/questionController');
+const scoreboardController = require('./controllers/scoreboardController');
+const charlieProxy = require('./services/socketService');
+
+charlieApp.service('charlieProxy', charlieProxy);
+charlieProxy.$inject = ['$rootScope'];
+
+charlieApp.controller('choosePlaylistController', choosePlaylistController);
+charlieApp.controller('createFromPlaylistController', createFromPlaylistController);
+charlieApp.controller('createNavController', createNavController);
+charlieApp.controller('homeController', homeController);
+charlieApp.controller('joinController', joinController);
+charlieApp.controller('lobbyController', lobbyController);
+charlieApp.controller('mainController', mainController);
+charlieApp.controller('profileController', profileController);
+charlieApp.controller('questionController', questionController);
+charlieApp.controller('scoreboardController', scoreboardController);
+
+choosePlaylistController.$inject = ['$scope', '$state', 'charlieProxy'];
+createFromPlaylistController.$inject = ['$scope', '$state', 'charlieProxy', '$stateParams'];
+createNavController.$inject = ['$scope'];
+homeController.$inject = ['$scope', '$state', 'charlieProxy'];
+joinController.$inject = ['$scope', '$state', 'charlieProxy'];
+lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
+mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
+profileController.$inject = ['$scope', 'charlieProxy'];
+questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
+choosePlaylistController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
 
 charlieApp.config(['$mdThemingProvider', function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
@@ -32,7 +54,7 @@ charlieApp.config(['$mdThemingProvider', function($mdThemingProvider) {
         .accentPalette('green', {
             'default': 'A400'
         });
-});
+}]);
 
 charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $stateProvider

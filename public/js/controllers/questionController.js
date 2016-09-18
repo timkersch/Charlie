@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/question.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('questionController', ['$scope', '$state', 'charlieProxy', '$document',
+module.exports =
     function ($scope, $state, charlieProxy, $document) {
         console.log("Inside questionController");
 
@@ -39,7 +38,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             });
 
             charlieProxy.getCurrentQuestion(function (result) {
-                $scope.currentQuestion = result.questionIndex+1;
+                $scope.currentQuestion = result.questionIndex + 1;
                 $scope.possibleArtists = result.question.artistOptions;
                 correctAnswer = result.question.correctArtist;
                 if (charlieProxy.isQuizOwner()) {
@@ -52,7 +51,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             init();
         });
 
-        charlieProxy.gameOver(function() {
+        charlieProxy.gameOver(function () {
             $state.go('main.scoreboard');
         });
 
@@ -70,17 +69,17 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             if (charlieProxy.isQuizOwner()) {
                 play(result.question.trackUrl);
             }
-            $scope.currentQuestion = result.questionIndex+1;
+            $scope.currentQuestion = result.questionIndex + 1;
             correctAnswer = result.question.correctArtist;
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
         });
 
-        charlieProxy.timeLeft(function(time) {
-            if(time > 5) {
-                $scope.timeLeft = time-5;
-            } else if(time <= 5 && time > 0) {
+        charlieProxy.timeLeft(function (time) {
+            if (time > 5) {
+                $scope.timeLeft = time - 5;
+            } else if (time <= 5 && time > 0) {
                 if (!hasAnswered) {
                     $scope.selectedAnswer("", "");
                 }
@@ -144,4 +143,4 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             audioElement.pause();
             audioElement.currentTime = 0;
         });
-    }]);
+    };

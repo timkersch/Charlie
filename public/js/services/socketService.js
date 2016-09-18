@@ -2,12 +2,9 @@
  * Created by Tim on 03/09/16.
  */
 
-const angular = require('angular');
 const io = require('socket.io-client');
 
-const charlieService = angular.module('charlieService', []);
-
-charlieService.factory('charlieProxy', ['$rootScope',
+module.exports =
     function ($rootScope) {
         const socket = io.connect();
         let isReady = false;
@@ -285,8 +282,4 @@ charlieService.factory('charlieProxy', ['$rootScope',
             }
 
         };
-    }]);
-
-module.exports = {
-    charlieService : charlieService
-};
+    };

@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/create.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('createFromPlaylistController', ['$scope', '$state', '$stateParams', 'charlieProxy',
+module.exports =
     function ($scope, $state, $stateParams, charlieProxy) {
         console.log("Inside createFromPlaylistController");
 
@@ -18,12 +17,11 @@ angular.module('charlieController').controller('createFromPlaylistController', [
             $scope.loading = true;
             charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
                 $scope.loading = false;
-                if(!quiz || quiz.error) {
+                if (!quiz || quiz.error) {
                     alert(quiz.error);
                 } else {
                     $state.go('main.lobby');
                 }
             });
         };
-
-    }]);
+    };

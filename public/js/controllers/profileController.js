@@ -3,13 +3,12 @@
  */
 
 require('../../css/partials/profile.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('profileController', ['$scope', 'charlieProxy',
+module.exports =
     function ($scope, charlieProxy) {
         console.log("Inside profileController");
 
         charlieProxy.getUser(function (user) {
             $scope.user = user;
         });
-    }]);
+    };

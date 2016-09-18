@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/lobby.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('lobbyController', ['$scope', '$state', 'charlieProxy',
+module.exports =
     function ($scope, $state, charlieProxy) {
         console.log("LobbyController!");
 
@@ -37,16 +36,16 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
             init();
         });
 
-        charlieProxy.userJoined(function(user) {
+        charlieProxy.userJoined(function (user) {
             $scope.$apply(function () {
                 $scope.players.push(user);
             });
         });
 
-        charlieProxy.userLeft(function(user) {
-            $scope.$apply(function() {
-                for(let i = 0; i < $scope.players.length; i++) {
-                    if($scope.players[i].userID === user) {
+        charlieProxy.userLeft(function (user) {
+            $scope.$apply(function () {
+                for (let i = 0; i < $scope.players.length; i++) {
+                    if ($scope.players[i].userID === user) {
                         $scope.players.splice(i, 1);
                         break;
                     }
@@ -60,11 +59,11 @@ angular.module('charlieController').controller('lobbyController', ['$scope', '$s
             }
         };
 
-        charlieProxy.quizStart(function() {
+        charlieProxy.quizStart(function () {
             console.log('in here');
             $scope.$apply(function () {
                 $state.go('main.question');
             });
         });
 
-    }]);
+    };

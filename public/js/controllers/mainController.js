@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/home.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('mainController', ['$scope', '$state', '$mdSidenav', 'charlieProxy',
+module.exports =
     function ($scope, $state, $mdSidenav, charlieProxy) {
         console.log('in mainController');
         $scope.user = '';
@@ -19,15 +18,15 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
         };
 
         $scope.changeView = function (viewString) {
-            if(viewString === 'home') {
-                if(charlieProxy.isLoggedIn()) {
+            if (viewString === 'home') {
+                if (charlieProxy.isLoggedIn()) {
                     $state.go('main.loggedIn');
                 } else {
                     $state.go('main.loggedOut');
                 }
-            } else if(viewString === 'profile') {
+            } else if (viewString === 'profile') {
                 $state.go('main.profile');
-            } else if(viewString === 'create') {
+            } else if (viewString === 'create') {
                 $state.go('main.create.choosePlaylist');
             }
         };
@@ -50,10 +49,10 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             $state.go('main.loggedOut');
         };
 
-        $scope.$on('loggedIn', function() {
+        $scope.$on('loggedIn', function () {
             $state.user = charlieProxy.getUser(function (user) {
                 $scope.user = user;
             });
         });
 
-    }]);
+    };

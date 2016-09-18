@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/home.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('homeController', ['$scope', '$state', 'charlieProxy',
+module.exports =
     function ($scope, $state, charlieProxy) {
         console.log("Inside homeController");
         $scope.url = '';
@@ -13,7 +12,7 @@ angular.module('charlieController').controller('homeController', ['$scope', '$st
         let init = function () {
             if (sessionStorage.getItem('code')) {
                 charlieProxy.login(sessionStorage.getItem('code'), function (user) {
-                    if(user) {
+                    if (user) {
                         $state.go('main.loggedIn');
                     } else {
                         alert('User already logged in!');
@@ -33,4 +32,4 @@ angular.module('charlieController').controller('homeController', ['$scope', '$st
         $scope.login = function () {
             window.open($scope.url, '_self');
         };
-    }]);
+    };

@@ -3,10 +3,9 @@
  */
 
 require('../../css/partials/create.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('choosePlaylistController', ['$scope', '$state', 'charlieProxy',
-    function ($scope, $state, charlieProxy) {
+module.exports =
+    function choosePlaylistController($scope, $state, charlieProxy) {
         console.log("Inside choosePlaylistController");
 
         let init = function () {
@@ -24,4 +23,4 @@ angular.module('charlieController').controller('choosePlaylistController', ['$sc
             $state.go('main.create.fromPlaylist', {id: playlist.id, name: playlist.name, owner: playlist.playlistOwner});
         };
 
-    }]);
+    };

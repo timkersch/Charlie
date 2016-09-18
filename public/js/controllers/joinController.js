@@ -3,9 +3,8 @@
  */
 
 require('../../css/partials/join.css');
-const angular = require('angular');
 
-angular.module('charlieController').controller('joinController', ['$scope', '$state', 'charlieProxy',
+module.exports =
     function ($scope, $state, charlieProxy) {
         console.log("Joincontroller");
 
@@ -14,14 +13,13 @@ angular.module('charlieController').controller('joinController', ['$scope', '$st
 
         $scope.changeView = function () {
             $scope.fetching = true;
-            charlieProxy.joinQuiz({username: $scope.displayName, room: $scope.joinCode}, function(result) {
+            charlieProxy.joinQuiz({username: $scope.displayName, room: $scope.joinCode}, function (result) {
                 $scope.fetching = false;
-                if(result && !result.error) {
+                if (result && !result.error) {
                     $state.go('main.lobby');
                 } else {
                     $scope.serverErrors = result.error;
                 }
             });
+        };
     };
-
-}]);
