@@ -5,7 +5,7 @@ require('angular-messages');
 require('angular-ui-router');
 require('angular-material');
 
-let charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial']);
+const charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial', 'ngMessages']);
 
 const choosePlaylistController = require('./controllers/choosePlaylistController');
 const createFromPlaylistController = require('./controllers/createFromPlaylistController');
@@ -34,7 +34,7 @@ charlieApp.controller('questionController', questionController);
 charlieApp.controller('scoreboardController', scoreboardController);
 
 choosePlaylistController.$inject = ['$scope', '$state', 'charlieProxy'];
-createFromPlaylistController.$inject = ['$scope', '$state', 'charlieProxy', '$stateParams'];
+createFromPlaylistController.$inject = ['$scope', '$state', '$stateParams', 'charlieProxy'];
 createNavController.$inject = ['$scope'];
 homeController.$inject = ['$scope', '$state', 'charlieProxy'];
 joinController.$inject = ['$scope', '$state', 'charlieProxy'];
@@ -42,7 +42,7 @@ lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
 mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
 profileController.$inject = ['$scope', 'charlieProxy'];
 questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
-choosePlaylistController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
+scoreboardController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
 
 charlieApp.config(['$mdThemingProvider', function($mdThemingProvider) {
     $mdThemingProvider.theme('default')

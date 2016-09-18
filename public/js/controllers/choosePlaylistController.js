@@ -6,7 +6,7 @@ require('../../css/partials/create.css');
 
 module.exports =
     function choosePlaylistController($scope, $state, charlieProxy) {
-        console.log("Inside choosePlaylistController");
+        console.log("Inside choosePlaylistController", $scope, $state, charlieProxy);
 
         let init = function () {
             charlieProxy.getPlaylists(function (lists) {
