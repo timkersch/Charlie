@@ -9,7 +9,7 @@ module.exports = {
     entry: __dirname + '/public/js/app.js',
     output: {
         path: __dirname + '/public/dist',
-        filename: 'bundle.js'
+        filename: 'bundle.js',
     },
 
     plugins: [
@@ -39,14 +39,6 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 loader: "webpack-strip?strip[]=debug,strip[]=console.log"
-            },
-
-
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'jshint-loader'
-
             }
         ],
 
@@ -79,8 +71,8 @@ module.exports = {
             {
                 test: /\.(jpe?g|png|gif|svg|eot|woff|ttf|svg|woff2)$/,
                 loader: "file?name=[name].[ext]"
-            },
+            }
         ]
     },
-    devtool: 'cheap-module-source-map'
+    devtool: 'source-map'
 };

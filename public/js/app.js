@@ -6,16 +6,10 @@ require('angular-ui-router');
 require('angular-material');
 require('./services/socketService');
 
-angular.module('charlieController', [
-    'charlieService',
-    'ngMaterial',
-    'ngMessages',
-]);
-
-let charlieApp = angular.module('charlieApp', [
-    'charlieController',
-    'ui.router',
-]);
+let charlieController = angular.module('charlieController', []);
+charlieController.$inject = ['charlieService', 'ngMaterial', 'ngMessages'];
+let charlieApp = angular.module('charlieApp', []);
+charlieApp.$inject = ['charlieController', 'ui.router', '$mdThemingProvider'];
 
 require('./controllers/choosePlaylistController');
 require('./controllers/createFromPlaylistController');
@@ -28,7 +22,7 @@ require('./controllers/profileController');
 require('./controllers/questionController');
 require('./controllers/scoreboardController');
 
-charlieApp.config(function($mdThemingProvider) {
+charlieApp.config(['$mdThemingProvider', function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
         .primaryPalette('indigo', {
             'default': '500',
