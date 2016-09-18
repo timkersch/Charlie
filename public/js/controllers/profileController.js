@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/profile.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('profileController', ['$scope', 'charlieProxy',
     function ($scope, charlieProxy) {

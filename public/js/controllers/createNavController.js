@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/create.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('createNavController', ['$scope',
     function ($scope) {

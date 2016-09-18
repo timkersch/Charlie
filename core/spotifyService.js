@@ -97,13 +97,13 @@ class SpotifyApi {
         return this.getOptionsForValidTracks(similarTracksPromise, noTracks);
     }
 
-    getQuizQuestions(playlistId, noTracks, generated, ownerId) {
+    getQuizQuestions(playlistId, noTracks, shuffle, ownerId) {
         return this.getPlaylistTracks(playlistId, ownerId).then((tracks) => {
             if(tracks.length >= noTracks) {
-                if(generated === true) {
-                    return this.getQuestionsGenerated(utils.shuffle(tracks), noTracks);
-                } else {
+                if(shuffle === true) {
                     return this.getQuestions(utils.shuffle(tracks), noTracks);
+                } else {
+                    return this.getQuestions(tracks, noTracks);
                 }
             } else {
                 throw new Error('Not enough songs in playlist');

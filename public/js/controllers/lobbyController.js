@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/lobby.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('lobbyController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {

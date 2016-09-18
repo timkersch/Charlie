@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/join.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('joinController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {

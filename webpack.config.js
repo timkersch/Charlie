@@ -12,6 +12,15 @@ module.exports = {
         filename: 'bundle.js'
     },
     module: {
+        preLoaders: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'jshint-loader'
+
+            }
+        ],
+
         loaders: [
             {
                 test: /\.css$/,
@@ -34,6 +43,16 @@ module.exports = {
             }
         ]
     },
+    jshint: {
+        esversion: 6,
+        curly: true,
+        eqeqeq: true,
+        undef: true,
+        unused: true,
+        browser: true,
+        predef: [ "console", "alert"]
+    },
     debug: true,
-    devtool: 'source-map'
+    devtool: 'eval',
+    watch: true
 };

@@ -3,7 +3,8 @@
  */
 
 require('../../css/partials/scoreboard.css');
-require('chart.js');
+const chartjs = require('chart.js');
+const angular = require('angular');
 
 angular.module('charlieController').controller('scoreboardController', ['$scope', '$document', '$state', 'charlieProxy',
     function ($scope, $document, $state, charlieProxy) {
@@ -41,7 +42,7 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
 
                     setTimeout(function () {
                         const ctx = document.getElementById("scoreboardChart").getContext("2d");
-                        const scoreboardChart = new Chart(ctx, chartObj);
+                        new chartjs.Chart(ctx, chartObj);
                         $scope.$apply();
                     }, 50);
 
@@ -56,8 +57,7 @@ angular.module('charlieController').controller('scoreboardController', ['$scope'
         });
 
         $scope.changeView = function () {
-            // TODO
-            //charlieProxy.leaveQuiz();
+            charlieProxy.leaveQuiz();
             if(charlieProxy.isLoggedIn()) {
                 $state.go('main.loggedIn');
             } else {

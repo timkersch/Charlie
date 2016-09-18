@@ -89,7 +89,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.user) {
                         const api = new spotify.SpotifyApi(storage.tokens);
-                        api.getQuizQuestions(quizDetails.playlistID, quizDetails.nbrOfSongs, quizDetails.generated, quizDetails.playlistOwner).then((result) => {
+                        api.getQuizQuestions(quizDetails.playlistID, quizDetails.nbrOfSongs, quizDetails.shuffle, quizDetails.playlistOwner).then((result) => {
                             const uid = utils.generateUID();
                             socket.join(uid);
 
@@ -101,7 +101,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             const newQuiz = new Quiz({
                                 quizID: uid,
                                 name: quizDetails.name,
-                                generated: quizDetails.generated,
+                                shuffle: quizDetails.shuffle,
                                 owner: storage.user,
                                 playlistOwner: quizDetails.playlistOwner,
                                 nbrOfSongs: quizDetails.nbrOfSongs,

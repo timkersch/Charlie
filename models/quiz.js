@@ -7,6 +7,7 @@ const Schema = require('mongoose').Schema;
 const Quiz = Schema({
     quizID: String,
     name: String,
+    shuffle: Boolean,
     owner: String,
     nbrOfSongs: Number,
     questionIndex: Number,

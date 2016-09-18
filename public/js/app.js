@@ -1,5 +1,3 @@
-'use strict';
-
 const angular = require('angular');
 require('../css/style.css');
 require('angular-material/angular-material.css');
@@ -8,7 +6,7 @@ require('angular-ui-router');
 require('angular-material');
 require('./services/socketService');
 
-let charlieController = angular.module('charlieController', [
+angular.module('charlieController', [
     'charlieService',
     'ngMaterial',
     'ngMessages',

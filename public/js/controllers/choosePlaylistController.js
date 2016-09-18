@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/create.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('choosePlaylistController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {

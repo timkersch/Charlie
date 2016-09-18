@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/question.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('questionController', ['$scope', '$state', 'charlieProxy', '$document',
     function ($scope, $state, charlieProxy, $document) {
@@ -41,8 +42,9 @@ angular.module('charlieController').controller('questionController', ['$scope', 
                 $scope.currentQuestion = result.questionIndex+1;
                 $scope.possibleArtists = result.question.artistOptions;
                 correctAnswer = result.question.correctArtist;
-                if (charlieProxy.isQuizOwner())
+                if (charlieProxy.isQuizOwner()) {
                     play(result.question.trackUrl);
+                }
             });
         };
 
@@ -65,8 +67,9 @@ angular.module('charlieController').controller('questionController', ['$scope', 
 
         charlieProxy.newQuestion(function (result) {
             $scope.possibleArtists = result.question.artistOptions;
-            if (charlieProxy.isQuizOwner())
+            if (charlieProxy.isQuizOwner()) {
                 play(result.question.trackUrl);
+            }
             $scope.currentQuestion = result.questionIndex+1;
             correctAnswer = result.question.correctArtist;
             $scope.timeLeft = 20;
@@ -94,7 +97,7 @@ angular.module('charlieController').controller('questionController', ['$scope', 
             return hasAnswered && $scope.myAnswer !== artist;
         };
 
-        $scope.selectedAnswer = function (data, index) {
+        $scope.selectedAnswer = function (data) {
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;

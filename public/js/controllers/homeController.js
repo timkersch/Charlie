@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/home.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('homeController', ['$scope', '$state', 'charlieProxy',
     function ($scope, $state, charlieProxy) {

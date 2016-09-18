@@ -2,7 +2,6 @@
  * Created by Tim on 03/09/16.
  */
 
-'use strict';
 const angular = require('angular');
 const io = require('socket.io-client');
 
@@ -60,10 +59,12 @@ charlieService.factory('charlieProxy', ['$rootScope',
                 return isReady;
             },
             onReady: function (callback) {
-                if (!isReady)
+                if (!isReady) {
                     readyCallbacks.push(callback);
-                else
+                }
+                else {
                     callback();
+                }
             },
 
             /**
@@ -119,13 +120,14 @@ charlieService.factory('charlieProxy', ['$rootScope',
              */
 
             // callback(quiz)
-            createQuiz: function (name, playlistId, playlistName, owner, nbrOfSongs, generated, callback) {
+            createQuiz: function (name, playlistId, playlistName, owner, nbrOfSongs, shuffle, callback) {
                 let data = {
                     name: name,
                     playlistID: playlistId,
                     playlistName: playlistName,
                     nbrOfSongs: parseInt(nbrOfSongs),
-                    generated: generated,
+                    shuffle: shuffle,
+                    generated: false,
                     playlistOwner: owner
                 };
                 socket.emit('createQuiz', data);
@@ -269,7 +271,7 @@ charlieService.factory('charlieProxy', ['$rootScope',
             },
 
             newQuestion : function(callback) {
-                socket.on('newQuestion', function(data) {;
+                socket.on('newQuestion', function(data) {
                     callback(data);
                     $rootScope.$apply();
                 });

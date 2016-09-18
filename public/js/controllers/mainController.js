@@ -3,6 +3,7 @@
  */
 
 require('../../css/partials/home.css');
+const angular = require('angular');
 
 angular.module('charlieController').controller('mainController', ['$scope', '$state', '$mdSidenav', 'charlieProxy',
     function ($scope, $state, $mdSidenav, charlieProxy) {
@@ -49,7 +50,7 @@ angular.module('charlieController').controller('mainController', ['$scope', '$st
             $state.go('main.loggedOut');
         };
 
-        $scope.$on('loggedIn', function(event, args) {
+        $scope.$on('loggedIn', function() {
             $state.user = charlieProxy.getUser(function (user) {
                 $scope.user = user;
             });
