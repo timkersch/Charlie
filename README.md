@@ -57,7 +57,17 @@ Then make sure you have a MongoDB server installed and fire it up from the comma
 ```
 mongod
 ```
-Finally fire up the server locally and visit localhost
+
+Build for development using
+```
+npm run dev
+```
+or build a production bundle with
+```
+npm run prod
+```
+
+After the build step fire up the server and visit localhost
 ```
 npm start
 ```

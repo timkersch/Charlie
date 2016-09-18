@@ -5,3 +5,7 @@ div .chart {
 .canvas {
     margin-top: 20px;
 }
+
+#container {
+    padding: 4em;
+}

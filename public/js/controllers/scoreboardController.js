@@ -11,27 +11,20 @@ module.exports =
         $scope.scores = [];
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
-        let chartColors = ["#80CBC4", "#FF8A80", "#8C9EFF", "#FFEB3B"];
 
         let init = function () {
             charlieProxy.getResults(function (users) {
+                // TODO the chart
                 if (users) {
-                    let chartObj = {
-                        type: 'bar',
-                        data: {
-                            labels: [""],
-                            datasets: []
-                        },
-                        options: {}
-                    };
-
                     $scope.scores = [];
+                    const namesArr = [];
+                    const pointsArr = [];
+                    const colorsArr = [];
                     for (let i = 0; i < users.length; i++) {
-                        let tmpArray = [users[i].points];
-                        chartObj.data.datasets.push({
-                            fillColor: chartColors[i],
-                            data: tmpArray
-                        });
+                        namesArr.push(users[i].userID);
+                        pointsArr.push(users[i].points);
+                        colorsArr.push(colors[users[i].color]);
+
                         $scope.scores.push({
                             value: users[i].points,
                             userName: users[i].userID,
@@ -39,8 +32,28 @@ module.exports =
                         });
                     }
 
+                    let chartObj = {
+                        type: 'bar',
+                        data: {
+                            labels : [namesArr],
+                            datasets: [
+                                {
+                                    label: '',
+                                    backgroundColor: [colorsArr],
+                                    borderWidth: 1,
+                                    data: [pointsArr]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    };
+
                     setTimeout(function () {
                         const ctx = document.getElementById("scoreboardChart").getContext("2d");
+                        ctx.canvas.width = 300;
+                        ctx.canvas.height = 300;
                         new chartjs.Chart(ctx, chartObj);
                         $scope.$apply();
                     }, 50);
@@ -71,3 +84,14 @@ module.exports =
         };
 
     };
+
+// TODO use CSS defs instead
+const colors = {
+    'gray-avatar' : '#f5f5f5',
+    'green-avatar' : '#4CAF50',
+    'orange-avatar': '#FFC107',
+    'blue-avatar' : '#3F51B5',
+    'red-avatar' : '#F44336',
+    'purple-avatar': '#9C27B0',
+    'teal-avatar': '#009688'
+};
