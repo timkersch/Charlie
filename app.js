@@ -1,6 +1,6 @@
 'use strict';
 
-const dotenv = require('dotenv').config({path: '.env'});
+const dotenv = require('dotenv').config({path: '.env', silent: true});
 const path = require('path');
 const express = require('express');
 const logger = require('morgan');
