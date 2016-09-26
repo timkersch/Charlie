@@ -192,6 +192,7 @@ module.exports =
             userLeft: function(callback) {
                 socket.on('userLeft', function(player) {
                     callback(player);
+                    $rootScope.$apply();
                 });
             },
 
@@ -199,7 +200,6 @@ module.exports =
                 socket.emit('leaveQuiz');
             },
 
-            // callback(question)
             nextQuestion: function () {
                 socket.emit('nextQuestion');
             },
@@ -256,7 +256,6 @@ module.exports =
             quizStart : function(callback) {
                 socket.on('quizStart', function(data) {
                     callback(data);
-                    $rootScope.$apply();
                 });
             },
 

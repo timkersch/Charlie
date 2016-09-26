@@ -8,6 +8,11 @@
     height: 50px;
 }
 
+.home {
+    padding-left: 2em;
+    padding-right: 2em;
+}
+
 .md-block {
     margin-bottom: 20px;
 }

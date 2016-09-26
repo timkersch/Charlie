@@ -13,13 +13,20 @@ module.exports =
 
         $scope.changeView = function () {
             $scope.fetching = true;
-            charlieProxy.joinQuiz({username: $scope.displayName, room: $scope.joinCode}, function (result) {
-                $scope.fetching = false;
-                if (result && !result.error) {
-                    $state.go('main.lobby');
-                } else {
-                    $scope.serverErrors = result.error;
-                }
+            charlieProxy.getUser(function(user) {
+                const name = user ? user : $scope.displayName;
+                charlieProxy.joinQuiz({username: name, room: $scope.joinCode}, function (result) {
+                    $scope.fetching = false;
+                    if (result && !result.error) {
+                        $state.go('main.lobby');
+                    } else {
+                        $scope.serverErrors = result.error;
+                    }
+                });
             });
+        };
+
+        $scope.isLoggedIn = function() {
+            return charlieProxy.isLoggedIn();
         };
     };

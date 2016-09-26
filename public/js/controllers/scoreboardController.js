@@ -90,6 +90,10 @@ module.exports =
             $scope.playlistText = "Playlist added";
         };
 
+        $scope.isLoggedIn = function() {
+            return charlieProxy.isLoggedIn();
+        };
+
     };
 
 // TODO use CSS defs instead

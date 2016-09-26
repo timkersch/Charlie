@@ -138,7 +138,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
 
             socket.on('joinQuiz', function (data) {
                 console.log("in joinQuiz", data);
-                const room = data.room || data;
+                const room = data.room;
                 sessionStore.load(session_id, function (err, storage) {
                     // The user joins a room
                     Quiz.findOne({'quizID': room}, function (err, quiz) {
@@ -146,7 +146,9 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
                         } else {
                             if (quiz.started === false && quiz.finished === false) {
-                                if(data.username) {
+                                let spotify = true;
+                                if(!storage.user) {
+                                    spotify = false;
                                     for(let i = 0; i < quiz.players.length; i++) {
                                         if(quiz.players[i].userID === data.username) {
                                             return socket.emit('joinQuizCallback', {error: {nameExists: 'Username already taken!'}});
@@ -164,7 +166,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 const player = {
                                     userID: storage.user,
                                     color: userColor,
-                                    spotify: data.username ? false : true,
+                                    spotify: spotify,
                                     answers: utils.initArr(quiz.nbrOfSongs),
                                     points: 0
                                 };
@@ -310,7 +312,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             socket.on('getQuiz', function () {
                 console.log("in getQuiz");
                 sessionStore.load(session_id, function (err, storage) {
-                    Quiz.findOne({'quizID': storage.quizID}, '-questions', function (err, quiz) {
+                    Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
                         socket.emit('getQuizCallback', quiz);
                     });
                 });

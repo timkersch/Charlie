@@ -10,7 +10,7 @@
 
         <br/>
 
-        <md-button ng-click="savePlaylist()" ng-disabled="isDisabled" class="md-primary md-raised">{{playlistText}}</md-button>
+        <md-button ng-show="isLoggedIn()" ng-click="savePlaylist()" ng-disabled="isDisabled" class="md-primary md-raised">{{playlistText}}</md-button>
     </div>
     <div class="end">
         <md-button ng-click="changeView()" class="md-primary md-raised">HOME</md-button>

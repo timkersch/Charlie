@@ -7,8 +7,9 @@
 
     <form name="form" ng-submit="changeView()">
         <div class="group">
-            <md-input-container md-no-float class="md-block">
-                <input type="text" ng-keyup="submitted=false"  ng-model="displayName" name="displayName" placeholder="Name" ng-minlength="3" ng-maxlength="10" required>
+
+            <md-input-container ng-show="!isLoggedIn()" md-no-float class="md-block">
+                <input type="text" ng-keyup="submitted=false"  ng-model="displayName" name="displayName" placeholder="Name" ng-minlength="3" ng-maxlength="10" ng-required="!isLoggedIn()">
 
                 <div ng-messages="form.displayName.$error" ng-if="form.displayName.$dirty">
                     <div ng-message="required">Required</div>
@@ -36,7 +37,7 @@
         </div>
 
         <div class="buttonHolder">
-            <md-button type="submit" ng-disabled="!form.joinCode.$valid || !form.displayName.$valid " ng-click="submitted=true" class="md-fab md-primary">
+            <md-button type="submit" ng-disabled="(!form.joinCode.$valid || (!isLoggedIn() && !form.displayName.$valid))" ng-click="submitted=true" class="md-fab md-primary">
                 <md-icon class="material-icons">navigate_next</md-icon>
             </md-button>
         </div>

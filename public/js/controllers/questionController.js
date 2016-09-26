@@ -30,6 +30,24 @@ module.exports =
             audioElement.play();
         };
 
+        // TODO
+        // let init = function () {
+        //     console.log('in init');
+        //     charlieProxy.getQuiz(function (quiz) {
+        //         console.log(quiz);
+        //         const question = quiz.questions[quiz.questionIndex];
+        //         $scope.possibleArtists = question.artistOptions;
+        //         $scope.players = quiz.players;
+        //         $scope.currentQuestion = quiz.questionIndex + 1;
+        //         $scope.lastQuestion = quiz.questions.length;
+        //         correctAnswer = question.correctArtist;
+        //
+        //         if (charlieProxy.isQuizOwner()) {
+        //             play(question.trackUrl);
+        //         }
+        //     });
+        // };
+
         let init = function () {
             $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
 

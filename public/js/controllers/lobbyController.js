@@ -37,20 +37,16 @@ module.exports =
         });
 
         charlieProxy.userJoined(function (user) {
-            $scope.$apply(function () {
-                $scope.players.push(user);
-            });
+            $scope.players.push(user);
         });
 
         charlieProxy.userLeft(function (user) {
-            $scope.$apply(function () {
-                for (let i = 0; i < $scope.players.length; i++) {
-                    if ($scope.players[i].userID === user) {
-                        $scope.players.splice(i, 1);
-                        break;
-                    }
+            for (let i = 0; i < $scope.players.length; i++) {
+                if ($scope.players[i].userID === user) {
+                    $scope.players.splice(i, 1);
+                    break;
                 }
-            });
+            }
         });
 
         $scope.startQuiz = function () {
@@ -60,10 +56,7 @@ module.exports =
         };
 
         charlieProxy.quizStart(function () {
-            console.log('in here');
-            $scope.$apply(function () {
-                $state.go('main.question');
-            });
+            $state.go('main.question');
         });
 
     };
