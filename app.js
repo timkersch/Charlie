@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 const logger = require('morgan');
 
-const mongoURL = process.env.MONGO_URL;
+const mongoURL = process.env.MONGODB_URI;
 const mongoose = require('mongoose').connect(mongoURL);
 const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
 const usermodel = mongoose.model('User', require('./models/user').User);
@@ -18,8 +18,7 @@ const server = require('http').Server(app);
 
 const sessionStore = require('sessionstore').createSessionStore({
     type: 'mongodb',
-    host: 'localhost',
-    port: 27017,
+    url: mongoURL,
     dbName: 'charlie',
     collectionName: 'sessions',
     timeout: 10000

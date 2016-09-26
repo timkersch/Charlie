@@ -35,25 +35,32 @@ module.exports =
                     let chartObj = {
                         type: 'bar',
                         data: {
-                            labels : [namesArr],
+                            labels : namesArr,
                             datasets: [
                                 {
-                                    label: '',
-                                    backgroundColor: [colorsArr],
+                                    label: 'Points',
+                                    backgroundColor: colorsArr,
                                     borderWidth: 1,
-                                    data: [pointsArr]
+                                    data: pointsArr
                                 }
                             ]
                         },
                         options: {
-                            responsive: true
+                            maintainAspectRatio: true,
+                            responsive: true,
+                            scales: {
+                                yAxes: [{
+                                    display: true,
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
                         }
                     };
 
                     setTimeout(function () {
                         const ctx = document.getElementById("scoreboardChart").getContext("2d");
-                        ctx.canvas.width = 300;
-                        ctx.canvas.height = 300;
                         new chartjs.Chart(ctx, chartObj);
                         $scope.$apply();
                     }, 50);

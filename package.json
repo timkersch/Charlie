@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "webpack --config ./webpack.prod.config.js --progress --colors",
     "start": "node app.js",
     "prod": "webpack --config ./webpack.prod.config.js --progress --colors",
     "dev": "webpack --config ./webpack.config.js --progress --colors"

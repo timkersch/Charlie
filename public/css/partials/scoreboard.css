@@ -2,10 +2,14 @@ div .chart {
     margin: 1.5em 0 1.2em 0;
 }
 
-.canvas {
+canvas {
     margin-top: 20px;
+    width: 100% !important;
+    max-width: 600px;
+    height: auto !important;
+    max-height: 600px;
 }
 
-#container {
-    padding: 4em;
+.container {
+    padding: 1em;
 }
