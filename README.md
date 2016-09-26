@@ -43,7 +43,7 @@ CALLBACK=http://localhost:8080/callback.html
 
 COOKIE_SECRET=321secret321
 
-MONGO_URL=mongodb://localhost:27017/charlie
+MONGODB_URI=mongodb://localhost:27017/charlie
 ```
 The first three entries are Spotify API credentials that can be created from Spotifys website.
 ```
