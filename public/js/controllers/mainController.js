@@ -18,6 +18,8 @@ module.exports =
         };
 
         $scope.changeView = function (viewString) {
+            charlieProxy.leaveQuiz();
+            charlieProxy.unregisterListeners();
             $mdSidenav('left').toggle();
             if (viewString === 'home') {
                 if (charlieProxy.isLoggedIn()) {

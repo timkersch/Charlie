@@ -66,6 +66,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                         };
                         new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
                             storage.user = user.userID;
+                            storage.spotifyAuthed = true;
                             sessionStore.set(session_id, storage);
                             socket.emit('loginCallback', user);
                         });
@@ -146,15 +147,14 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
                         } else {
                             if (quiz.started === false && quiz.finished === false) {
-                                let spotify = true;
-                                if(!storage.user) {
-                                    spotify = false;
+                                if(!storage.spotifyAuthed) {
                                     for(let i = 0; i < quiz.players.length; i++) {
                                         if(quiz.players[i].userID === data.username) {
                                             return socket.emit('joinQuizCallback', {error: {nameExists: 'Username already taken!'}});
                                         }
                                     }
                                     storage.user = data.username;
+                                    storage.spotifyAuthed = false;
                                 }
                                 // Join the room
                                 socket.join(room);
@@ -166,7 +166,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 const player = {
                                     userID: storage.user,
                                     color: userColor,
-                                    spotify: spotify,
+                                    spotify: storage.spotifyAuthed,
                                     answers: utils.initArr(quiz.nbrOfSongs),
                                     points: 0
                                 };
@@ -339,9 +339,21 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 console.log("in leaveQuiz");
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.quizID) {
+                        Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
+                            for(let i = 0; i < quiz.players.length; i++) {
+                                if(quiz.players[i].userID === storage.user) {
+                                    quiz.players.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            quiz.save(function(err) {
+                                console.log('error when saving', err);
+                            })
+                        });
+                        io.to(storage.quizID).emit('userLeft', storage.user);
                         delete storage.quizID;
+                        sessionStore.set(session_id, storage);
                     }
-                    sessionStore.set(session_id, storage);
                 });
             });
 
@@ -349,6 +361,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 console.log("in logout");
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.quizID) {
+                        io.to(storage.quizID).emit('userLeft', storage.user);
                         delete storage.quizID;
                     }
                     if(storage.user) {
@@ -357,12 +370,17 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                     if(storage.tokens) {
                         delete storage.tokens;
                     }
+                    if(storage.spotifyAuthed) {
+                        delete storage.spotifyAuthed;
+                    }
                     sessionStore.set(session_id, storage);
                 });
             });
 
             socket.on('disconnect', function () {
                 console.log("Client disconnected");
+                // TODO Some work needs to be done here. How to differ between a refresh and a leave?
+                // TODO Want to do stuff if user is not reconnected in like 5 seconds
                 sessionStore.load(session_id, function (err, storage) {
                     if(storage.quizID) {
                         io.to(storage.quizID).emit('userLeft', storage.user);

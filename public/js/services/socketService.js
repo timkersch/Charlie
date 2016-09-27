@@ -64,25 +64,33 @@ module.exports =
                 }
             },
 
-            /**
-             * Users
-             */
-
-            getLoginUrl: function (callback) {
-                socket.emit('getLoginURL');
-                socket.on('getLoginURLCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
+            isQuizOwner: function () {
+                return currentQuiz.owner === user;
             },
 
             isLoggedIn: function () {
                 return (user !== null && user !== undefined && user !== '');
             },
 
+            getUser: function (callback) {
+                callback(user);
+            },
+
+            /**
+             * Users
+             */
+
+            getLoginUrl: function (callback) {
+                socket.emit('getLoginURL');
+                socket.once('getLoginURLCallback', function(data) {
+                    callback(data);
+                    $rootScope.$apply();
+                });
+            },
+
             login: function (code, callback) {
                 socket.emit('login', code);
-                socket.on('loginCallback', function(userData) {
+                socket.once('loginCallback', function(userData) {
                     if(userData) {
                         user = userData.userID;
                         sessionStorage.setItem('user', userData.userID);
@@ -92,21 +100,6 @@ module.exports =
                     }
                     $rootScope.$broadcast('loggedIn', {});
                 });
-            },
-
-            logout: function () {
-                socket.emit('logout');
-                user = undefined;
-                currentQuiz = undefined;
-                sessionStorage.clear();
-            },
-
-            getUser: function (callback) {
-                if (this.isLoggedIn()) {
-                    callback(user);
-                } else {
-                    callback();
-                }
             },
 
             /**
@@ -124,7 +117,7 @@ module.exports =
                     playlistOwner: owner
                 };
                 socket.emit('createQuiz', data);
-                socket.on('createQuizCallback', function(quiz) {
+                socket.once('createQuizCallback', function(quiz) {
                     if(!quiz || quiz.error) {
                         callback(quiz);
                     } else {
@@ -137,31 +130,23 @@ module.exports =
 
             getPlaylists: function (callback) {
                 socket.emit('getPlaylists');
-                socket.on('getPlaylistsCallback', function(data) {
+                socket.once('getPlaylistsCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();
                 });
-            },
-
-            answerQuestion: function (artistName) {
-                socket.emit('answerQuestion', artistName);
             },
 
             getCurrentQuestion: function (callback) {
                 socket.emit('getCurrentQuestion');
-                socket.on('getCurrentQuestionCallback', function(data) {
+                socket.once('getCurrentQuestionCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();
                 });
             },
 
-            isQuizOwner: function () {
-                return currentQuiz.owner === user;
-            },
-
             isQuizStarted: function (callback) {
                 socket.emit('isQuizStarted');
-                socket.on('isQuizStartedCallback', function(data) {
+                socket.once('isQuizStartedCallback', function(data) {
                     callback(data);
                     $rootScope.$apply();
                 });
@@ -169,7 +154,7 @@ module.exports =
 
             joinQuiz: function (data, callback) {
                 socket.emit('joinQuiz', data);
-                socket.on('joinQuizCallback', function(quiz) {
+                socket.once('joinQuizCallback', function(quiz) {
                     if (quiz && !quiz.error) {
                         currentQuiz = quiz;
                         callback(quiz);
@@ -179,11 +164,25 @@ module.exports =
                 });
             },
 
-            userLeft: function(callback) {
-                socket.on('userLeft', function(player) {
-                    callback(player);
+            getResults: function (callback) {
+                socket.emit('getResults');
+                socket.once('getResultsCallback', function(data) {
+                    callback(data);
                     $rootScope.$apply();
                 });
+            },
+
+            getQuiz: function (callback, forceGet) {
+                if(!forceGet && currentQuiz) {
+                    callback(currentQuiz);
+                } else {
+                    socket.emit('getQuiz');
+                    socket.once('getQuizCallback', function (quiz) {
+                        currentQuiz = quiz;
+                        callback(quiz);
+                        $rootScope.$apply();
+                    });
+                }
             },
 
             leaveQuiz: function () {
@@ -198,29 +197,16 @@ module.exports =
                 socket.emit('savePlaylist');
             },
 
-            getResults: function (callback) {
-                socket.emit('getResults');
-                socket.on('getResultsCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
+            answerQuestion: function (artistName) {
+                socket.emit('answerQuestion', artistName);
             },
 
-            getQuiz: function (callback, forceGet) {
-                if(!forceGet && currentQuiz) {
-                    callback(currentQuiz);
-                } else {
-                    socket.emit('getQuiz');
-                    socket.on('getQuizCallback', function (quiz) {
-                        currentQuiz = quiz;
-                        callback(quiz);
-                        $rootScope.$apply();
-                    });
-                }
-            },
-
-            getNumberOfQuestions: function () {
-                return !currentQuiz ? 0 : currentQuiz.nbrOfSongs;
+            logout: function () {
+                this.unregisterListeners();
+                socket.emit('logout');
+                user = undefined;
+                currentQuiz = undefined;
+                sessionStorage.clear();
             },
 
             /**
@@ -237,6 +223,13 @@ module.exports =
             userJoined : function(callback) {
                 socket.on('userJoined', function(user) {
                     callback(user);
+                    $rootScope.$apply();
+                });
+            },
+
+            userLeft: function(callback) {
+                socket.on('userLeft', function(player) {
+                    callback(player);
                     $rootScope.$apply();
                 });
             },
@@ -266,6 +259,16 @@ module.exports =
                     callback(data);
                     $rootScope.$apply();
                 });
+            },
+
+            unregisterListeners: function() {
+                socket.off('userPointsUpdate');
+                socket.off('newQuestion');
+                socket.off('gameOver');
+                socket.off('quizStart');
+                socket.off('userJoined');
+                socket.off('userLeft');
+                socket.off('timeLeft');
             }
 
         };
