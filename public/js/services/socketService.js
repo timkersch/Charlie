@@ -107,7 +107,6 @@ module.exports =
                 } else {
                     callback();
                 }
-                $rootScope.$apply();
             },
 
             /**
@@ -177,7 +176,6 @@ module.exports =
                     } else {
                         callback(quiz);
                     }
-                    $rootScope.$apply();
                 });
             },
 

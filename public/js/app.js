@@ -19,7 +19,6 @@ const joinController = require('./controllers/joinController');
 const lobbyController = require('./controllers/lobbyController');
 const homeController = require('./controllers/homeController');
 const mainController = require('./controllers/mainController');
-const profileController = require('./controllers/profileController');
 const questionController = require('./controllers/questionController');
 const scoreboardController = require('./controllers/scoreboardController');
 
@@ -30,18 +29,16 @@ charlieApp.controller('homeController', homeController);
 charlieApp.controller('joinController', joinController);
 charlieApp.controller('lobbyController', lobbyController);
 charlieApp.controller('mainController', mainController);
-charlieApp.controller('profileController', profileController);
 charlieApp.controller('questionController', questionController);
 charlieApp.controller('scoreboardController', scoreboardController);
 
 choosePlaylistController.$inject = ['$scope', '$state', 'charlieProxy'];
 createFromPlaylistController.$inject = ['$scope', '$state', '$stateParams', 'charlieProxy'];
-createNavController.$inject = ['$scope'];
+createNavController.$inject = ['$scope', '$location'];
 homeController.$inject = ['$scope', '$state', 'charlieProxy'];
 joinController.$inject = ['$scope', '$state', 'charlieProxy'];
 lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
 mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
-profileController.$inject = ['$scope', 'charlieProxy'];
 questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
 scoreboardController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
 
@@ -114,8 +111,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             url: '/profile',
             views: {
                 'container@': {
-                    templateUrl: '../views/profile.html',
-                    controller: 'profileController'
+                    templateUrl: '../views/profile.html'
                 }
             },
         })

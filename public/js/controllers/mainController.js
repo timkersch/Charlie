@@ -18,6 +18,7 @@ module.exports =
         };
 
         $scope.changeView = function (viewString) {
+            $mdSidenav('left').toggle();
             if (viewString === 'home') {
                 if (charlieProxy.isLoggedIn()) {
                     $state.go('main.loggedIn');
