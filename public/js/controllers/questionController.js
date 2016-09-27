@@ -30,39 +30,30 @@ module.exports =
             audioElement.play();
         };
 
-        // TODO
-        // let init = function () {
-        //     console.log('in init');
-        //     charlieProxy.getQuiz(function (quiz) {
-        //         console.log(quiz);
-        //         const question = quiz.questions[quiz.questionIndex];
-        //         $scope.possibleArtists = question.artistOptions;
-        //         $scope.players = quiz.players;
-        //         $scope.currentQuestion = quiz.questionIndex + 1;
-        //         $scope.lastQuestion = quiz.questions.length;
-        //         correctAnswer = question.correctArtist;
-        //
-        //         if (charlieProxy.isQuizOwner()) {
-        //             play(question.trackUrl);
-        //         }
-        //     });
-        // };
-
         let init = function () {
-            $scope.lastQuestion = charlieProxy.getNumberOfQuestions();
+            charlieProxy.getQuiz(function (quiz) {
+                const question = quiz.questions[quiz.questionIndex];
+                $scope.possibleArtists = question.artistOptions;
+                $scope.players = quiz.players;
+                $scope.currentQuestion = quiz.questionIndex + 1;
+                $scope.lastQuestion = quiz.questions.length;
+                correctAnswer = question.correctArtist;
 
-            charlieProxy.getResults(function (players) {
-                $scope.players = players;
-            });
+                charlieProxy.getUser(function(user) {
+                    for(let i = 0; i < quiz.players.length; i++) {
+                        if (quiz.players[i].userID === user) {
+                            $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
+                            hasAnswered = $scope.myAnswer !== '';
+                            $scope.correctAnswer = hasAnswered ? correctAnswer : '';
+                            break;
+                        }
+                    }
+                });
 
-            charlieProxy.getCurrentQuestion(function (result) {
-                $scope.currentQuestion = result.questionIndex + 1;
-                $scope.possibleArtists = result.question.artistOptions;
-                correctAnswer = result.question.correctArtist;
                 if (charlieProxy.isQuizOwner()) {
-                    play(result.question.trackUrl);
+                    play(question.trackUrl);
                 }
-            });
+            }, true);
         };
 
         charlieProxy.onReady(function () {

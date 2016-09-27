@@ -205,32 +205,39 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 if (quiz.started === false) {
                                     quiz.questionIndex = 0;
                                     quiz.started = true;
-                                    io.to(storage.quizID).emit('quizStart');
-                                } else {
-                                    quiz.questionIndex++;
-                                }
-                                if (quiz.questionIndex < quiz.questions.length) {
-                                    const nextQuestion = quiz.questions[quiz.questionIndex];
-                                    io.to(storage.quizID).emit('newQuestion', {
-                                        question: nextQuestion,
-                                        questionIndex: quiz.questionIndex
-                                    });
-                                    utils.countDown(25, io, storage.quizID);
                                     quiz.save(function (err) {
                                         if (err) {
                                             console.log('error in nextQuestion', err);
                                         }
+                                        io.to(storage.quizID).emit('quizStart');
+                                        utils.countDown(25, io, storage.quizID);
                                     });
                                 } else {
-                                    quiz.finished = true;
-                                    quiz.save(function (err) {
-                                        if (err) {
-                                            console.log('error in nextQuestion save to mongo', err);
-                                        } else {
-                                            io.to(storage.quizID).emit('gameOver');
-                                        }
-                                    });
+                                    quiz.questionIndex++;
+                                    if (quiz.questionIndex < quiz.questions.length) {
+                                        const nextQuestion = quiz.questions[quiz.questionIndex];
+                                        io.to(storage.quizID).emit('newQuestion', {
+                                            question: nextQuestion,
+                                            questionIndex: quiz.questionIndex
+                                        });
+                                        utils.countDown(25, io, storage.quizID);
+                                        quiz.save(function (err) {
+                                            if (err) {
+                                                console.log('error in nextQuestion', err);
+                                            }
+                                        });
+                                    } else {
+                                        quiz.finished = true;
+                                        quiz.save(function (err) {
+                                            if (err) {
+                                                console.log('error in nextQuestion save to mongo', err);
+                                            } else {
+                                                io.to(storage.quizID).emit('gameOver');
+                                            }
+                                        });
+                                    }
                                 }
+
                             }
                         });
                     }
@@ -335,7 +342,6 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                         delete storage.quizID;
                     }
                     sessionStore.set(session_id, storage);
-
                 });
             });
 

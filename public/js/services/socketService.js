@@ -68,7 +68,6 @@ module.exports =
              * Users
              */
 
-            // callback(url)
             getLoginUrl: function (callback) {
                 socket.emit('getLoginURL');
                 socket.on('getLoginURLCallback', function(data) {
@@ -102,7 +101,6 @@ module.exports =
                 sessionStorage.clear();
             },
 
-            // callback(user)
             getUser: function (callback) {
                 if (this.isLoggedIn()) {
                     callback(user);
@@ -116,7 +114,6 @@ module.exports =
              * Quiz
              */
 
-            // callback(quiz)
             createQuiz: function (name, playlistId, playlistName, owner, nbrOfSongs, shuffle, callback) {
                 let data = {
                     name: name,
@@ -139,7 +136,6 @@ module.exports =
                 });
             },
 
-            // callback(lists)
             getPlaylists: function (callback) {
                 socket.emit('getPlaylists');
                 socket.on('getPlaylistsCallback', function(data) {
@@ -148,12 +144,10 @@ module.exports =
                 });
             },
 
-            // callback(isCorrect)
             answerQuestion: function (artistName) {
                 socket.emit('answerQuestion', artistName);
             },
 
-            // callback(question)
             getCurrentQuestion: function (callback) {
                 socket.emit('getCurrentQuestion');
                 socket.on('getCurrentQuestionCallback', function(data) {
@@ -166,7 +160,6 @@ module.exports =
                 return currentQuiz.owner === user;
             },
 
-            // callback(started)
             isQuizStarted: function (callback) {
                 socket.emit('isQuizStarted');
                 socket.on('isQuizStartedCallback', function(data) {
@@ -175,7 +168,6 @@ module.exports =
                 });
             },
 
-            // callback(success)
             joinQuiz: function (data, callback) {
                 socket.emit('joinQuiz', data);
                 socket.on('joinQuizCallback', function(quiz) {
@@ -208,7 +200,6 @@ module.exports =
                 socket.emit('savePlaylist');
             },
 
-            // callback(users)
             getResults: function (callback) {
                 socket.emit('getResults');
                 socket.on('getResultsCallback', function(data) {
@@ -217,9 +208,8 @@ module.exports =
                 });
             },
 
-            // callback(quiz)
-            getQuiz: function (callback) {
-                if (currentQuiz) {
+            getQuiz: function (callback, forceGet) {
+                if(!forceGet && currentQuiz) {
                     callback(currentQuiz);
                 } else {
                     socket.emit('getQuiz');
