@@ -33,18 +33,16 @@ const sessionStore = require('sessionstore').createSessionStore({
 
 const session = require('express-session')({
     store: sessionStore,
-    key: 'connect.sid',
     secret: process.env.COOKIE_SECRET,
     resave: false,
     saveUninitialized: true
 });
 
-const socketHandler = require('./core/socketHandler')(server, Quiz, User, sessionStore);
+app.use(logger('dev'));
 
 app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 passport.use(new SpotifyStrategy({
@@ -53,28 +51,29 @@ passport.use(new SpotifyStrategy({
         callbackURL: process.env.CALLBACK
     },
     function(accessToken, refreshToken, profile, done) {
-        User.findOne({'id': profile.id}, function(err, user) {
-            console.log(user);
-            if(err) {
-                return done(err);
-            }
-            if(!user) {
-                user = new User({
-                    userID: profile.id,
-                    country: profile.country,
-                    email: profile._json.email,
-                    product: profile.product,
-                    quizIDS: []
-                });
-                user.save(function(err) {
-                    if(err) {
-                        console.log('Error when saving new user');
-                    }
-                    return done(err, user);
-                });
-            } else {
-                return done(err, user);
-            }
+        process.nextTick(function () {
+            User.findOne({'id': profile.id}, function(err, user) {
+                if(err) {
+                    return done(err);
+                }
+                if(!user) {
+                    user = new User({
+                        userID: profile.id,
+                        country: profile.country,
+                        email: profile._json.email,
+                        product: profile.product,
+                        quizIDS: []
+                    });
+                    user.save(function(err) {
+                        if(err) {
+                            console.log('Error when saving new user');
+                        }
+                        return done(null, user);
+                    });
+                } else {
+                    return done(null, user);
+                }
+            });
         });
     }
 ));
@@ -142,6 +141,7 @@ db.once('open', function() {
 server.on('error', onError);
 server.on('listening', onListening);
 server.listen(port);
+require('./core/socketHandler')(server, Quiz, User, sessionStore);
 
 /**
  * Normalize a port into a number, string, or false.

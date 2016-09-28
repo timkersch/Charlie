@@ -6,27 +6,30 @@
 module.exports = function(server, quizmodel, usermodel, sessionStore) {
     const utils = require('./helpers');
     const io = require('socket.io')(server);
+    const passportSocketIo = require('passport.socketio');
     const cookieParser = require('cookie-parser');
     const cookParse = require('cookie');
     const spotify = require('./spotifyService.js');
     const Quiz = quizmodel;
 
-    io.set('authorization', function (data, accept) {
-        if (data.headers.cookie) {
-            data.cookie = cookParse.parse(data.headers.cookie);
-            data.sessionID = cookieParser.signedCookie(data.cookie['connect.sid'], process.env.COOKIE_SECRET);
-            sessionStore.load(data.sessionID, function (err, session) {
-                if (err || !session) {
-                    accept('Error', false);
-                } else {
-                    data.session = session;
-                    accept(null, true);
-                }
-            });
-        } else {
-            return accept('No cookie transmitted', false);
-        }
-    });
+    io.use(passportSocketIo.authorize({
+        cookieParser: cookieParser,
+        secret:       process.env.COOKIE_SECRET,
+        store:        sessionStore,
+        success:      onAuthorizeSuccess,
+        fail:         onAuthorizeFail,
+    }));
+
+    function onAuthorizeSuccess(data, accept){
+        console.log('successful connection to socket.io');
+        accept();
+    }
+
+    function onAuthorizeFail(data, message, error, accept){
+        console.log('connection not authorized');
+        if(error)
+            accept(new Error(message));
+    }
 
     io.on('connection', function (socket) {
         console.log('Client connected');
