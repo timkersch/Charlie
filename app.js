@@ -16,10 +16,7 @@ const passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 const app = express();
-const port = normalizePort(process.env.PORT || '8080');
-
-const scope = ['playlist-read-private', 'playlist-read-collaborative',
-    'playlist-modify-private', 'playlist-modify-public', 'user-read-email', 'user-read-private'];
+const port = (process.env.PORT || 8080);
 
 const server = require('http').Server(app);
 
@@ -38,13 +35,6 @@ const session = require('express-session')({
     saveUninitialized: true
 });
 
-app.use(logger('dev'));
-
-app.use(session);
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.static(path.join(__dirname, 'public')));
-
 passport.use(new SpotifyStrategy({
         clientID: process.env.CLIENT_ID,
         clientSecret: process.env.CLIENT_SECRET,
@@ -52,23 +42,24 @@ passport.use(new SpotifyStrategy({
     },
     function(accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
-            User.findOne({'id': profile.id}, function(err, user) {
+            User.findOne({'userID': profile.id}, function(err, user) {
                 if(err) {
                     return done(err);
                 }
+
                 if(!user) {
-                    user = new User({
+                    const newUser = new User({
                         userID: profile.id,
                         country: profile.country,
                         email: profile._json.email,
                         product: profile.product,
                         quizIDS: []
                     });
-                    user.save(function(err) {
-                        if(err) {
-                            console.log('Error when saving new user');
+                    newUser.save(function(error) {
+                        if(error) {
+                            console.log('Error when saving new user', error);
                         }
-                        return done(null, user);
+                        return done(null, newUser);
                     });
                 } else {
                     return done(null, user);
@@ -79,58 +70,48 @@ passport.use(new SpotifyStrategy({
 ));
 
 passport.serializeUser(function(user, done) {
-    done(null, user);
+    done(null, user.userID);
 });
 
-passport.deserializeUser(function(obj, done) {
-    done(null, obj);
+passport.deserializeUser(function(id, done) {
+    User.findOne({'userID': id}, function(err, user) {
+        done(err, user);
+    });
 });
 
-app.get('/auth/spotify', passport.authenticate('spotify', {scope: scope, showDialog: true}), function(req, res){
-    // The request will be redirected to spotify for authentication
-});
 
-app.get('/auth/spotify/callback', passport.authenticate('spotify', { failureRedirect: '/' }), function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/home');
-});
+app.use(logger('dev'));
+app.use(session);
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+require('./core/routes')(app, passport);
 
 app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect('/');
-}
-
-// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
     let err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// Development error handler - will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    if(process.env.NODE_ENV === 'production') {
         res.json({
             message: err.message,
             error: err
         });
-    });
-}
-
-// Production error handler - no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.json({
-        message: err.message,
-        error: {}
-    });
+    } else {
+        res.json({
+            message: err.message,
+            error: {}
+        });
+    }
 });
 
 db.on('error', console.error.bind(console, 'Mongodb connection error:'));
@@ -138,34 +119,7 @@ db.once('open', function() {
     console.log('Connected to Mongodb');
 });
 
-server.on('error', onError);
-server.on('listening', onListening);
-server.listen(port);
-require('./core/socketHandler')(server, Quiz, User, sessionStore);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-function normalizePort(val) {
-    let port = parseInt(val, 10);
-
-    if (isNaN(port)) {
-        // named pipe
-        return val;
-    }
-
-    if (port >= 0) {
-        // port number
-        return port;
-    }
-
-    return false;
-}
-
-/**
- * Event listener for HTTP server "error" event.
- */
-function onError(error) {
+server.on('error', function(error) {
     if (error.syscall !== 'listen') {
         throw error;
     }
@@ -174,7 +128,6 @@ function onError(error) {
         ? 'Pipe ' + port
         : 'Port ' + port;
 
-    // handle specific listen errors with friendly messages
     switch (error.code) {
         case 'EACCES':
             console.error(bind + ' requires elevated privileges');
@@ -187,17 +140,17 @@ function onError(error) {
         default:
             throw error;
     }
-}
+});
 
-/**
- * Event listener for HTTP server "listening" event.
- */
-function onListening() {
+server.on('listening', function() {
     let addr = server.address();
     let bind = typeof addr === 'string'
         ? 'pipe ' + addr
         : 'port ' + addr.port;
     console.log('Listening on ' + bind);
-}
+});
+
+server.listen(port);
+require('./core/socketHandler')(server, Quiz, User, sessionStore);
 
 module.exports = app;
