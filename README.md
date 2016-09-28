@@ -1,5 +1,6 @@
 # Charlie
-A Spotify based music quiz application.
+A music quiz application powered by Spotify.
+Early alpha available on [http://charlie-quiz.herokuapp.com/]
 
 ## About
 The purpose of the application is to simplify the task of creating, distributing and playing music quizes.
@@ -71,23 +72,3 @@ After the build step fire up the server and visit localhost
 ```
 npm start
 ```
-
-## Graphical interface (Updated pics to come)
-
-#### Home
-![Home](docs/images/home.png)
-![Invited](docs/images/invited.png)
-
-#### Create Quiz
-![Created](docs/images/create-quiz.png)
-
-#### Lobby
-![Lobby](docs/images/lobby.png)
-
-#### Questions
-![Question](docs/images/question.png)
-![Answered](docs/images/answered.png)
-![Score](docs/images/score.png)
-
-#### Scoreboard
-![Scoreboard](docs/images/scoreboard.png)
