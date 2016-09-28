@@ -26,6 +26,8 @@
     "mongodb": "^2.2.9",
     "mongoose": "^4.6.0",
     "morgan": "~1.7.0",
+    "passport": "^0.3.2",
+    "passport-spotify": "^0.3.0",
     "request": "^2.74.0",
     "sessionstore": "^1.2.16",
     "socket.io": "^1.4.8",

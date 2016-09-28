@@ -7,12 +7,19 @@ const logger = require('morgan');
 
 const mongoURL = process.env.MONGODB_URI;
 const mongoose = require('mongoose').connect(mongoURL);
-const quizmodel = mongoose.model('Quiz', require('./models/quiz').Quiz);
-const usermodel = mongoose.model('User', require('./models/user').User);
 const db = mongoose.connection;
+
+const Quiz = mongoose.model('Quiz', require('./models/quiz').Quiz);
+const User = mongoose.model('User', require('./models/user').User);
+
+const passport = require('passport');
+const SpotifyStrategy = require('passport-spotify').Strategy;
 
 const app = express();
 const port = normalizePort(process.env.PORT || '8080');
+
+const scope = ['playlist-read-private', 'playlist-read-collaborative',
+    'playlist-modify-private', 'playlist-modify-public', 'user-read-email', 'user-read-private'];
 
 const server = require('http').Server(app);
 
@@ -32,14 +39,73 @@ const session = require('express-session')({
     saveUninitialized: true
 });
 
-const socketHandler = require('./core/socketHandler')(server, quizmodel, usermodel, sessionStore);
+const socketHandler = require('./core/socketHandler')(server, Quiz, User, sessionStore);
 
-app.use(logger('dev'));
 app.use(session);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+passport.use(new SpotifyStrategy({
+        clientID: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        callbackURL: process.env.CALLBACK
+    },
+    function(accessToken, refreshToken, profile, done) {
+        User.findOne({'id': profile.id}, function(err, user) {
+            console.log(user);
+            if(err) {
+                return done(err);
+            }
+            if(!user) {
+                user = new User({
+                    userID: profile.id,
+                    country: profile.country,
+                    email: profile._json.email,
+                    product: profile.product,
+                    quizIDS: []
+                });
+                user.save(function(err) {
+                    if(err) {
+                        console.log('Error when saving new user');
+                    }
+                    return done(err, user);
+                });
+            } else {
+                return done(err, user);
+            }
+        });
+    }
+));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+    done(null, obj);
+});
+
+app.get('/auth/spotify', passport.authenticate('spotify', {scope: scope, showDialog: true}), function(req, res){
+    // The request will be redirected to spotify for authentication
+});
+
+app.get('/auth/spotify/callback', passport.authenticate('spotify', { failureRedirect: '/' }), function(req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/home');
+});
+
 app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/');
+}
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {
