@@ -5,7 +5,7 @@
 require('../../css/partials/home.css');
 
 module.exports =
-    function ($scope, $state, $mdSidenav, charlieProxy) {
+    function ($scope, $state, $mdSidenav, charlieProxy, $http) {
         console.log('in mainController');
         $scope.user = '';
 
@@ -22,6 +22,19 @@ module.exports =
             charlieProxy.unregisterListeners();
             $mdSidenav('left').toggle();
             if (viewString === 'home') {
+
+                $http({
+                    method: 'GET',
+                    url: '/api/test'
+                }).then(function successCallback(response) {
+                    // this callback will be called asynchronously
+                    // when the response is available
+                }, function errorCallback(response) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                });
+
+
                 if (charlieProxy.isLoggedIn()) {
                     $state.go('main.loggedIn');
                 } else {

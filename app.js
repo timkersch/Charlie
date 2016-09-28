@@ -89,8 +89,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 require('./core/routes')(app, passport);
 
-app.get('*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('*', function (req, res) {
+    if(req.isAuthenticated()) {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } else {
+        res.redirect('/');
+    }
 });
 
 app.use(function(req, res, next) {

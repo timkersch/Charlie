@@ -38,7 +38,7 @@ createNavController.$inject = ['$scope', '$location'];
 homeController.$inject = ['$scope', '$state', 'charlieProxy'];
 joinController.$inject = ['$scope', '$state', 'charlieProxy'];
 lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
-mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
+mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy', '$http'];
 questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
 scoreboardController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
 
