@@ -15,7 +15,6 @@ module.exports =
         let init = function () {
             charlieProxy.unregisterListeners();
             charlieProxy.getResults(function (users) {
-                // TODO the chart
                 if (users) {
                     $scope.scores = [];
                     const namesArr = [];

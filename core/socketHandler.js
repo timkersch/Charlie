@@ -346,9 +346,12 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                     break;
                                 }
                             }
+
                             quiz.save(function(err) {
-                                console.log('error when saving', err);
-                            })
+                                if(err) {
+                                    console.log('error when saving', err);
+                                }
+                            });
                         });
                         io.to(storage.quizID).emit('userLeft', storage.user);
                         delete storage.quizID;
