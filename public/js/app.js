@@ -10,7 +10,7 @@ const charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial', 'ngM
 
 const charlieProxy = require('./services/socketService');
 charlieApp.service('charlieProxy', charlieProxy);
-charlieProxy.$inject = ['$rootScope'];
+charlieProxy.$inject = ['$rootScope', '$http'];
 
 const choosePlaylistController = require('./controllers/choosePlaylistController');
 const createFromPlaylistController = require('./controllers/createFromPlaylistController');
@@ -38,7 +38,7 @@ createNavController.$inject = ['$scope', '$location'];
 homeController.$inject = ['$scope', '$state', 'charlieProxy'];
 joinController.$inject = ['$scope', '$state', 'charlieProxy'];
 lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
-mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy', '$http'];
+mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
 questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
 scoreboardController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
 

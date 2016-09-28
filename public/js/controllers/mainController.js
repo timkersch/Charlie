@@ -5,7 +5,7 @@
 require('../../css/partials/home.css');
 
 module.exports =
-    function ($scope, $state, $mdSidenav, charlieProxy, $http) {
+    function ($scope, $state, $mdSidenav, charlieProxy) {
         console.log('in mainController');
         $scope.user = '';
 
@@ -18,23 +18,8 @@ module.exports =
         };
 
         $scope.changeView = function (viewString) {
-            charlieProxy.leaveQuiz();
-            charlieProxy.unregisterListeners();
             $mdSidenav('left').toggle();
             if (viewString === 'home') {
-
-                $http({
-                    method: 'GET',
-                    url: '/api/test'
-                }).then(function successCallback(response) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                }, function errorCallback(response) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                });
-
-
                 if (charlieProxy.isLoggedIn()) {
                     $state.go('main.loggedIn');
                 } else {
@@ -47,28 +32,15 @@ module.exports =
             }
         };
 
-        let init = function () {
-            if (charlieProxy.isLoggedIn()) {
-                charlieProxy.getUser(function (user) {
-                    $scope.user = user;
-                });
+        charlieProxy.getUser(function (user) {
+            if(user) {
+                $scope.user = user;
+                $state.go('main.loggedIn');
             }
-        };
-
-        charlieProxy.onReady(function () {
-            init();
         });
 
         $scope.logout = function () {
-            $scope.user = '';
             charlieProxy.logout();
-            $state.go('main.loggedOut');
+            window.open('/logout', '_self');
         };
-
-        $scope.$on('loggedIn', function () {
-            $state.user = charlieProxy.getUser(function (user) {
-                $scope.user = user;
-            });
-        });
-
     };

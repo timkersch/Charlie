@@ -8,18 +8,11 @@ module.exports =
     function choosePlaylistController($scope, $state, charlieProxy) {
         console.log("Inside choosePlaylistController");
 
-        let init = function () {
-            charlieProxy.getPlaylists(function (lists) {
-                $scope.playlists = lists;
-            });
-        };
-
-        charlieProxy.onReady(function () {
-            init();
+        charlieProxy.getPlaylists(function (lists) {
+            $scope.playlists = lists;
         });
 
         $scope.choosePlaylist = function(playlist) {
             $state.go('main.create.fromPlaylist', {id: playlist.id, name: playlist.name, owner: playlist.playlistOwner});
         };
-
     };

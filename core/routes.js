@@ -20,12 +20,10 @@ module.exports = function (app, passport) {
 
     app.get('/logout', middleware.ensureAuthenticated, function(req,res){
         req.logOut();
-        req.session.destroy(function (err) {
-            res.redirect('/');
-        });
-    });
+        res.redirect('/');
 
-    app.get('/api/test', middleware.ensureAuthenticated, function(req, res) {
-        console.log('here', req.isAuthenticated());
+        // TODO
+        //req.session.destroy(function (err) {
+        //});
     });
 };

@@ -14,6 +14,7 @@ const User = mongoose.model('User', require('./models/user').User);
 
 const passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
+const middleware = require('./core/middleware');
 
 const app = express();
 const port = (process.env.PORT || 8080);
@@ -50,6 +51,8 @@ passport.use(new SpotifyStrategy({
                 if(!user) {
                     const newUser = new User({
                         userID: profile.id,
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
                         country: profile.country,
                         email: profile._json.email,
                         product: profile.product,
@@ -62,7 +65,14 @@ passport.use(new SpotifyStrategy({
                         return done(null, newUser);
                     });
                 } else {
-                    return done(null, user);
+                    user.accessToken = accessToken;
+                    user.refreshToken = refreshToken;
+                    user.save(function(error) {
+                        if(error) {
+                            console.log('Error when updating user', error);
+                        }
+                        return done(null, user);
+                    });
                 }
             });
         });
@@ -89,12 +99,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 require('./core/routes')(app, passport);
 
-app.get('*', function (req, res) {
-    if(req.isAuthenticated()) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    } else {
-        res.redirect('/');
-    }
+app.use(require('./core/api'));
+
+app.get('*', middleware.ensureAuthenticated, function (req, res) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.use(function(req, res, next) {

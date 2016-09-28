@@ -52,42 +52,6 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 }
             });
 
-            socket.on('getLoginURL', function () {
-                console.log("in getURL");
-                const url = spotify.getRedirectURL();
-                socket.emit('getLoginURLCallback', url);
-            });
-
-            socket.on('login', function (code) {
-                console.log("in login", code);
-                const tokenPromise = spotify.getTokens(code);
-                sessionStore.load(session_id, function (err, storage) {
-                    tokenPromise.then((result) => {
-                        storage.tokens = {
-                            access_token: result['access_token'],
-                            refresh_token: result['refresh_token']
-                        };
-                        new spotify.SpotifyApi(storage.tokens).getUser().then((user) => {
-                            storage.user = user.userID;
-                            storage.spotifyAuthed = true;
-                            sessionStore.set(session_id, storage);
-                            socket.emit('loginCallback', user);
-                        });
-                    });
-                });
-            });
-
-            socket.on('getPlaylists', function () {
-                console.log("in getPlaylists");
-                sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user && storage.tokens) {
-                        new spotify.SpotifyApi(storage.tokens).getPlaylists().then((playlists) => {
-                            socket.emit('getPlaylistsCallback', playlists);
-                        });
-                    }
-                });
-            });
-
             socket.on('createQuiz', function (quizDetails) {
                 console.log("in createQuiz", quizDetails);
                 sessionStore.load(session_id, function (err, storage) {
@@ -247,33 +211,6 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 });
             });
 
-            socket.on('getCurrentQuestion', function () {
-                console.log('in getCurrentQuestion');
-
-                sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user && storage.quizID) {
-                        Quiz.findOne({'quizID': storage.quizID}, 'questionIndex questions', function (err, quiz) {
-                            socket.emit('getCurrentQuestionCallback', {
-                                question: quiz.questions[quiz.questionIndex],
-                                questionIndex: quiz.questionIndex
-                            });
-                        });
-                    }
-                });
-            });
-
-            socket.on('getResults', function () {
-                console.log("in getResults");
-
-                sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user && storage.quizID) {
-                        Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
-                            socket.emit('getResultsCallback', quiz.players);
-                        });
-                    }
-                });
-            });
-
             socket.on('answerQuestion', function (answer) {
                 console.log("in answerQuestion", answer);
 
@@ -296,45 +233,6 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                             });
                         });
                     }
-                });
-            });
-
-            socket.on('getUser', function (userId) {
-                console.log('in getUser', userId);
-                sessionStore.load(session_id, function (err, storage) {
-                    if(userId === storage.user) {
-                        socket.emit('getUserCallback', userId);
-                    } else {
-                        socket.emit('getUserCallback', {error: 'No such user!'});
-                    }
-                })
-            });
-
-            socket.on('isQuizStarted', function () {
-                console.log("in isQuizStarted");
-                sessionStore.load(session_id, function (err, storage) {
-                    Quiz.findOne({'quizID': storage.quizID}, 'started', function (err, quiz) {
-                        socket.emit('isQuizStartedCallback', quiz.started);
-                    });
-                });
-            });
-
-            socket.on('getQuiz', function () {
-                console.log("in getQuiz");
-                sessionStore.load(session_id, function (err, storage) {
-                    Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
-                        socket.emit('getQuizCallback', quiz);
-                    });
-                });
-            });
-
-            socket.on('savePlaylist', function () {
-                console.log("in savePlaylist");
-                sessionStore.load(session_id, function (err, storage) {
-                    Quiz.findOne({'quizID': storage.quizID}, 'name questions', function (err, quiz) {
-                        const api = new spotify.SpotifyApi(storage.tokens);
-                        api.savePlaylist(storage.user, quiz.name, quiz.questions);
-                    });
                 });
             });
 
@@ -363,25 +261,25 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 });
             });
 
-            socket.on('logout', function () {
-                console.log("in logout");
-                sessionStore.load(session_id, function (err, storage) {
-                    if(storage.quizID) {
-                        io.to(storage.quizID).emit('userLeft', storage.user);
-                        delete storage.quizID;
-                    }
-                    if(storage.user) {
-                        delete storage.user;
-                    }
-                    if(storage.tokens) {
-                        delete storage.tokens;
-                    }
-                    if(storage.spotifyAuthed) {
-                        delete storage.spotifyAuthed;
-                    }
-                    sessionStore.set(session_id, storage);
-                });
-            });
+            // socket.on('logout', function () {
+            //     console.log("in logout");
+            //     sessionStore.load(session_id, function (err, storage) {
+            //         if(storage.quizID) {
+            //             io.to(storage.quizID).emit('userLeft', storage.user);
+            //             delete storage.quizID;
+            //         }
+            //         if(storage.user) {
+            //             delete storage.user;
+            //         }
+            //         if(storage.tokens) {
+            //             delete storage.tokens;
+            //         }
+            //         if(storage.spotifyAuthed) {
+            //             delete storage.spotifyAuthed;
+            //         }
+            //         sessionStore.set(session_id, storage);
+            //     });
+            // });
 
             socket.on('disconnect', function () {
                 console.log("Client disconnected");

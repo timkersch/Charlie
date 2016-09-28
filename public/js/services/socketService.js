@@ -5,7 +5,7 @@
 const io = require('socket.io-client');
 
 module.exports =
-    function ($rootScope) {
+    function ($rootScope, $http) {
         const socket = io();
         let isReady = false;
         let readyCallbacks = [];
@@ -69,37 +69,29 @@ module.exports =
             },
 
             isLoggedIn: function () {
-                return (user !== null && user !== undefined && user !== '');
+                const user = sessionStorage.getItem('user');
+                return (user !== undefined && user !== 'undefined');
             },
 
             getUser: function (callback) {
-                callback(user);
-            },
-
-            /**
-             * Users
-             */
-
-            getLoginUrl: function (callback) {
-                socket.emit('getLoginURL');
-                socket.once('getLoginURLCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
-            },
-
-            login: function (code, callback) {
-                socket.emit('login', code);
-                socket.once('loginCallback', function(userData) {
-                    if(userData) {
-                        user = userData.userID;
-                        sessionStorage.setItem('user', userData.userID);
-                        callback(userData.userID);
-                    } else {
+                const user = sessionStorage.getItem('user');
+                if(user && user !== 'undefined') {
+                    callback(user);
+                } else {
+                    $http({
+                        method: 'GET',
+                        url: '/api/getMe'
+                    }).then(function successCallback(response) {
+                        sessionStorage.setItem('user', response.data.userID);
+                        callback(response.data.userID);
+                    }, function errorCallback(response) {
                         callback();
-                    }
-                    $rootScope.$broadcast('loggedIn', {});
-                });
+                    });
+                }
+            },
+
+            logout: function () {
+                sessionStorage.clear();
             },
 
             /**
@@ -129,10 +121,15 @@ module.exports =
             },
 
             getPlaylists: function (callback) {
-                socket.emit('getPlaylists');
-                socket.once('getPlaylistsCallback', function(data) {
-                    callback(data);
+                $http({
+                    method: 'GET',
+                    url: '/api/getPlaylists'
+                }).then(function successCallback(response) {
+                    console.log(response.data);
+                    callback(response.data);
                     $rootScope.$apply();
+                }, function errorCallback(response) {
+                    callback();
                 });
             },
 
@@ -201,13 +198,13 @@ module.exports =
                 socket.emit('answerQuestion', artistName);
             },
 
-            logout: function () {
-                this.unregisterListeners();
-                socket.emit('logout');
-                user = undefined;
-                currentQuiz = undefined;
-                sessionStorage.clear();
-            },
+            // logout: function () {
+            //     this.unregisterListeners();
+            //     socket.emit('logout');
+            //     user = undefined;
+            //     currentQuiz = undefined;
+            //     sessionStorage.clear();
+            // },
 
             /**
              * Listeners

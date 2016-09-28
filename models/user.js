@@ -7,6 +7,8 @@ const Schema = require('mongoose').Schema;
 const User = Schema({
     userID: String,
     country: String,
+    accessToken: String,
+    refreshToken: String,
     email: String,
     product: String,
     quizIDs: [String]
