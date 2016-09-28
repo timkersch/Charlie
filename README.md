@@ -1,6 +1,7 @@
 # Charlie
 A music quiz application powered by Spotify.
-Early alpha available on [http://charlie-quiz.herokuapp.com/]
+
+Early alpha available on http://charlie-quiz.herokuapp.com/
 
 ## About
 The purpose of the application is to simplify the task of creating, distributing and playing music quizes.
