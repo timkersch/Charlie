@@ -33,96 +33,72 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
 
     io.on('connection', function (socket) {
         console.log('Client connected');
-        let cookie = cookParse.parse(socket.handshake.headers.cookie);
-        let session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
 
-        if (session_id) {
-
-            sessionStore.load(session_id, function(err, storage) {
-                if(storage.quizID) {
-                    socket.join(storage.quizID);
-                    Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
-                        for(let i = 0; i < quiz.players.length; i++) {
-                            if(quiz.players[i].userID === storage.user) {
-                                io.to(storage.quizID).emit('userJoined', quiz.players[i]);
-                                break;
-                            }
-                        }
-                    });
-                }
-            });
+        if(socket.request.user.logged_in) {
+            const user = socket.request.user;
+            const cookie = cookParse.parse(socket.handshake.headers.cookie);
+            const session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
 
             socket.on('createQuiz', function (quizDetails) {
                 console.log("in createQuiz", quizDetails);
+
                 sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user) {
-                        const api = new spotify.SpotifyApi(storage.tokens);
-                        api.getQuizQuestions(quizDetails.playlistID, quizDetails.nbrOfSongs, quizDetails.shuffle, quizDetails.playlistOwner).then((result) => {
-                            const uid = utils.generateUID();
-                            socket.join(uid);
+                    const api = new spotify.SpotifyApi(user.accessToken, user.refreshToken);
+                    api.getQuizQuestions(quizDetails.playlistID, quizDetails.nbrOfSongs, quizDetails.shuffle, quizDetails.playlistOwner).then((result) => {
+                        const uid = utils.generateUID();
 
-                            storage.quizID = uid;
-                            sessionStore.set(session_id, storage);
+                        socket.join(uid);
+                        storage.quizID = uid;
+                        sessionStore.set(session_id, storage);
 
-                            const colors = utils.getColors();
-
-                            const newQuiz = new Quiz({
-                                quizID: uid,
-                                name: quizDetails.name,
-                                shuffle: quizDetails.shuffle,
-                                owner: storage.user,
-                                playlistOwner: quizDetails.playlistOwner,
-                                nbrOfSongs: quizDetails.nbrOfSongs,
-                                availableColors: colors.splice(1, colors.length),
-                                started: false,
-                                finished: false,
-                                playlist: {
-                                    id: quizDetails.playlistID,
-                                    name: quizDetails.playlistName,
-                                    owner: quizDetails.playlistOwner,
-                                    generated: quizDetails.generated,
-                                },
-                                players: [{
-                                    userID: storage.user,
-                                    answers: utils.initArr(quizDetails.nbrOfSongs),
-                                    points: 0,
-                                    color: colors[0],
-                                    spotify: true
-                                }]
-                            });
-                            newQuiz.questions = result;
-                            newQuiz.save(function (err) {
-                                if (err) {
-                                    console.log('error when saving quiz!', err);
-                                }
-                            });
-                            socket.emit('createQuizCallback', newQuiz);
-                        }).catch((err) => {
-                            socket.emit('createQuizCallback', {error: 'Could not create quiz. Try reducing the number of questions'});
+                        const colors = utils.getColors();
+                        const newQuiz = new Quiz({
+                            quizID: uid,
+                            name: quizDetails.name,
+                            shuffle: quizDetails.shuffle,
+                            owner: user.userID,
+                            playlistOwner: quizDetails.playlistOwner,
+                            nbrOfSongs: quizDetails.nbrOfSongs,
+                            availableColors: colors.splice(1, colors.length),
+                            started: false,
+                            finished: false,
+                            playlist: {
+                                id: quizDetails.playlistID,
+                                name: quizDetails.playlistName,
+                                owner: quizDetails.playlistOwner,
+                                generated: quizDetails.generated,
+                            },
+                            players: [{
+                                userID: user.userID,
+                                answers: utils.initArr(quizDetails.nbrOfSongs),
+                                points: 0,
+                                color: colors[0],
+                                spotify: true
+                            }]
                         });
-                    }
+                        newQuiz.questions = result;
+                        newQuiz.save(function (err) {
+                            if (err) {
+                                console.log('error when saving quiz!', err);
+                            }
+                        });
+                        socket.emit('createQuizCallback', newQuiz);
+                    }).catch((err) => {
+                        socket.emit('createQuizCallback', {error: 'Could not create quiz. Try reducing the number of questions'});
+                    });
                 });
             });
 
             socket.on('joinQuiz', function (data) {
                 console.log("in joinQuiz", data);
+
                 const room = data.room;
                 sessionStore.load(session_id, function (err, storage) {
-                    // The user joins a room
                     Quiz.findOne({'quizID': room}, function (err, quiz) {
                         if (err || !quiz) {
                             socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
                         } else {
-                            if (quiz.started === false && quiz.finished === false) {
-                                if(!storage.spotifyAuthed) {
-                                    for(let i = 0; i < quiz.players.length; i++) {
-                                        if(quiz.players[i].userID === data.username) {
-                                            return socket.emit('joinQuizCallback', {error: {nameExists: 'Username already taken!'}});
-                                        }
-                                    }
-                                    storage.user = data.username;
-                                    storage.spotifyAuthed = false;
-                                }
+                            if (!quiz.started && !quiz.finished) {
                                 // Join the room
                                 socket.join(room);
                                 storage.quizID = room;
@@ -131,18 +107,15 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 const userColor = quiz.availableColors[0];
                                 quiz.availableColors = quiz.availableColors.splice(1, quiz.availableColors.length);
                                 const player = {
-                                    userID: storage.user,
+                                    userID: user.userID,
                                     color: userColor,
-                                    spotify: storage.spotifyAuthed,
+                                    spotify: true,
                                     answers: utils.initArr(quiz.nbrOfSongs),
                                     points: 0
                                 };
                                 quiz.players.push(player);
 
-                                // Emit result back to client
                                 socket.emit('joinQuizCallback', quiz);
-
-                                // Emit to room that user with name joined
                                 io.to(room).emit('userJoined', player);
 
                                 quiz.save(function (err) {
@@ -152,7 +125,7 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                                 });
 
                             } else {
-                                if(quiz.started === true) {
+                                if (quiz.started) {
                                     socket.emit('joinQuizCallback', {error: {invalid: 'Quiz already started!'}});
                                 } else {
                                     socket.emit('joinQuizCallback', {error: {invalid: 'Invalid Quiz code!'}});
@@ -165,10 +138,11 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
 
             socket.on('nextQuestion', function () {
                 console.log("in nextQuestion");
+
                 sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user && storage.quizID) {
+                    if (user.userID && storage.quizID) {
                         Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
-                            if(storage.user === quiz.owner) {
+                            if (user.userID === quiz.owner) {
                                 if (quiz.started === false) {
                                     quiz.questionIndex = 0;
                                     quiz.started = true;
@@ -215,10 +189,10 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
                 console.log("in answerQuestion", answer);
 
                 sessionStore.load(session_id, function (err, storage) {
-                    if(storage.user && storage.quizID) {
+                    if (storage.quizID) {
                         Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
                             quiz.players.forEach(function (player) {
-                                if (player.userID === storage.user) {
+                                if (player.userID === user.userID) {
                                     player.answers.set(quiz.questionIndex, answer);
                                     if (answer === quiz.questions[quiz.questionIndex].correctArtist) {
                                         player.points++;
@@ -239,55 +213,35 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
             socket.on('leaveQuiz', function () {
                 console.log("in leaveQuiz");
                 sessionStore.load(session_id, function (err, storage) {
-                    if(storage.quizID) {
+                    if (storage.quizID) {
                         Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
-                            for(let i = 0; i < quiz.players.length; i++) {
-                                if(quiz.players[i].userID === storage.user) {
+                            for (let i = 0; i < quiz.players.length; i++) {
+                                if (quiz.players[i].userID === user.userID) {
                                     quiz.players.splice(i, 1);
                                     break;
                                 }
                             }
 
-                            quiz.save(function(err) {
-                                if(err) {
+                            quiz.save(function (err) {
+                                if (err) {
                                     console.log('error when saving', err);
                                 }
                             });
                         });
-                        io.to(storage.quizID).emit('userLeft', storage.user);
+                        io.to(storage.quizID).emit('userLeft', user.userID);
                         delete storage.quizID;
                         sessionStore.set(session_id, storage);
                     }
                 });
             });
 
-            // socket.on('logout', function () {
-            //     console.log("in logout");
-            //     sessionStore.load(session_id, function (err, storage) {
-            //         if(storage.quizID) {
-            //             io.to(storage.quizID).emit('userLeft', storage.user);
-            //             delete storage.quizID;
-            //         }
-            //         if(storage.user) {
-            //             delete storage.user;
-            //         }
-            //         if(storage.tokens) {
-            //             delete storage.tokens;
-            //         }
-            //         if(storage.spotifyAuthed) {
-            //             delete storage.spotifyAuthed;
-            //         }
-            //         sessionStore.set(session_id, storage);
-            //     });
-            // });
-
             socket.on('disconnect', function () {
                 console.log("Client disconnected");
                 // TODO Some work needs to be done here. How to differ between a refresh and a leave?
                 // TODO Want to do stuff if user is not reconnected in like 5 seconds
                 sessionStore.load(session_id, function (err, storage) {
-                    if(storage.quizID) {
-                        io.to(storage.quizID).emit('userLeft', storage.user);
+                    if (storage.quizID) {
+                        io.to(storage.quizID).emit('userLeft', user.userID);
                     }
                 });
             });

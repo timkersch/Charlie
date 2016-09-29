@@ -31,7 +31,7 @@ class SpotifyApi {
     constructor(accessToken, refreshToken) {
         this.api = new SpotifyWebApi(credentials);
         this.api.setAccessToken(accessToken);
-        this.api.setRefreshToken(refreshToken);
+        this.api.setRefreshToken(ref);
     }
 
     getUser() {
@@ -186,12 +186,15 @@ class SpotifyApi {
 
     savePlaylist(owner, name, questions) {
         const api = this.api;
-        api.createPlaylist(owner, ('Charliequiz: ' + name), {'public' : false}).then((data) => {
-            questions.forEach(function(question) {
-                api.addTracksToPlaylist(owner, data.body.id, 'spotify:track:' + question.trackID);
+        return new Promise((resolve, reject) => {
+            api.createPlaylist(owner, ('Charliequiz: ' + name), {'public' : false}).then((data) => {
+                questions.forEach(function(question) {
+                    api.addTracksToPlaylist(owner, data.body.id, 'spotify:track:' + question.trackID);
+                });
+                resolve();
+            }).catch((err) => {
+                reject(err);
             });
-        }).catch((err) => {
-            console.log('Something went wrong!', err);
         });
     }
 }

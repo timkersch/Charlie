@@ -5,7 +5,7 @@
 require('../../css/partials/lobby.css');
 
 module.exports =
-    function ($scope, $state, charlieProxy) {
+    function ($scope, $state, socketService, apiService) {
         console.log("LobbyController!");
 
         $scope.quizname = '';
@@ -18,29 +18,23 @@ module.exports =
         $scope.playlistName = '';
         $scope.playlisOwner = '';
 
-        let init = function () {
-            charlieProxy.getQuiz(function (quiz) {
-                $scope.quizname = quiz.name;
-                $scope.owner = quiz.owner;
-                $scope.id = quiz.quizID;
-                $scope.isOwner = charlieProxy.isQuizOwner();
-                $scope.players = quiz.players;
-                $scope.nbrOfSongs = quiz.nbrOfSongs;
-                $scope.generated = quiz.playlist.generated;
-                $scope.playlistName = quiz.playlist.name;
-                $scope.playlisOwner = quiz.playlist.owner;
-            });
-        };
-
-        charlieProxy.onReady(function () {
-            init();
+        apiService.getQuiz(function (quiz) {
+            $scope.quizname = quiz.name;
+            $scope.owner = quiz.owner;
+            $scope.id = quiz.quizID;
+            $scope.isOwner = apiService.isQuizOwner();
+            $scope.players = quiz.players;
+            $scope.nbrOfSongs = quiz.nbrOfSongs;
+            $scope.generated = quiz.playlist.generated;
+            $scope.playlistName = quiz.playlist.name;
+            $scope.playlisOwner = quiz.playlist.owner;
         });
 
-        charlieProxy.userJoined(function (user) {
+        socketService.userJoined(function (user) {
             $scope.players.push(user);
         });
 
-        charlieProxy.userLeft(function (user) {
+        socketService.userLeft(function (user) {
             for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].userID === user) {
                     $scope.players.splice(i, 1);
@@ -50,12 +44,12 @@ module.exports =
         });
 
         $scope.startQuiz = function () {
-            if (charlieProxy.isQuizOwner()) {
-                charlieProxy.nextQuestion();
+            if (apiService.isQuizOwner()) {
+                socketService.nextQuestion();
             }
         };
 
-        charlieProxy.quizStart(function () {
+        socketService.quizStart(function () {
             $state.go('main.question');
         });
 

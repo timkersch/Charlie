@@ -89,17 +89,15 @@ passport.deserializeUser(function(id, done) {
     });
 });
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(logger('dev'));
 app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-require('./core/routes')(app, passport);
-
-app.use(require('./core/api'));
+app.use(require('./core/auth')(passport));
+app.use(require('./core/api')(Quiz));
 
 app.get('*', middleware.ensureAuthenticated, function (req, res) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -164,5 +162,3 @@ server.on('listening', function() {
 
 server.listen(port);
 require('./core/socketHandler')(server, Quiz, User, sessionStore);
-
-module.exports = app;

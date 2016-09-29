@@ -9,6 +9,15 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/');
 }
 
+function inQuiz(req, res, next) {
+    if(req.session.quizID) {
+        return next();
+    } else {
+        res.status(404);
+        return res.json({message: 'User not in quiz'});
+    }
+}
+
 module.exports = {
     ensureAuthenticated
 };

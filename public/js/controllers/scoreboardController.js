@@ -6,15 +6,14 @@ require('../../css/partials/scoreboard.css');
 const chartjs = require('chart.js');
 
 module.exports =
-    function ($scope, $document, $state, charlieProxy) {
+    function ($scope, $document, $state, socketService, apiService) {
         console.log("Inside scoreboardController");
         $scope.scores = [];
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
 
         let init = function () {
-            charlieProxy.unregisterListeners();
-            charlieProxy.getResults(function (users) {
+            apiService.getResults(function (users) {
                 if (users) {
                     $scope.scores = [];
                     const namesArr = [];
@@ -71,13 +70,13 @@ module.exports =
         };
 
         // Initialize when service is ready
-        charlieProxy.onReady(function () {
+        socketService.onReady(function () {
             init();
         });
 
         $scope.changeView = function () {
-            charlieProxy.leaveQuiz();
-            if (charlieProxy.isLoggedIn()) {
+            socketService.leaveQuiz();
+            if (apiService.isLoggedIn()) {
                 $state.go('main.loggedIn');
             } else {
                 $state.go('main.loggedOut');
@@ -85,13 +84,13 @@ module.exports =
         };
 
         $scope.savePlaylist = function () {
-            charlieProxy.savePlaylist();
+            apiService.savePlaylist();
             $scope.isDisabled = true;
             $scope.playlistText = "Playlist added";
         };
 
         $scope.isLoggedIn = function() {
-            return charlieProxy.isLoggedIn();
+            return apiService.isLoggedIn();
         };
 
     };

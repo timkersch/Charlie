@@ -5,99 +5,19 @@
 const io = require('socket.io-client');
 
 module.exports =
-    function ($rootScope, $http) {
+    function ($rootScope) {
         const socket = io();
-        let isReady = false;
-        let readyCallbacks = [];
-        let user = '';
-        let currentQuiz;
 
-        socket.once('connect', function(){
+        socket.on('connect', function(){
             console.log('socketio open!');
-            if (sessionStorage.getItem('user')) {
-                // User in storage
-                user = sessionStorage.getItem('user');
-                // Get the user data
-                socket.emit('getUser', user);
-                socket.on('getUserCallback', function(data) {
-
-                    if(!data || data.error) {
-                        sessionStorage.clear();
-                    } else {
-                        // TODO Check current quiz and get relevant data
-                    }
-                    setReady();
-                });
-            } else {
-                setReady();
-            }
         });
 
         socket.on('disconnect', function(){
-            sessionStorage.clear();
             console.log("socketio close!");
         });
 
-        let setReady = function () {
-            isReady = true;
-            for (let i = 0; i < readyCallbacks.length; i++) {
-                readyCallbacks[i]();
-            }
-            readyCallbacks = [];
-            $rootScope.$broadcast('service-ready');
-        };
-
         return {
-            /**
-             * Service
-             */
-
-            isReady: function () {
-                return isReady;
-            },
-            onReady: function (callback) {
-                if (!isReady) {
-                    readyCallbacks.push(callback);
-                }
-                else {
-                    callback();
-                }
-            },
-
-            isQuizOwner: function () {
-                return currentQuiz.owner === user;
-            },
-
-            isLoggedIn: function () {
-                const user = sessionStorage.getItem('user');
-                return (user !== undefined && user !== 'undefined');
-            },
-
-            getUser: function (callback) {
-                const user = sessionStorage.getItem('user');
-                if(user && user !== 'undefined') {
-                    callback(user);
-                } else {
-                    $http({
-                        method: 'GET',
-                        url: '/api/getMe'
-                    }).then(function successCallback(response) {
-                        sessionStorage.setItem('user', response.data.userID);
-                        callback(response.data.userID);
-                    }, function errorCallback(response) {
-                        callback();
-                    });
-                }
-            },
-
-            logout: function () {
-                sessionStorage.clear();
-            },
-
-            /**
-             * Quiz
-             */
-
+            // ----------- Quiz management -----------
             createQuiz: function (name, playlistId, playlistName, owner, nbrOfSongs, shuffle, callback) {
                 let data = {
                     name: name,
@@ -113,38 +33,8 @@ module.exports =
                     if(!quiz || quiz.error) {
                         callback(quiz);
                     } else {
-                        currentQuiz = quiz;
-                        callback(currentQuiz);
+                        callback(quiz);
                     }
-                    $rootScope.$apply();
-                });
-            },
-
-            getPlaylists: function (callback) {
-                $http({
-                    method: 'GET',
-                    url: '/api/getPlaylists'
-                }).then(function successCallback(response) {
-                    console.log(response.data);
-                    callback(response.data);
-                    $rootScope.$apply();
-                }, function errorCallback(response) {
-                    callback();
-                });
-            },
-
-            getCurrentQuestion: function (callback) {
-                socket.emit('getCurrentQuestion');
-                socket.once('getCurrentQuestionCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
-            },
-
-            isQuizStarted: function (callback) {
-                socket.emit('isQuizStarted');
-                socket.once('isQuizStartedCallback', function(data) {
-                    callback(data);
                     $rootScope.$apply();
                 });
             },
@@ -153,33 +43,11 @@ module.exports =
                 socket.emit('joinQuiz', data);
                 socket.once('joinQuizCallback', function(quiz) {
                     if (quiz && !quiz.error) {
-                        currentQuiz = quiz;
                         callback(quiz);
                     } else {
                         callback(quiz);
                     }
                 });
-            },
-
-            getResults: function (callback) {
-                socket.emit('getResults');
-                socket.once('getResultsCallback', function(data) {
-                    callback(data);
-                    $rootScope.$apply();
-                });
-            },
-
-            getQuiz: function (callback, forceGet) {
-                if(!forceGet && currentQuiz) {
-                    callback(currentQuiz);
-                } else {
-                    socket.emit('getQuiz');
-                    socket.once('getQuizCallback', function (quiz) {
-                        currentQuiz = quiz;
-                        callback(quiz);
-                        $rootScope.$apply();
-                    });
-                }
             },
 
             leaveQuiz: function () {
@@ -190,26 +58,12 @@ module.exports =
                 socket.emit('nextQuestion');
             },
 
-            savePlaylist: function () {
-                socket.emit('savePlaylist');
-            },
-
             answerQuestion: function (artistName) {
                 socket.emit('answerQuestion', artistName);
             },
 
-            // logout: function () {
-            //     this.unregisterListeners();
-            //     socket.emit('logout');
-            //     user = undefined;
-            //     currentQuiz = undefined;
-            //     sessionStorage.clear();
-            // },
 
-            /**
-             * Listeners
-             */
-
+            // -------- Listeners --------
             timeLeft : function(callback) {
                 socket.on('timeLeft', function(time) {
                     callback(time);
@@ -258,15 +112,6 @@ module.exports =
                 });
             },
 
-            unregisterListeners: function() {
-                socket.off('userPointsUpdate');
-                socket.off('newQuestion');
-                socket.off('gameOver');
-                socket.off('quizStart');
-                socket.off('userJoined');
-                socket.off('userLeft');
-                socket.off('timeLeft');
-            }
-
+            // TODO unregister listeners
         };
     };

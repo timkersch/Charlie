@@ -5,7 +5,7 @@
 require('../../css/partials/create.css');
 
 module.exports =
-    function ($scope, $state, $stateParams, charlieProxy) {
+    function ($scope, $state, $stateParams, socketService) {
         console.log("Inside createFromPlaylistController");
 
         $scope.name = null;
@@ -15,7 +15,7 @@ module.exports =
 
         $scope.createQuiz = function () {
             $scope.loading = true;
-            charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
+            socketService.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
                 $scope.loading = false;
                 if (!quiz || quiz.error) {
                     alert(quiz.error);

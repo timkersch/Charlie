@@ -5,7 +5,7 @@
 require('../../css/partials/join.css');
 
 module.exports =
-    function ($scope, $state, charlieProxy) {
+    function ($scope, $state, socketService) {
         console.log("Joincontroller");
 
         $scope.fetching = false;
@@ -13,9 +13,7 @@ module.exports =
 
         $scope.changeView = function () {
             $scope.fetching = true;
-            charlieProxy.getUser(function(user) {
-                const name = user ? user : $scope.displayName;
-                charlieProxy.joinQuiz({username: name, room: $scope.joinCode}, function (result) {
+                socketService.joinQuiz({room: $scope.joinCode}, function (result) {
                     $scope.fetching = false;
                     if (result && !result.error) {
                         $state.go('main.lobby');
@@ -23,10 +21,5 @@ module.exports =
                         $scope.serverErrors = result.error;
                     }
                 });
-            });
-        };
-
-        $scope.isLoggedIn = function() {
-            return charlieProxy.isLoggedIn();
         };
     };

@@ -5,7 +5,7 @@
 require('../../css/partials/home.css');
 
 module.exports =
-    function ($scope, $state, $mdSidenav, charlieProxy) {
+    function ($scope, $state, $mdSidenav, apiService) {
         console.log('in mainController');
         $scope.user = '';
 
@@ -14,13 +14,13 @@ module.exports =
         };
 
         $scope.isLoggedIn = function () {
-            return charlieProxy.isLoggedIn();
+            return apiService.isLoggedIn();
         };
 
         $scope.changeView = function (viewString) {
             $mdSidenav('left').toggle();
             if (viewString === 'home') {
-                if (charlieProxy.isLoggedIn()) {
+                if (apiService.isLoggedIn()) {
                     $state.go('main.loggedIn');
                 } else {
                     $state.go('main.loggedOut');
@@ -32,7 +32,7 @@ module.exports =
             }
         };
 
-        charlieProxy.getUser(function (user) {
+        apiService.getUser(function (user) {
             if(user) {
                 $scope.user = user;
                 $state.go('main.loggedIn');
@@ -40,7 +40,7 @@ module.exports =
         });
 
         $scope.logout = function () {
-            charlieProxy.logout();
+            apiService.logout();
             window.open('/logout', '_self');
         };
     };
