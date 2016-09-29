@@ -55,8 +55,7 @@ passport.use(new SpotifyStrategy({
                         refreshToken: refreshToken,
                         country: profile.country,
                         email: profile._json.email,
-                        product: profile.product,
-                        quizIDS: []
+                        product: profile.product
                     });
                     newUser.save(function(error) {
                         if(error) {
@@ -96,8 +95,8 @@ app.use(session);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(require('./core/auth')(passport));
-app.use(require('./core/api')(Quiz));
+app.use(require('./core/authEndpoints')(passport));
+app.use(require('./core/apiEndpoints')(Quiz));
 
 app.get('*', middleware.ensureAuthenticated, function (req, res) {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -161,4 +160,4 @@ server.on('listening', function() {
 });
 
 server.listen(port);
-require('./core/socketHandler')(server, Quiz, User, sessionStore);
+require('./core/socketEndpoints')(server, sessionStore, Quiz);

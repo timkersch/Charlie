@@ -3,14 +3,14 @@
  * Created by Tim on 04/09/16.
  */
 
-module.exports = function(server, quizmodel, usermodel, sessionStore) {
-    const utils = require('./helpers');
+const utils = require('./helpers');
+const passportSocketIo = require('passport.socketio');
+const cookieParser = require('cookie-parser');
+const cookie = require('cookie');
+const spotify = require('./spotifyService.js');
+
+module.exports = function(server, sessionStore, Quiz) {
     const io = require('socket.io')(server);
-    const passportSocketIo = require('passport.socketio');
-    const cookieParser = require('cookie-parser');
-    const cookParse = require('cookie');
-    const spotify = require('./spotifyService.js');
-    const Quiz = quizmodel;
 
     io.use(passportSocketIo.authorize({
         cookieParser: cookieParser,
@@ -27,8 +27,9 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
 
     function onAuthorizeFail(data, message, error, accept){
         console.log('connection not authorized');
-        if(error)
+        if(error) {
             accept(new Error(message));
+        }
     }
 
     io.on('connection', function (socket) {
@@ -36,8 +37,8 @@ module.exports = function(server, quizmodel, usermodel, sessionStore) {
 
         if(socket.request.user.logged_in) {
             const user = socket.request.user;
-            const cookie = cookParse.parse(socket.handshake.headers.cookie);
-            const session_id = cookieParser.signedCookie(cookie['connect.sid'], process.env.COOKIE_SECRET);
+            const cookies = cookie.parse(socket.handshake.headers.cookie);
+            const session_id = cookieParser.signedCookie(cookies['connect.sid'], process.env.COOKIE_SECRET);
 
             socket.on('createQuiz', function (quizDetails) {
                 console.log("in createQuiz", quizDetails);

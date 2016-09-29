@@ -11,7 +11,6 @@ const User = Schema({
     refreshToken: String,
     email: String,
     product: String,
-    quizIDs: [String]
 });
 
 module.exports = {

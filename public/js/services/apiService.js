@@ -30,7 +30,7 @@ module.exports =
                     }).then(function successCallback(response) {
                         sessionStorage.setItem('user', response.data.userID);
                         callback(response.data.userID);
-                    }, function errorCallback(response) {
+                    }, function errorCallback() {
                         callback();
                     });
                 }
@@ -47,7 +47,7 @@ module.exports =
                 }).then(function successCallback(response) {
                     callback(response.data);
                     $rootScope.$apply();
-                }, function errorCallback(response) {
+                }, function errorCallback() {
                     callback();
                 });
             },
@@ -59,7 +59,7 @@ module.exports =
                 }).then(function successCallback(response) {
                     callback(response.data);
                     $rootScope.$apply();
-                }, function errorCallback(response) {
+                }, function errorCallback() {
                     callback();
                 });
             },
@@ -71,7 +71,7 @@ module.exports =
                 }).then(function successCallback(response) {
                     callback(response.data);
                     $rootScope.$apply();
-                }, function errorCallback(response) {
+                }, function errorCallback() {
                     callback();
                 });
             },
@@ -84,7 +84,7 @@ module.exports =
                     currentQuiz = response.data;
                     callback(response.data);
                     $rootScope.$apply();
-                }, function errorCallback(response) {
+                }, function errorCallback() {
                     callback();
                 });
             },
@@ -93,12 +93,10 @@ module.exports =
                 $http({
                     method: 'POST',
                     url: '/api/savePlaylist'
-                }).then(function successCallback(response) {
-                    callback(response.data);
+                }).then(function successCallback() {
                     $rootScope.$apply();
-                }, function errorCallback(response) {
-                    callback();
+                }, function errorCallback() {
                 });
             },
-        }
+        };
     };

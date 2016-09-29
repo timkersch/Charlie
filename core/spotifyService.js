@@ -34,22 +34,6 @@ class SpotifyApi {
         this.api.setRefreshToken(refreshToken);
     }
 
-    getUser() {
-        return this.api.getMe().then((data) => {
-            this.user = data.body.id;
-            return {
-                userID : data.body.id,
-                birthdate : data.body.birthdate,
-                country: data.body.country,
-                dispName: data.body.display_name,
-                email: data.body.email,
-                product: data.body.product
-            };
-        },(err) => {
-            console.log('Something went wrong!', err);
-        });
-    }
-
     getPlaylists() {
         return this.api.getUserPlaylists(this.userID).then((data) => {
             const items = data.body.items;

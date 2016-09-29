@@ -30,34 +30,28 @@ module.exports =
             audioElement.play();
         };
 
-        let init = function () {
-            apiService.getQuiz(function (quiz) {
-                const question = quiz.questions[quiz.questionIndex];
-                $scope.possibleArtists = question.artistOptions;
-                $scope.players = quiz.players;
-                $scope.currentQuestion = quiz.questionIndex + 1;
-                $scope.lastQuestion = quiz.questions.length;
-                correctAnswer = question.correctArtist;
+        apiService.getQuiz(function (quiz) {
+            const question = quiz.questions[quiz.questionIndex];
+            $scope.possibleArtists = question.artistOptions;
+            $scope.players = quiz.players;
+            $scope.currentQuestion = quiz.questionIndex + 1;
+            $scope.lastQuestion = quiz.questions.length;
+            correctAnswer = question.correctArtist;
 
-                apiService.getUser(function(user) {
-                    for(let i = 0; i < quiz.players.length; i++) {
-                        if (quiz.players[i].userID === user) {
-                            $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
-                            hasAnswered = $scope.myAnswer !== '';
-                            $scope.correctAnswer = hasAnswered ? correctAnswer : '';
-                            break;
-                        }
+            apiService.getUser(function(user) {
+                for(let i = 0; i < quiz.players.length; i++) {
+                    if (quiz.players[i].userID === user) {
+                        $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
+                        hasAnswered = $scope.myAnswer !== '';
+                        $scope.correctAnswer = hasAnswered ? correctAnswer : '';
+                        break;
                     }
-                });
-
-                if (apiService.isQuizOwner()) {
-                    play(question.trackUrl);
                 }
-            }, true);
-        };
+            });
 
-        socketService.onReady(function () {
-            init();
+            if (apiService.isQuizOwner()) {
+                play(question.trackUrl);
+            }
         });
 
         socketService.gameOver(function () {
