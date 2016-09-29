@@ -31,7 +31,7 @@ class SpotifyApi {
     constructor(accessToken, refreshToken) {
         this.api = new SpotifyWebApi(credentials);
         this.api.setAccessToken(accessToken);
-        this.api.setRefreshToken(ref);
+        this.api.setRefreshToken(refreshToken);
     }
 
     getUser() {

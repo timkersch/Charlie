@@ -19,5 +19,6 @@ function inQuiz(req, res, next) {
 }
 
 module.exports = {
-    ensureAuthenticated
+    ensureAuthenticated,
+    inQuiz
 };
