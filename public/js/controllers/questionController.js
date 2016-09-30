@@ -145,8 +145,11 @@ module.exports =
         };
 
         $scope.$on('$destroy', function () {
-            socketService.unregisterAllListeners();
             audioElement.pause();
             audioElement.currentTime = 0;
+            socketService.unregisterAllListeners();
+            if($state.current.name !== 'main.scoreboard') {
+                socketService.leaveQuiz();
+            }
         });
     };
