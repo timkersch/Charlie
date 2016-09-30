@@ -145,6 +145,7 @@ module.exports =
         };
 
         $scope.$on('$destroy', function () {
+            socketService.unregisterAllListeners();
             audioElement.pause();
             audioElement.currentTime = 0;
         });

@@ -55,4 +55,8 @@ module.exports =
             $state.go('main.question');
         });
 
+        $scope.$on('$destroy', function () {
+            socketService.unregisterUserListeners();
+        });
+
     };

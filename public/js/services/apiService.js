@@ -4,7 +4,7 @@
 "use strict";
 
 module.exports =
-    function($rootScope, $http) {
+    function($http) {
 
         // TODO better solution is to let backend decide on the owner
         let currentQuiz;

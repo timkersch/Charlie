@@ -5,7 +5,7 @@
 const io = require('socket.io-client');
 
 module.exports =
-    function ($rootScope) {
+    function () {
         const socket = io();
 
         socket.on('connect', function(){
@@ -105,6 +105,19 @@ module.exports =
                 });
             },
 
-            // TODO unregister listeners
+            unregisterAllListeners : function() {
+                socket.off('userPointsUpdate');
+                socket.off('newQuestion');
+                socket.off('gameOver');
+                socket.off('quizStart');
+                socket.off('userLeft');
+                socket.off('userJoined');
+                socket.off('timeLeft');
+            },
+
+            unregisterUserListeners : function() {
+                socket.off('userLeft');
+                socket.off('userJoined');
+            }
         };
     };

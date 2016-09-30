@@ -10,11 +10,10 @@ const charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial', 'ngM
 
 const socketService = require('./services/socketService');
 charlieApp.service('socketService', socketService);
-socketService.$inject = ['$rootScope'];
 
 const apiService = require('./services/apiService');
 charlieApp.service('apiService', apiService);
-apiService.$inject = ['$rootScope', '$http'];
+apiService.$inject = ['$http'];
 
 const choosePlaylistController = require('./controllers/choosePlaylistController');
 const createFromPlaylistController = require('./controllers/createFromPlaylistController');

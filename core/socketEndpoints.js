@@ -10,6 +10,8 @@ const cookie = require('cookie');
 const spotify = require('./spotifyService.js');
 
 module.exports = function(server, sessionStore, Quiz) {
+    let startTime;
+
     const io = require('socket.io')(server);
 
     io.use(passportSocketIo.authorize({
@@ -74,7 +76,6 @@ module.exports = function(server, sessionStore, Quiz) {
                                 answers: utils.initArr(quizDetails.nbrOfSongs),
                                 points: 0,
                                 color: colors[0],
-                                spotify: true
                             }]
                         });
                         newQuiz.questions = result;
@@ -110,7 +111,6 @@ module.exports = function(server, sessionStore, Quiz) {
                                 const player = {
                                     userID: user.userID,
                                     color: userColor,
-                                    spotify: true,
                                     answers: utils.initArr(quiz.nbrOfSongs),
                                     points: 0
                                 };
@@ -152,6 +152,7 @@ module.exports = function(server, sessionStore, Quiz) {
                                             console.log('error in nextQuestion', err);
                                         }
                                         io.to(storage.quizID).emit('quizStart');
+                                        startTime = new Date().getTime();
                                         utils.countDown(25, io, storage.quizID);
                                     });
                                 } else {
@@ -162,6 +163,7 @@ module.exports = function(server, sessionStore, Quiz) {
                                             question: nextQuestion,
                                             questionIndex: quiz.questionIndex
                                         });
+                                        startTime = new Date().getTime();
                                         utils.countDown(25, io, storage.quizID);
                                         quiz.save(function (err) {
                                             if (err) {
@@ -189,6 +191,9 @@ module.exports = function(server, sessionStore, Quiz) {
             socket.on('answerQuestion', function (answer) {
                 console.log("in answerQuestion", answer);
 
+                let endTime = new Date().getTime();
+                let time = endTime - startTime;
+
                 sessionStore.load(session_id, function (err, storage) {
                     if (storage.quizID) {
                         Quiz.findOne({'quizID': storage.quizID}, function (err, quiz) {
@@ -196,7 +201,8 @@ module.exports = function(server, sessionStore, Quiz) {
                                 if (player.userID === user.userID) {
                                     player.answers.set(quiz.questionIndex, answer);
                                     if (answer === quiz.questions[quiz.questionIndex].correctArtist) {
-                                        player.points++;
+                                        let pointChange = ((1-((time/2)/10000)) * 5);
+                                        player.points = player.points + Number(pointChange.toFixed(2));
                                         io.to(storage.quizID).emit('userPointsUpdate', player);
                                     }
                                     return quiz.save(function (err) {
@@ -230,6 +236,7 @@ module.exports = function(server, sessionStore, Quiz) {
                             });
                         });
                         io.to(storage.quizID).emit('userLeft', user.userID);
+                        socket.leave(storage.quizID);
                         delete storage.quizID;
                         sessionStore.set(session_id, storage);
                     }
@@ -238,13 +245,6 @@ module.exports = function(server, sessionStore, Quiz) {
 
             socket.on('disconnect', function () {
                 console.log("Client disconnected");
-                // TODO Some work needs to be done here. How to differ between a refresh and a leave?
-                // TODO Want to do stuff if user is not reconnected in like 5 seconds
-                sessionStore.load(session_id, function (err, storage) {
-                    if (storage.quizID) {
-                        io.to(storage.quizID).emit('userLeft', user.userID);
-                    }
-                });
             });
         }
     });

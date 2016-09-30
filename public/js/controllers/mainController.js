@@ -7,6 +7,7 @@ require('../../css/partials/home.css');
 module.exports =
     function ($scope, $state, $mdSidenav, apiService) {
         console.log('in mainController');
+
         $scope.user = '';
 
         $scope.toggleLeftMenu = function () {
@@ -35,7 +36,9 @@ module.exports =
         apiService.getUser(function (user) {
             if(user) {
                 $scope.user = user;
-                $state.go('main.loggedIn');
+                if($state.current.name === 'main.loggedOut') {
+                    $state.go('main.loggedIn');
+                }
             }
         });
 

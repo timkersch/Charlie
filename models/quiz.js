@@ -23,7 +23,6 @@ const Quiz = Schema({
     players: [{
         userID: String,
         color: String,
-        spotify: Boolean,
         answers: [String],
         points: Number
     }],
