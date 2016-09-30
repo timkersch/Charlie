@@ -46,7 +46,6 @@ module.exports =
                     url: '/api/getPlaylists'
                 }).then(function successCallback(response) {
                     callback(response.data);
-                    $rootScope.$apply();
                 }, function errorCallback() {
                     callback();
                 });
@@ -58,7 +57,6 @@ module.exports =
                     url: '/api/getCurrentQuestion'
                 }).then(function successCallback(response) {
                     callback(response.data);
-                    $rootScope.$apply();
                 }, function errorCallback() {
                     callback();
                 });
@@ -70,7 +68,6 @@ module.exports =
                     url: '/api/getResults'
                 }).then(function successCallback(response) {
                     callback(response.data);
-                    $rootScope.$apply();
                 }, function errorCallback() {
                     callback();
                 });
@@ -83,7 +80,6 @@ module.exports =
                 }).then(function successCallback(response) {
                     currentQuiz = response.data;
                     callback(response.data);
-                    $rootScope.$apply();
                 }, function errorCallback() {
                     callback();
                 });
@@ -94,7 +90,6 @@ module.exports =
                     method: 'POST',
                     url: '/api/savePlaylist'
                 }).then(function successCallback() {
-                    $rootScope.$apply();
                 }, function errorCallback() {
                 });
             },

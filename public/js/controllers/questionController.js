@@ -77,6 +77,7 @@ module.exports =
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
+            $scope.$apply();
         });
 
         socketService.timeLeft(function (time) {
@@ -93,6 +94,7 @@ module.exports =
                     socketService.nextQuestion();
                 }
             }
+            $scope.$apply();
         });
 
         $scope.isDisabled = function (artist) {

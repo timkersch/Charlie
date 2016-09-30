@@ -32,12 +32,14 @@ module.exports =
 
         socketService.userJoined(function (user) {
             $scope.players.push(user);
+            $scope.$apply();
         });
 
         socketService.userLeft(function (user) {
             for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].userID === user) {
                     $scope.players.splice(i, 1);
+                    $scope.$apply();
                     break;
                 }
             }

@@ -35,7 +35,6 @@ module.exports =
                     } else {
                         callback(quiz);
                     }
-                    $rootScope.$apply();
                 });
             },
 
@@ -67,21 +66,18 @@ module.exports =
             timeLeft : function(callback) {
                 socket.on('timeLeft', function(time) {
                     callback(time);
-                    $rootScope.$apply();
                 });
             },
 
             userJoined : function(callback) {
                 socket.on('userJoined', function(user) {
                     callback(user);
-                    $rootScope.$apply();
                 });
             },
 
             userLeft: function(callback) {
                 socket.on('userLeft', function(player) {
                     callback(player);
-                    $rootScope.$apply();
                 });
             },
 
@@ -94,21 +90,18 @@ module.exports =
             gameOver : function(callback) {
                 socket.on('gameOver', function() {
                     callback();
-                    $rootScope.$apply();
                 });
             },
 
             newQuestion : function(callback) {
                 socket.on('newQuestion', function(data) {
                     callback(data);
-                    $rootScope.$apply();
                 });
             },
 
             userPointsUpdate : function(callback) {
                 socket.on('userPointsUpdate', function(data) {
                     callback(data);
-                    $rootScope.$apply();
                 });
             },
 
