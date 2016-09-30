@@ -7,7 +7,8 @@ const chartjs = require('chart.js');
 
 module.exports =
     function ($scope, $document, $state, socketService, apiService) {
-        console.log("Inside scoreboardController");
+        console.log("scoreboardController");
+
         $scope.scores = [];
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";

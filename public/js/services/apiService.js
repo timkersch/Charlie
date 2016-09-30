@@ -6,7 +6,6 @@
 module.exports =
     function($http) {
 
-        // TODO better solution is to let backend decide on the owner
         let currentQuiz;
 
         return {

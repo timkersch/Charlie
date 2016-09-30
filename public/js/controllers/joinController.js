@@ -6,7 +6,7 @@ require('../../css/partials/join.css');
 
 module.exports =
     function ($scope, $state, socketService) {
-        console.log("Joincontroller");
+        console.log("joincontroller");
 
         $scope.fetching = false;
         $scope.serverErrors = {};
@@ -18,6 +18,7 @@ module.exports =
                     if (result && !result.error) {
                         $state.go('main.lobby');
                     } else {
+                        console.log(result.error);
                         $scope.serverErrors = result.error;
                     }
                 });

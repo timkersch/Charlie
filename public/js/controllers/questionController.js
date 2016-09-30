@@ -6,7 +6,7 @@ require('../../css/partials/question.css');
 
 module.exports =
     function ($scope, $state, $document, socketService, apiService) {
-        console.log("Inside questionController");
+        console.log("questionController");
 
         let audioElement = $document[0].createElement('audio');
         let hasAnswered = false;

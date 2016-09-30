@@ -7,7 +7,7 @@ const authUrl = '/auth/spotify';
 
 module.exports =
     function ($scope) {
-        console.log("Inside homeController");
+        console.log("homeController");
 
         $scope.login = function () {
             window.open(authUrl, '_self');

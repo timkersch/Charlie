@@ -114,7 +114,7 @@ module.exports = function(server, sessionStore, Quiz) {
                         });
                         socket.emit('createQuizCallback', newQuiz);
                     }).catch((err) => {
-                        socket.emit('createQuizCallback', {error: 'Could not create quiz. Try reducing the number of questions'});
+                        socket.emit('createQuizCallback', {error: {invalid: 'Could not create quiz. Try reducing the number of questions'}});
                     });
                 });
             });
@@ -229,8 +229,7 @@ module.exports = function(server, sessionStore, Quiz) {
                                 if (player.userID === user.userID) {
                                     player.answers.set(quiz.questionIndex, answer);
                                     if (answer === quiz.questions[quiz.questionIndex].correctArtist) {
-                                        let pointChange = ((1-((time/2)/10000)) * 5);
-                                        player.points += pointChange;
+                                        player.points += Math.round(100-((time/1000)*5));
                                         io.to(storage.quizID).emit('userPointsUpdate', player);
                                     }
                                     return quiz.save(function (err) {

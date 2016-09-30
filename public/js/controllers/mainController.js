@@ -6,7 +6,7 @@ require('../../css/partials/home.css');
 
 module.exports =
     function ($scope, $state, $mdSidenav, apiService) {
-        console.log('in mainController');
+        console.log('mainController');
 
         $scope.user = '';
 

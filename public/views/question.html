@@ -34,8 +34,7 @@
                     <md-list-item class="md-3-line" ng-repeat="player in players | orderBy:'-points'" ng-disabled="true">
                         <div class="md-list-item-text" layout="column">
                             <div class="item">
-                                <h3 ng-if="player.points % 1 != 0">{{ player.points.toFixed(2) }} - {{ player.userID }}</h3>
-                                <h3 ng-if="player.points % 1 == 0">{{ player.points }} - {{ player.userID }}</h3>
+                                <h3>{{ player.points }} - {{ player.userID }}</h3>
                             </div>
                             <md-divider ></md-divider>
                         </div>

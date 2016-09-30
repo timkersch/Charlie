@@ -6,7 +6,7 @@ require('../../css/partials/create.css');
 
 module.exports =
     function choosePlaylistController($scope, $state, apiService) {
-        console.log("Inside choosePlaylistController");
+        console.log("choosePlaylistController");
 
         apiService.getPlaylists(function (lists) {
             $scope.playlists = lists;

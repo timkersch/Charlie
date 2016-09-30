@@ -6,7 +6,7 @@ require('../../css/partials/create.css');
 
 module.exports =
     function ($scope, $location) {
-        console.log("Inside createController");
+        console.log("createNavController");
 
         const currentPath = $location.$$path;
         const regexp = /\/create\/([a-z]*)/;

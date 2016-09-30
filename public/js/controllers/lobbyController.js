@@ -6,7 +6,7 @@ require('../../css/partials/lobby.css');
 
 module.exports =
     function ($scope, $state, socketService, apiService) {
-        console.log("LobbyController!");
+        console.log("lobbyController");
 
         $scope.quizname = '';
         $scope.owner = '';
