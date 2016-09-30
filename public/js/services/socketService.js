@@ -118,6 +118,7 @@ module.exports =
             unregisterUserListeners : function() {
                 socket.off('userLeft');
                 socket.off('userJoined');
+                socket.off('quizStart');
             }
         };
     };

@@ -42,6 +42,12 @@ module.exports = function(server, sessionStore, Quiz) {
             const cookies = cookie.parse(socket.handshake.headers.cookie);
             const session_id = cookieParser.signedCookie(cookies['connect.sid'], process.env.COOKIE_SECRET);
 
+            sessionStore.load(session_id, function(err, storage) {
+                if(storage.quizID) {
+                    socket.join(storage.quizID);
+                }
+            });
+
             socket.on('createQuiz', function (quizDetails) {
                 console.log("in createQuiz", quizDetails);
 
@@ -202,7 +208,7 @@ module.exports = function(server, sessionStore, Quiz) {
                                     player.answers.set(quiz.questionIndex, answer);
                                     if (answer === quiz.questions[quiz.questionIndex].correctArtist) {
                                         let pointChange = ((1-((time/2)/10000)) * 5);
-                                        player.points = player.points + Number(pointChange.toFixed(2));
+                                        player.points += pointChange;
                                         io.to(storage.quizID).emit('userPointsUpdate', player);
                                     }
                                     return quiz.save(function (err) {
