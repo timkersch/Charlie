@@ -67,7 +67,6 @@ module.exports =
         });
 
         $scope.changeView = function () {
-            socketService.leaveQuiz();
             if (apiService.isLoggedIn()) {
                 $state.go('main.loggedIn');
             } else {
@@ -84,6 +83,10 @@ module.exports =
         $scope.isLoggedIn = function() {
             return apiService.isLoggedIn();
         };
+
+        $scope.$on('$destroy', function () {
+            socketService.leaveQuiz();
+        });
 
     };
 

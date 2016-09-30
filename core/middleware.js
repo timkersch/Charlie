@@ -3,7 +3,6 @@
  */
 
 function ensureAuthenticated(req, res, next) {
-    console.log('is authed', req.isAuthenticated());
     if (req.isAuthenticated()) {
         return next();
     }

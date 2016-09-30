@@ -11,7 +11,7 @@ const spotify = require('./spotifyService.js');
 
 module.exports = function(server, sessionStore, Quiz) {
     let startTime;
-
+    const timers = {};
     const io = require('socket.io')(server);
 
     io.use(passportSocketIo.authorize({
@@ -34,6 +34,23 @@ module.exports = function(server, sessionStore, Quiz) {
         }
     }
 
+    function leaveQuiz(quizID, user) {
+        Quiz.findOne({'quizID': quizID}, 'players', function (err, quiz) {
+            for (let i = 0; i < quiz.players.length; i++) {
+                if (quiz.players[i].userID === user) {
+                    quiz.players.splice(i, 1);
+                    break;
+                }
+            }
+
+            quiz.save(function (err) {
+                if (err) {
+                    console.log('error when saving', err);
+                }
+            });
+        });
+    }
+
     io.on('connection', function (socket) {
         console.log('Client connected');
 
@@ -41,6 +58,11 @@ module.exports = function(server, sessionStore, Quiz) {
             const user = socket.request.user;
             const cookies = cookie.parse(socket.handshake.headers.cookie);
             const session_id = cookieParser.signedCookie(cookies['connect.sid'], process.env.COOKIE_SECRET);
+
+            if(timers[user.userID]) {
+                clearTimeout(timers[user.userID]);
+                delete timers[user.userID];
+            }
 
             sessionStore.load(session_id, function(err, storage) {
                 if(storage.quizID) {
@@ -227,20 +249,7 @@ module.exports = function(server, sessionStore, Quiz) {
                 console.log("in leaveQuiz");
                 sessionStore.load(session_id, function (err, storage) {
                     if (storage.quizID) {
-                        Quiz.findOne({'quizID': storage.quizID}, 'players', function (err, quiz) {
-                            for (let i = 0; i < quiz.players.length; i++) {
-                                if (quiz.players[i].userID === user.userID) {
-                                    quiz.players.splice(i, 1);
-                                    break;
-                                }
-                            }
-
-                            quiz.save(function (err) {
-                                if (err) {
-                                    console.log('error when saving', err);
-                                }
-                            });
-                        });
+                        leaveQuiz(storage.quizID, user.userID);
                         io.to(storage.quizID).emit('userLeft', user.userID);
                         socket.leave(storage.quizID);
                         delete storage.quizID;
@@ -250,7 +259,18 @@ module.exports = function(server, sessionStore, Quiz) {
             });
 
             socket.on('disconnect', function () {
-                console.log("Client disconnected");
+                console.log('Client disconnected');
+                sessionStore.load(session_id, function (err, storage) {
+                    if (storage.quizID) {
+                        timers[user.userID] = setTimeout(function () {
+                            leaveQuiz(storage.quizID, user.userID);
+                            io.to(storage.quizID).emit('userLeft', user.userID);
+                            socket.leave(storage.quizID);
+                            delete storage.quizID;
+                            sessionStore.set(session_id, storage);
+                        }, 5000);
+                    }
+                });
             });
         }
     });
