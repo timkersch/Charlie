@@ -2,10 +2,26 @@
     box-sizing:border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     background: #ffffff;
     font-family: Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.wrap {
+    flex: 1;
+}
+
+.sticky {
+    background: white;
+    margin-bottom: 10px;
 }
 
 #wrapper {
@@ -178,7 +194,7 @@ span md-icon {
 
 footer {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
 }
 
 footer p {

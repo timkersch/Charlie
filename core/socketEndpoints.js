@@ -54,8 +54,8 @@ module.exports = function(server, sessionStore, Quiz) {
     io.on('connection', function (socket) {
         console.log('Client connected');
 
-        if(socket.request.user.logged_in) {
-            const user = socket.request.user;
+        const user = socket.request.user;
+        if(user.logged_in) {
             const cookies = cookie.parse(socket.handshake.headers.cookie);
             const session_id = cookieParser.signedCookie(cookies['connect.sid'], process.env.COOKIE_SECRET);
 

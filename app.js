@@ -159,5 +159,5 @@ server.on('listening', function() {
     console.log('Listening on ' + bind);
 });
 
-server.listen(port);
 require('./core/socketEndpoints')(server, sessionStore, Quiz);
+server.listen(port);
