@@ -15,21 +15,6 @@ const credentials = {
     redirectUri : process.env.CALLBACK
 };
 
-function getRedirectURL() {
-    const scope = ['playlist-read-private', 'playlist-read-collaborative',
-        'playlist-modify-private', 'playlist-modify-public', 'user-read-email', 'user-read-private'];
-    const state = 'someState';
-    return new SpotifyWebApi(credentials).createAuthorizeURL(scope, state);
-}
-
-function getTokens(code) {
-    return new SpotifyWebApi(credentials).authorizationCodeGrant(code).then((data) => {
-        return data.body;
-    },(err) => {
-        console.log('Something went wrong in getTokens()', err);
-    });
-}
-
 function testUrl(track) {
     return new Promise((resolve, reject) => {
         request(track.preview_url, function (error, response, body) {
@@ -43,26 +28,10 @@ function testUrl(track) {
 }
 
 class SpotifyApi {
-    constructor(tokens) {
+    constructor(accessToken, refreshToken) {
         this.api = new SpotifyWebApi(credentials);
-        this.api.setAccessToken(tokens.access_token);
-        this.api.setRefreshToken(tokens.refresh_token);
-    }
-
-    getUser() {
-        return this.api.getMe().then((data) => {
-            this.user = data.body.id;
-            return {
-                userID : data.body.id,
-                birthdate : data.body.birthdate,
-                country: data.body.country,
-                dispName: data.body.display_name,
-                email: data.body.email,
-                product: data.body.product
-            };
-        },(err) => {
-            console.log('Something went wrong!', err);
-        });
+        this.api.setAccessToken(accessToken);
+        this.api.setRefreshToken(refreshToken);
     }
 
     getPlaylists() {
@@ -201,19 +170,20 @@ class SpotifyApi {
 
     savePlaylist(owner, name, questions) {
         const api = this.api;
-        api.createPlaylist(owner, ('Charliequiz: ' + name), {'public' : false}).then((data) => {
-            questions.forEach(function(question) {
-                api.addTracksToPlaylist(owner, data.body.id, 'spotify:track:' + question.trackID);
+        return new Promise((resolve, reject) => {
+            api.createPlaylist(owner, ('Charliequiz: ' + name), {'public' : false}).then((data) => {
+                questions.forEach(function(question) {
+                    api.addTracksToPlaylist(owner, data.body.id, 'spotify:track:' + question.trackID);
+                });
+                resolve();
+            }).catch((err) => {
+                reject(err);
             });
-        }).catch((err) => {
-            console.log('Something went wrong!', err);
         });
     }
 }
 
 
 module.exports = {
-    SpotifyApi : SpotifyApi,
-    getTokens : getTokens,
-    getRedirectURL : getRedirectURL
+    SpotifyApi : SpotifyApi
 };

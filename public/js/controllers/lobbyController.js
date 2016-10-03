@@ -5,8 +5,8 @@
 require('../../css/partials/lobby.css');
 
 module.exports =
-    function ($scope, $state, charlieProxy) {
-        console.log("LobbyController!");
+    function ($scope, $state, socketService, apiService) {
+        console.log("lobbyController");
 
         $scope.quizname = '';
         $scope.owner = '';
@@ -18,45 +18,52 @@ module.exports =
         $scope.playlistName = '';
         $scope.playlisOwner = '';
 
-        let init = function () {
-            charlieProxy.getQuiz(function (quiz) {
+        apiService.getQuiz(function (quiz) {
+            if(quiz) {
                 $scope.quizname = quiz.name;
                 $scope.owner = quiz.owner;
                 $scope.id = quiz.quizID;
-                $scope.isOwner = charlieProxy.isQuizOwner();
+                $scope.isOwner = apiService.isQuizOwner();
                 $scope.players = quiz.players;
                 $scope.nbrOfSongs = quiz.nbrOfSongs;
                 $scope.generated = quiz.playlist.generated;
                 $scope.playlistName = quiz.playlist.name;
                 $scope.playlisOwner = quiz.playlist.owner;
-            });
-        };
-
-        charlieProxy.onReady(function () {
-            init();
+            } else {
+                // TODO redirect
+            }
         });
 
-        charlieProxy.userJoined(function (user) {
+        socketService.userJoined(function (user) {
             $scope.players.push(user);
+            $scope.$apply();
         });
 
-        charlieProxy.userLeft(function (user) {
+        socketService.userLeft(function (user) {
             for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].userID === user) {
                     $scope.players.splice(i, 1);
+                    $scope.$apply();
                     break;
                 }
             }
         });
 
         $scope.startQuiz = function () {
-            if (charlieProxy.isQuizOwner()) {
-                charlieProxy.nextQuestion();
+            if (apiService.isQuizOwner()) {
+                socketService.nextQuestion();
             }
         };
 
-        charlieProxy.quizStart(function () {
+        socketService.quizStart(function () {
             $state.go('main.question');
+        });
+
+        $scope.$on('$destroy', function () {
+            if($state.current.name !== 'main.question') {
+                socketService.leaveQuiz();
+            }
+            socketService.unregisterUserListeners();
         });
 
     };

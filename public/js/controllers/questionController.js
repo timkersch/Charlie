@@ -5,8 +5,8 @@
 require('../../css/partials/question.css');
 
 module.exports =
-    function ($scope, $state, charlieProxy, $document) {
-        console.log("Inside questionController");
+    function ($scope, $state, $document, socketService, apiService) {
+        console.log("questionController");
 
         let audioElement = $document[0].createElement('audio');
         let hasAnswered = false;
@@ -30,41 +30,35 @@ module.exports =
             audioElement.play();
         };
 
-        let init = function () {
-            charlieProxy.getQuiz(function (quiz) {
-                const question = quiz.questions[quiz.questionIndex];
-                $scope.possibleArtists = question.artistOptions;
-                $scope.players = quiz.players;
-                $scope.currentQuestion = quiz.questionIndex + 1;
-                $scope.lastQuestion = quiz.questions.length;
-                correctAnswer = question.correctArtist;
+        apiService.getQuiz(function (quiz) {
+            const question = quiz.questions[quiz.questionIndex];
+            $scope.possibleArtists = question.artistOptions;
+            $scope.players = quiz.players;
+            $scope.currentQuestion = quiz.questionIndex + 1;
+            $scope.lastQuestion = quiz.questions.length;
+            correctAnswer = question.correctArtist;
 
-                charlieProxy.getUser(function(user) {
-                    for(let i = 0; i < quiz.players.length; i++) {
-                        if (quiz.players[i].userID === user) {
-                            $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
-                            hasAnswered = $scope.myAnswer !== '';
-                            $scope.correctAnswer = hasAnswered ? correctAnswer : '';
-                            break;
-                        }
+            apiService.getUser(function(user) {
+                for(let i = 0; i < quiz.players.length; i++) {
+                    if (quiz.players[i].userID === user) {
+                        $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
+                        hasAnswered = $scope.myAnswer !== '';
+                        $scope.correctAnswer = hasAnswered ? correctAnswer : '';
+                        break;
                     }
-                });
-
-                if (charlieProxy.isQuizOwner()) {
-                    play(question.trackUrl);
                 }
-            }, true);
-        };
+            });
 
-        charlieProxy.onReady(function () {
-            init();
+            if (apiService.isQuizOwner()) {
+                play(question.trackUrl);
+            }
         });
 
-        charlieProxy.gameOver(function () {
+        socketService.gameOver(function () {
             $state.go('main.scoreboard');
         });
 
-        charlieProxy.userPointsUpdate(function (player) {
+        socketService.userPointsUpdate(function (player) {
             for (let i = 0; i < $scope.players.length; i++) {
                 if ($scope.players[i].userID === player.userID) {
                     $scope.players[i].points = player.points;
@@ -73,9 +67,9 @@ module.exports =
             }
         });
 
-        charlieProxy.newQuestion(function (result) {
+        socketService.newQuestion(function (result) {
             $scope.possibleArtists = result.question.artistOptions;
-            if (charlieProxy.isQuizOwner()) {
+            if (apiService.isQuizOwner()) {
                 play(result.question.trackUrl);
             }
             $scope.currentQuestion = result.questionIndex + 1;
@@ -83,9 +77,10 @@ module.exports =
             $scope.timeLeft = 20;
             hasAnswered = false;
             $scope.showScores = false;
+            $scope.$apply();
         });
 
-        charlieProxy.timeLeft(function (time) {
+        socketService.timeLeft(function (time) {
             if (time > 5) {
                 $scope.timeLeft = time - 5;
             } else if (time <= 5 && time > 0) {
@@ -95,10 +90,11 @@ module.exports =
                 $scope.showScores = true;
                 $scope.timeLeft = time;
             } else {
-                if (charlieProxy.isQuizOwner()) {
-                    charlieProxy.nextQuestion();
+                if (apiService.isQuizOwner()) {
+                    socketService.nextQuestion();
                 }
             }
+            $scope.$apply();
         });
 
         $scope.isDisabled = function (artist) {
@@ -109,7 +105,7 @@ module.exports =
             if (!hasAnswered) {
                 $scope.myAnswer = data;
                 hasAnswered = true;
-                charlieProxy.answerQuestion(data);
+                socketService.answerQuestion(data);
                 $scope.correctAnswer = correctAnswer;
             }
         };
@@ -151,5 +147,9 @@ module.exports =
         $scope.$on('$destroy', function () {
             audioElement.pause();
             audioElement.currentTime = 0;
+            socketService.unregisterAllListeners();
+            if($state.current.name !== 'main.scoreboard') {
+                socketService.leaveQuiz();
+            }
         });
     };

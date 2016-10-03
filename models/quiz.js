@@ -18,12 +18,11 @@ const Quiz = Schema({
         id: String,
         name: String,
         owner: String,
-        generated: Boolean,
+        generated: Boolean
     },
     players: [{
         userID: String,
         color: String,
-        spotify: Boolean,
         answers: [String],
         points: Number
     }],

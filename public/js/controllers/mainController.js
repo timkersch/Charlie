@@ -5,8 +5,9 @@
 require('../../css/partials/home.css');
 
 module.exports =
-    function ($scope, $state, $mdSidenav, charlieProxy) {
-        console.log('in mainController');
+    function ($scope, $state, $mdSidenav, apiService) {
+        console.log('mainController');
+
         $scope.user = '';
 
         $scope.toggleLeftMenu = function () {
@@ -14,15 +15,13 @@ module.exports =
         };
 
         $scope.isLoggedIn = function () {
-            return charlieProxy.isLoggedIn();
+            return apiService.isLoggedIn();
         };
 
         $scope.changeView = function (viewString) {
-            charlieProxy.leaveQuiz();
-            charlieProxy.unregisterListeners();
             $mdSidenav('left').toggle();
             if (viewString === 'home') {
-                if (charlieProxy.isLoggedIn()) {
+                if (apiService.isLoggedIn()) {
                     $state.go('main.loggedIn');
                 } else {
                     $state.go('main.loggedOut');
@@ -34,28 +33,17 @@ module.exports =
             }
         };
 
-        let init = function () {
-            if (charlieProxy.isLoggedIn()) {
-                charlieProxy.getUser(function (user) {
-                    $scope.user = user;
-                });
+        apiService.getUser(function (user) {
+            if(user) {
+                $scope.user = user;
+                if($state.current.name === 'main.loggedOut') {
+                    $state.go('main.loggedIn');
+                }
             }
-        };
-
-        charlieProxy.onReady(function () {
-            init();
         });
 
         $scope.logout = function () {
-            $scope.user = '';
-            charlieProxy.logout();
-            $state.go('main.loggedOut');
+            apiService.logout();
+            window.open('/logout', '_self');
         };
-
-        $scope.$on('loggedIn', function () {
-            $state.user = charlieProxy.getUser(function (user) {
-                $scope.user = user;
-            });
-        });
-
     };

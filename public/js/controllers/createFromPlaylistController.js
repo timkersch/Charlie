@@ -5,22 +5,24 @@
 require('../../css/partials/create.css');
 
 module.exports =
-    function ($scope, $state, $stateParams, charlieProxy) {
-        console.log("Inside createFromPlaylistController");
+    function ($scope, $state, $stateParams, socketService) {
+        console.log("createFromPlaylistController");
 
-        $scope.name = null;
+        $scope.fetching = false;
+        $scope.serverErrors = {};
+
         $scope.nbrOfQuestions = "";
         $scope.shuffle = true;
-        $scope.loading = false;
+        $scope.name = null;
 
         $scope.createQuiz = function () {
-            $scope.loading = true;
-            charlieProxy.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
-                $scope.loading = false;
-                if (!quiz || quiz.error) {
-                    alert(quiz.error);
-                } else {
+            $scope.fetching = true;
+            socketService.createQuiz($scope.name, $stateParams.id, $stateParams.name, $stateParams.owner, $scope.nbrOfQuestions, $scope.shuffle, function (quiz) {
+                $scope.fetching = false;
+                if (quiz && !quiz.error) {
                     $state.go('main.lobby');
+                } else {
+                    $scope.serverErrors = quiz.error;
                 }
             });
         };

@@ -1,5 +1,6 @@
 md-grid-list {
     margin: 8px;
+    margin-bottom: 72px !important;
 }
 
 md-grid-tile {

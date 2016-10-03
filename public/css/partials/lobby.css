@@ -4,6 +4,8 @@ span {
 
 .lobby md-progress-linear .md-container {
     width: 380px;
+    min-width: 40%;
+    max-width: 100%;
 }
 
 .lobby form {

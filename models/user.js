@@ -5,13 +5,12 @@
 const Schema = require('mongoose').Schema;
 
 const User = Schema({
-    id: String,
-    birthdate : String,
+    userID: String,
     country: String,
-    name: String,
+    accessToken: String,
+    refreshToken: String,
     email: String,
     product: String,
-    quizIDs: [String]
 });
 
 module.exports = {

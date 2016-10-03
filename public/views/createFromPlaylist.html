@@ -20,6 +20,9 @@
                 <div ng-messages="form.nbrOfQuestions.$error" ng-if="form.nbrOfQuestions.$dirty">
                     <div ng-message="required">Required</div>
                 </div>
+                <div ng-messages="serverErrors">
+                    <div ng-message="invalid">{{serverErrors.invalid}}</div>
+                </div>
             </md-input-container>
 
             <md-switch ng-model="shuffle" aria-label="Shuffle tracks">
@@ -29,11 +32,11 @@
         </div>
 
         <div class="buttonHolder">
-            <md-button type="submit" ng-disabled="loading || !form.name.$valid || !form.nbrOfQuestions.$valid" class="md-fab md-primary">
+            <md-button type="submit" ng-disabled="fetching || !form.name.$valid || !form.nbrOfQuestions.$valid" class="md-fab md-primary">
                 <md-icon class="material-icons">navigate_next</md-icon>
             </md-button>
         </div>
 
-        <md-progress-linear class="md-accent" ng-show="loading" md-mode="indeterminate"></md-progress-linear>
+        <md-progress-linear class="md-accent" ng-show="fetching" md-mode="indeterminate"></md-progress-linear>
     </form>
 </md-content>

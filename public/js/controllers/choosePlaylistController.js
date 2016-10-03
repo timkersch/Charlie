@@ -5,21 +5,14 @@
 require('../../css/partials/create.css');
 
 module.exports =
-    function choosePlaylistController($scope, $state, charlieProxy) {
-        console.log("Inside choosePlaylistController");
+    function choosePlaylistController($scope, $state, apiService) {
+        console.log("choosePlaylistController");
 
-        let init = function () {
-            charlieProxy.getPlaylists(function (lists) {
-                $scope.playlists = lists;
-            });
-        };
-
-        charlieProxy.onReady(function () {
-            init();
+        apiService.getPlaylists(function (lists) {
+            $scope.playlists = lists;
         });
 
         $scope.choosePlaylist = function(playlist) {
             $state.go('main.create.fromPlaylist', {id: playlist.id, name: playlist.name, owner: playlist.playlistOwner});
         };
-
     };

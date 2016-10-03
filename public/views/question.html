@@ -14,10 +14,10 @@
 
     <md-grid-list md-cols="2" md-row-height="50px" ng-show="showScores">
         <md-grid-tile>
-            <h3>Your guess is</h3>
+            <h3>Your guess</h3>
         </md-grid-tile>
         <md-grid-tile>
-            <h3>Correct answer is</h3>
+            <h3>Correct answer</h3>
         </md-grid-tile>
         <md-grid-tile>
             <h4>{{myAnswer}}</h4>
@@ -34,7 +34,7 @@
                     <md-list-item class="md-3-line" ng-repeat="player in players | orderBy:'-points'" ng-disabled="true">
                         <div class="md-list-item-text" layout="column">
                             <div class="item">
-                                <h3>{{player.points}} - {{ player.userID }}</h3>
+                                <h3>{{ player.points }} - {{ player.userID }}</h3>
                             </div>
                             <md-divider ></md-divider>
                         </div>

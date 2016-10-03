@@ -6,78 +6,70 @@ require('../../css/partials/scoreboard.css');
 const chartjs = require('chart.js');
 
 module.exports =
-    function ($scope, $document, $state, charlieProxy) {
-        console.log("Inside scoreboardController");
+    function ($scope, $document, $state, socketService, apiService) {
+        console.log("scoreboardController");
+
         $scope.scores = [];
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
 
-        let init = function () {
-            charlieProxy.unregisterListeners();
-            charlieProxy.getResults(function (users) {
-                if (users) {
-                    $scope.scores = [];
-                    const namesArr = [];
-                    const pointsArr = [];
-                    const colorsArr = [];
-                    for (let i = 0; i < users.length; i++) {
-                        namesArr.push(users[i].userID);
-                        pointsArr.push(users[i].points);
-                        colorsArr.push(colors[users[i].color]);
+        apiService.getResults(function (users) {
+            if (users) {
+                $scope.scores = [];
+                const namesArr = [];
+                const pointsArr = [];
+                const colorsArr = [];
+                for (let i = 0; i < users.length; i++) {
+                    namesArr.push(users[i].userID);
+                    pointsArr.push(users[i].points);
+                    colorsArr.push(colors[users[i].color]);
 
-                        $scope.scores.push({
-                            value: users[i].points,
-                            userName: users[i].userID,
-                            color: users[i].color
-                        });
-                    }
-
-                    let chartObj = {
-                        type: 'bar',
-                        data: {
-                            labels : namesArr,
-                            datasets: [
-                                {
-                                    label: 'Points',
-                                    backgroundColor: colorsArr,
-                                    borderWidth: 1,
-                                    data: pointsArr
-                                }
-                            ]
-                        },
-                        options: {
-                            maintainAspectRatio: true,
-                            responsive: true,
-                            scales: {
-                                yAxes: [{
-                                    display: true,
-                                    ticks: {
-                                        beginAtZero: true
-                                    }
-                                }]
-                            }
-                        }
-                    };
-
-                    setTimeout(function () {
-                        const ctx = document.getElementById("scoreboardChart").getContext("2d");
-                        new chartjs.Chart(ctx, chartObj);
-                        $scope.$apply();
-                    }, 50);
-
-
+                    $scope.scores.push({
+                        value: users[i].points,
+                        userName: users[i].userID,
+                        color: users[i].color
+                    });
                 }
-            });
-        };
 
-        // Initialize when service is ready
-        charlieProxy.onReady(function () {
-            init();
+                let chartObj = {
+                    type: 'bar',
+                    data: {
+                        labels : namesArr,
+                        datasets: [
+                            {
+                                label: 'Points',
+                                backgroundColor: colorsArr,
+                                borderWidth: 1,
+                                data: pointsArr
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: true,
+                        responsive: true,
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                };
+
+                setTimeout(function () {
+                    chartjs.Chart.defaults.global.legend.display = false;
+                    const ctx = document.getElementById("scoreboardChart").getContext("2d");
+                    new chartjs.Chart(ctx, chartObj);
+                    $scope.$apply();
+                }, 50);
+
+            }
         });
 
         $scope.changeView = function () {
-            charlieProxy.leaveQuiz();
-            if (charlieProxy.isLoggedIn()) {
+            if (apiService.isLoggedIn()) {
                 $state.go('main.loggedIn');
             } else {
                 $state.go('main.loggedOut');
@@ -85,14 +77,18 @@ module.exports =
         };
 
         $scope.savePlaylist = function () {
-            charlieProxy.savePlaylist();
+            apiService.savePlaylist();
             $scope.isDisabled = true;
             $scope.playlistText = "Playlist added";
         };
 
         $scope.isLoggedIn = function() {
-            return charlieProxy.isLoggedIn();
+            return apiService.isLoggedIn();
         };
+
+        $scope.$on('$destroy', function () {
+            socketService.leaveQuiz();
+        });
 
     };
 

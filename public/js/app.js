@@ -8,9 +8,12 @@ require('angular-material');
 
 const charlieApp = angular.module('charlieApp', ['ui.router', 'ngMaterial', 'ngMessages']);
 
-const charlieProxy = require('./services/socketService');
-charlieApp.service('charlieProxy', charlieProxy);
-charlieProxy.$inject = ['$rootScope'];
+const socketService = require('./services/socketService');
+charlieApp.service('socketService', socketService);
+
+const apiService = require('./services/apiService');
+charlieApp.service('apiService', apiService);
+apiService.$inject = ['$http'];
 
 const choosePlaylistController = require('./controllers/choosePlaylistController');
 const createFromPlaylistController = require('./controllers/createFromPlaylistController');
@@ -32,15 +35,15 @@ charlieApp.controller('mainController', mainController);
 charlieApp.controller('questionController', questionController);
 charlieApp.controller('scoreboardController', scoreboardController);
 
-choosePlaylistController.$inject = ['$scope', '$state', 'charlieProxy'];
-createFromPlaylistController.$inject = ['$scope', '$state', '$stateParams', 'charlieProxy'];
+choosePlaylistController.$inject = ['$scope', '$state', 'apiService'];
+createFromPlaylistController.$inject = ['$scope', '$state', '$stateParams', 'socketService'];
 createNavController.$inject = ['$scope', '$location'];
-homeController.$inject = ['$scope', '$state', 'charlieProxy'];
-joinController.$inject = ['$scope', '$state', 'charlieProxy'];
-lobbyController.$inject = ['$scope', '$state', 'charlieProxy'];
-mainController.$inject = ['$scope', '$state', '$mdSidenav', 'charlieProxy'];
-questionController.$inject = ['$scope', '$state', 'charlieProxy', '$document'];
-scoreboardController.$inject = ['$scope', '$document', '$state', 'charlieProxy'];
+homeController.$inject = ['$scope', '$state', 'socketService'];
+joinController.$inject = ['$scope', '$state', 'socketService'];
+lobbyController.$inject = ['$scope', '$state', 'socketService', 'apiService', 'apiService'];
+mainController.$inject = ['$scope', '$state', '$mdSidenav', 'apiService'];
+questionController.$inject = ['$scope', '$state', '$document', 'socketService', 'apiService'];
+scoreboardController.$inject = ['$scope', '$document', '$state', 'socketService', 'apiService'];
 
 charlieApp.config(['$mdThemingProvider', function($mdThemingProvider) {
     $mdThemingProvider.theme('default')
@@ -63,7 +66,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'header': {
                     templateUrl: '../views/main.html',
                     controller: 'mainController'
-                },
+                }
             },
             abstract: true,
         })
@@ -74,6 +77,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/homeLoggedOut.html',
                     controller: 'homeController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -83,6 +89,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             views: {
                 'container@': {
                     templateUrl: '../views/homeLoggedIn.html'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -103,6 +112,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/join.html',
                     controller: 'joinController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -142,6 +154,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/createNavBar.html',
                     controller: 'createNavController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
             abstract: true
