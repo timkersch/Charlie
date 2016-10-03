@@ -66,7 +66,7 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'header': {
                     templateUrl: '../views/main.html',
                     controller: 'mainController'
-                },
+                }
             },
             abstract: true,
         })
@@ -77,6 +77,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/homeLoggedOut.html',
                     controller: 'homeController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -86,6 +89,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
             views: {
                 'container@': {
                     templateUrl: '../views/homeLoggedIn.html'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -106,6 +112,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/join.html',
                     controller: 'joinController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
         })
@@ -145,6 +154,9 @@ charlieApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 
                 'container@': {
                     templateUrl: '../views/createNavBar.html',
                     controller: 'createNavController'
+                },
+                'footer@': {
+                    templateUrl: '../views/footer.html'
                 }
             },
             abstract: true

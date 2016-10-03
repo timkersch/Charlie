@@ -12,18 +12,16 @@
 </head>
 <body ng-app="charlieApp">
 
-<div class="wrap">
 
-    <div ui-view="header"></div>
+<div ui-view="header"></div>
+
+<div class="wrap">
 
     <div ui-view="container"></div>
 
 </div>
 
-<footer class="sticky">
-    <p>Powered by</p>
-    <a href="http://spotify.com" target="_blank"><img src="../img/Spotify_Icon_RGB_Green.png" height="42" width="42"></a>
-</footer>
+<div ui-view="footer"></div>
 
 </body>
 </html>
