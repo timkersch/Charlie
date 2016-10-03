@@ -1,5 +1,6 @@
 # Charlie
 A music quiz application powered by Spotify.
+
 Early alpha available on http://charlie-quiz.herokuapp.com/
 
 ## About
