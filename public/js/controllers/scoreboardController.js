@@ -59,6 +59,7 @@ module.exports =
                 };
 
                 setTimeout(function () {
+                    chartjs.Chart.defaults.global.legend.display = false;
                     const ctx = document.getElementById("scoreboardChart").getContext("2d");
                     new chartjs.Chart(ctx, chartObj);
                     $scope.$apply();
