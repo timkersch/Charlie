@@ -21,7 +21,6 @@ body {
 
 .sticky {
     background: white;
-    margin-bottom: 10px;
 }
 
 #wrapper {
@@ -75,6 +74,8 @@ hgroup {
 
 form {
     width: 380px;
+    min-width: 40%;
+    max-width: 100%;
     margin: 4em auto;
     padding: 3em 2em 2em 2em;
     background: #fafafa;
@@ -194,14 +195,19 @@ span md-icon {
 
 footer {
     text-align: center;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 footer p {
+    margin-top: 0;
     color: #888;
     font-size: 13px;
     letter-spacing: .4px;
     text-align: center;
+}
+
+footer img {
+    margin-bottom: 10px;
 }
 
 footer a {
