@@ -40,7 +40,7 @@ module.exports =
 
             apiService.getUser(function(user) {
                 for(let i = 0; i < quiz.players.length; i++) {
-                    if (quiz.players[i].userID === user) {
+                    if (quiz.players[i].userID === user.userID) {
                         $scope.myAnswer = quiz.players[i].answers[quiz.questionIndex];
                         hasAnswered = $scope.myAnswer !== '';
                         $scope.correctAnswer = hasAnswered ? correctAnswer : '';

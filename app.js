@@ -49,8 +49,14 @@ passport.use(new SpotifyStrategy({
                 }
 
                 if(!user) {
+                    let name = profile.id;
+                    if(profile.displayName) {
+                        name = profile.displayName;
+                    }
+
                     const newUser = new User({
                         userID: profile.id,
+                        name: name,
                         accessToken: accessToken,
                         refreshToken: refreshToken,
                         country: profile.country,

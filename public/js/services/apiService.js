@@ -11,7 +11,7 @@ module.exports =
         return {
             isLoggedIn: function () {
                 const user = sessionStorage.getItem('user');
-                return (user !== undefined && user !== 'undefined');
+                return (user && user !== undefined && user !== 'undefined');
             },
 
             isQuizOwner: function () {
@@ -21,14 +21,23 @@ module.exports =
             getUser: function (callback) {
                 const user = sessionStorage.getItem('user');
                 if (user && user !== 'undefined') {
-                    callback(user);
+                    const json = {
+                        userID: user,
+                        name: sessionStorage.getItem('name')
+                    };
+                    callback(json);
                 } else {
                     $http({
                         method: 'GET',
                         url: '/api/getMe'
                     }).then(function successCallback(response) {
+                        sessionStorage.setItem('name', response.data.name);
                         sessionStorage.setItem('user', response.data.userID);
-                        callback(response.data.userID);
+                        const json = {
+                            userID: response.data.userID,
+                            name: response.data.name
+                        };
+                        callback(json);
                     }, function errorCallback() {
                         callback();
                     });

@@ -6,6 +6,7 @@ const Schema = require('mongoose').Schema;
 
 const User = Schema({
     userID: String,
+    name: String,
     country: String,
     accessToken: String,
     refreshToken: String,

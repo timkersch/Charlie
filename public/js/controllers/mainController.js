@@ -34,8 +34,8 @@ module.exports =
         };
 
         apiService.getUser(function (user) {
-            if(user) {
-                $scope.user = user;
+            if(user && user.userID) {
+                $scope.user = user.name;
                 if($state.current.name === 'main.loggedOut') {
                     $state.go('main.loggedIn');
                 }

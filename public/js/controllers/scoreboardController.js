@@ -21,7 +21,7 @@ module.exports =
                     const pointsArr = [];
                     const colorsArr = [];
                     for (let i = 0; i < users.length; i++) {
-                        if(users[i].userID === me && users[i].savedPlaylist) {
+                        if(users[i].userID === me.userID && users[i].savedPlaylist) {
                             $scope.isDisabled = true;
                             $scope.playlistText = "Playlist added";
                         }
