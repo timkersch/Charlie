@@ -64,10 +64,21 @@ module.exports = function(Quiz) {
 
     router.post('/api/savePlaylist', middleware.ensureAuthenticated, middleware.inQuiz, function (req, res) {
         const quizID = req.session.quizID;
-        Quiz.findOne({'quizID': quizID}, 'name questions', function (err, quiz) {
+        Quiz.findOne({'quizID': quizID}, 'name questions players', function (err, quiz) {
             if(!err && quiz) {
                 const api = new spotify.SpotifyApi(req.user.accessToken, req.user.refreshToken);
                 api.savePlaylist(req.user.userID, quiz.name, quiz.questions).then(() => {
+                    for(let i = 0; i < quiz.players.length; i++) {
+                        if(quiz.players[i].userID == req.user.userID) {
+                            quiz.players[i].savedPlaylist = true;
+                            quiz.save(function (err) {
+                                if (err) {
+                                    console.log('error when saving', err);
+                                }
+                            });
+                            break;
+                        }
+                    }
                     res.sendStatus(200);
                 }).catch((err) => {
                     res.status(500);

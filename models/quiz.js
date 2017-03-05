@@ -24,7 +24,8 @@ const Quiz = Schema({
         userID: String,
         color: String,
         answers: [String],
-        points: Number
+        points: Number,
+        savedPlaylist: Boolean
     }],
     questions: [{
         trackID: String,

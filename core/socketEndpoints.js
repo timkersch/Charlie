@@ -104,6 +104,7 @@ module.exports = function(server, sessionStore, Quiz) {
                                 answers: utils.initArr(quizDetails.nbrOfSongs),
                                 points: 0,
                                 color: colors[0],
+                                savedPlaylist: false,
                             }]
                         });
                         newQuiz.questions = result;

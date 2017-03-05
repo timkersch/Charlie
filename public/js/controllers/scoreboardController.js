@@ -13,59 +13,66 @@ module.exports =
         $scope.isDisabled = false;
         $scope.playlistText = "Save playlist to Spotify";
 
-        apiService.getResults(function (users) {
-            if (users) {
-                $scope.scores = [];
-                const namesArr = [];
-                const pointsArr = [];
-                const colorsArr = [];
-                for (let i = 0; i < users.length; i++) {
-                    namesArr.push(users[i].userID);
-                    pointsArr.push(users[i].points);
-                    colorsArr.push(colors[users[i].color]);
-
-                    $scope.scores.push({
-                        value: users[i].points,
-                        userName: users[i].userID,
-                        color: users[i].color
-                    });
-                }
-
-                let chartObj = {
-                    type: 'bar',
-                    data: {
-                        labels : namesArr,
-                        datasets: [
-                            {
-                                label: 'Points',
-                                backgroundColor: colorsArr,
-                                borderWidth: 1,
-                                data: pointsArr
-                            }
-                        ]
-                    },
-                    options: {
-                        maintainAspectRatio: true,
-                        responsive: true,
-                        scales: {
-                            yAxes: [{
-                                display: true,
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }]
+        apiService.getUser(function (me) {
+            apiService.getResults(function (users) {
+                if (users) {
+                    $scope.scores = [];
+                    const namesArr = [];
+                    const pointsArr = [];
+                    const colorsArr = [];
+                    for (let i = 0; i < users.length; i++) {
+                        if(users[i].userID === me && users[i].savedPlaylist) {
+                            $scope.isDisabled = true;
+                            $scope.playlistText = "Playlist added";
                         }
+
+                        namesArr.push(users[i].userID);
+                        pointsArr.push(users[i].points);
+                        colorsArr.push(colors[users[i].color]);
+
+                        $scope.scores.push({
+                            value: users[i].points,
+                            userName: users[i].userID,
+                            color: users[i].color
+                        });
                     }
-                };
 
-                setTimeout(function () {
-                    chartjs.Chart.defaults.global.legend.display = false;
-                    const ctx = document.getElementById("scoreboardChart").getContext("2d");
-                    new chartjs.Chart(ctx, chartObj);
-                    $scope.$apply();
-                }, 50);
+                    let chartObj = {
+                        type: 'bar',
+                        data: {
+                            labels : namesArr,
+                            datasets: [
+                                {
+                                    label: 'Points',
+                                    backgroundColor: colorsArr,
+                                    borderWidth: 1,
+                                    data: pointsArr
+                                }
+                            ]
+                        },
+                        options: {
+                            maintainAspectRatio: true,
+                            responsive: true,
+                            scales: {
+                                yAxes: [{
+                                    display: true,
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    };
 
-            }
+                    setTimeout(function () {
+                        chartjs.Chart.defaults.global.legend.display = false;
+                        const ctx = document.getElementById("scoreboardChart").getContext("2d");
+                        new chartjs.Chart(ctx, chartObj);
+                        $scope.$apply();
+                    }, 50);
+
+                }
+            });
         });
 
         $scope.changeView = function () {

@@ -1,10 +1,10 @@
 /**
  * Created by Tim on 2016-09-29.
  */
-"use strict";
 
 module.exports =
     function($http) {
+        "use strict";
 
         let currentQuiz;
 
@@ -92,5 +92,6 @@ module.exports =
                 }, function errorCallback() {
                 });
             },
+
         };
     };
